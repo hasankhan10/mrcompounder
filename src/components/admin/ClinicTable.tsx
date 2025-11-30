@@ -57,14 +57,14 @@ export function ClinicTable({
                                 <TableCell>
                                     <div className="flex items-center space-x-3">
                                         {clinic.logo_url ? (
-                                            <img src={clinic.logo_url} alt={clinic.name} className="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+                                            <img src={clinic.logo_url} alt={clinic.name || 'Clinic'} className="w-10 h-10 rounded-lg object-cover border border-gray-100" />
                                         ) : (
                                             <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                                                {clinic.name.charAt(0)}
+                                                {(clinic.name || '?').charAt(0)}
                                             </div>
                                         )}
                                         <div>
-                                            <div className="font-medium text-gray-900">{clinic.name}</div>
+                                            <div className="font-medium text-gray-900">{clinic.name || 'Unnamed Clinic'}</div>
                                             <div className="text-xs text-gray-500">/{clinic.slug}</div>
                                         </div>
                                     </div>

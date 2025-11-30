@@ -213,7 +213,10 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         { event: '*', schema: 'public', table: 'clinics' },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setClinics((prev) => [...prev, payload.new as Clinic]);
+            setClinics((prev) => {
+              if (prev.some(c => c.id === payload.new.id)) return prev;
+              return [...prev, payload.new as Clinic];
+            });
             fetchStats();
           } else if (payload.eventType === 'UPDATE') {
             setClinics((prev) => prev.map((c) => (c.id === payload.new.id ? (payload.new as Clinic) : c)));
@@ -312,9 +315,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         body: JSON.stringify({
           name: newClinicName,
           slug: newClinicSlug,
-          logo_url: logoUrl,
-          email: newClinicEmail,
-          password: newClinicPassword
+          logoUrl: logoUrl,
+          compounderEmail: newClinicEmail,
+          compounderPassword: newClinicPassword
         }),
       });
 
@@ -323,8 +326,11 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         throw new Error(err.error || 'Failed to create clinic');
       }
 
-      const newClinic = await response.json();
-      setClinics([...clinics, newClinic]);
+      const { clinic: newClinic } = await response.json();
+      setClinics(prev => {
+        if (prev.some(c => c.id === newClinic.id)) return prev;
+        return [...prev, newClinic];
+      });
       setIsCreateModalOpen(false);
 
       // Reset form
@@ -549,8 +555,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
   // --- Derived Data ---
   const filteredClinics = clinics.filter(c =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.slug.toLowerCase().includes(searchQuery.toLowerCase())
+    (c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.slug || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (pageIsLoading) return <PageLoading message="Loading Admin Dashboard..." />;
