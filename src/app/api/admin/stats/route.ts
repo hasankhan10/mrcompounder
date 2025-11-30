@@ -32,17 +32,13 @@ export async function GET(request: NextRequest) {
             .select('*', { count: 'exact', head: true })
             .gte('created_at', today.toISOString());
 
-        // Total Revenue (Sum of all top-ups from transactions)
-        // If transactions table exists and is used.
-        // Otherwise sum of current balances (which is not revenue, but "Outstanding Balance").
-        // Let's try to sum 'amount' from 'transactions' where type='topup'.
-
-        const { data: transactions } = await supabaseAdmin
-            .from('transactions')
+        // Total Revenue (Sum of all approved payment requests)
+        const { data: approvedRequests } = await supabaseAdmin
+            .from('payment_requests')
             .select('amount')
-            .eq('type', 'topup');
+            .eq('status', 'approved');
 
-        const totalRevenue = transactions?.reduce((sum, tx) => sum + (tx.amount || 0), 0) || 0;
+        const totalRevenue = approvedRequests?.reduce((sum, req) => sum + (req.amount || 0), 0) || 0;
 
         // Last Month Revenue
         const firstDayLastMonth = new Date();
@@ -54,20 +50,30 @@ export async function GET(request: NextRequest) {
         lastDayLastMonth.setDate(0); // Last day of previous month
         lastDayLastMonth.setHours(23, 59, 59, 999);
 
-        const { data: lastMonthTx } = await supabaseAdmin
-            .from('transactions')
+        const { data: lastMonthRequests } = await supabaseAdmin
+            .from('payment_requests')
             .select('amount')
-            .eq('type', 'topup')
-            .gte('created_at', firstDayLastMonth.toISOString())
-            .lte('created_at', lastDayLastMonth.toISOString());
+            .eq('status', 'approved')
+            .gte('updated_at', firstDayLastMonth.toISOString())
+            .lte('updated_at', lastDayLastMonth.toISOString());
 
-        const lastMonthRevenue = lastMonthTx?.reduce((sum, tx) => sum + (tx.amount || 0), 0) || 0;
+        const lastMonthRevenue = lastMonthRequests?.reduce((sum, req) => sum + (req.amount || 0), 0) || 0;
+
+        // Today's Revenue
+        const { data: todayRequests } = await supabaseAdmin
+            .from('payment_requests')
+            .select('amount')
+            .eq('status', 'approved')
+            .gte('updated_at', today.toISOString());
+
+        const todayRevenue = todayRequests?.reduce((sum, req) => sum + (req.amount || 0), 0) || 0;
 
         return NextResponse.json({
             totalClinics: totalClinics || 0,
             totalPatientsToday: totalPatientsToday || 0,
             totalRevenue,
-            lastMonthRevenue
+            lastMonthRevenue,
+            todayRevenue
         });
 
     } catch (error: any) {

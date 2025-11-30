@@ -42,7 +42,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     totalClinics: 0,
     totalPatientsToday: 0,
     totalRevenue: 0,
-    lastMonthRevenue: 0
+    lastMonthRevenue: 0,
+    todayRevenue: 0
   });
 
   // UPI Settings State
@@ -63,7 +64,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     }
   }, [activeTab]);
 
-  const handleRequestAction = async (requestId: string, action: 'approve' | 'reject') => {
+  const handleRequestAction = async (requestId: string, action: 'approve' | 'reject', amount?: number) => {
     try {
       const res = await fetch('/api/admin/recharge/approve', {
         method: 'POST',
@@ -74,6 +75,16 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
       toast.success(`Request ${action}d`);
       setPaymentRequests(prev => prev.filter(r => r.id !== requestId));
+
+      if (action === 'approve' && amount) {
+        setStats(prev => ({
+          ...prev,
+          totalRevenue: prev.totalRevenue + amount,
+          todayRevenue: prev.todayRevenue + amount
+        }));
+      }
+
+      fetchStats(); // Refresh stats to update revenue immediately
     } catch (err) {
       toast.error('Failed to process request');
     }
@@ -225,7 +236,21 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'transactions' },
         () => {
-          fetchStats(); // Update revenue
+          fetchStats(); // Update revenue (from topups)
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'payment_requests' },
+        () => {
+          fetchStats(); // Update revenue (from approved requests)
+          // Also refresh the payment requests list if we are on that tab
+          if (activeTab === 'payment-requests') {
+            fetch('/api/admin/recharge/requests')
+              .then(res => res.json())
+              .then(data => setPaymentRequests(data))
+              .catch(err => console.error(err));
+          }
         }
       )
       .subscribe();
@@ -445,6 +470,13 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setTopupAmounts(prev => ({ ...prev, [id]: '' }));
       toast.success(`Added ₹${amount} to balance`);
 
+      // Optimistic update
+      setStats(prev => ({
+        ...prev,
+        totalRevenue: prev.totalRevenue + amount,
+        todayRevenue: prev.todayRevenue + amount
+      }));
+
       // Refresh stats
       const statsRes = await fetch('/api/admin/stats');
       if (statsRes.ok) setStats(await statsRes.json());
@@ -546,6 +578,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
             totalPatientsToday={stats.totalPatientsToday}
             totalRevenue={stats.totalRevenue}
             lastMonthRevenue={stats.lastMonthRevenue}
+            todayRevenue={stats.todayRevenue}
           />
         </div>
       )}
@@ -602,7 +635,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
                     </a>
                     <div className="flex flex-col gap-2">
                       <button
-                        onClick={() => handleRequestAction(req.id, 'approve')}
+                        onClick={() => handleRequestAction(req.id, 'approve', req.amount)}
                         className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-medium"
                       >
                         Approve

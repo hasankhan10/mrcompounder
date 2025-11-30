@@ -7,9 +7,10 @@ interface AdminStatsGridProps {
     totalPatientsToday: number;
     totalRevenue: number;
     lastMonthRevenue: number;
+    todayRevenue: number;
 }
 
-export function AdminStatsGrid({ totalClinics, totalPatientsToday, totalRevenue, lastMonthRevenue }: AdminStatsGridProps) {
+export function AdminStatsGrid({ totalClinics, totalPatientsToday, totalRevenue, lastMonthRevenue, todayRevenue }: AdminStatsGridProps) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="border-none shadow-md bg-gradient-to-br from-blue-500 to-blue-600 text-white overflow-hidden relative hover-lift">
@@ -66,7 +67,7 @@ export function AdminStatsGrid({ totalClinics, totalPatientsToday, totalRevenue,
                     <div className="flex justify-between items-start">
                         <div>
                             <p className="text-gray-500 font-medium mb-1">Current Day Revenue</p>
-                            <h3 className="text-4xl font-bold text-gray-900">₹{totalPatientsToday}</h3>
+                            <h3 className="text-4xl font-bold text-gray-900">₹{todayRevenue}</h3>
                         </div>
                         <div className="bg-orange-100 p-3 rounded-xl">
                             <Activity className="w-6 h-6 text-orange-600" />
