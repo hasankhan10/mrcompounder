@@ -19,13 +19,14 @@ import { CreateClinicDialog } from '@/components/admin/CreateClinicDialog';
 import { EditClinicDialog } from '@/components/admin/EditClinicDialog';
 import { DeleteClinicAlert } from '@/components/admin/DeleteClinicAlert';
 import { FileUpload } from '@/components/ui/file-upload';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 interface AdminClientProps {
   initialClinics: Clinic[];
 }
 
 export function AdminClient({ initialClinics }: AdminClientProps) {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const router = useRouter();
 
   // Page-level state
@@ -579,13 +580,15 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
             <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
             <p className="text-gray-500 mt-1">Welcome back, Admin. Here's what's happening today.</p>
           </div>
-          <AdminStatsGrid
-            totalClinics={stats.totalClinics}
-            totalPatientsToday={stats.totalPatientsToday}
-            totalRevenue={stats.totalRevenue}
-            lastMonthRevenue={stats.lastMonthRevenue}
-            todayRevenue={stats.todayRevenue}
-          />
+          <ErrorBoundary name="Admin Stats">
+            <AdminStatsGrid
+              totalClinics={stats.totalClinics}
+              totalPatientsToday={stats.totalPatientsToday}
+              totalRevenue={stats.totalRevenue}
+              lastMonthRevenue={stats.lastMonthRevenue}
+              todayRevenue={stats.todayRevenue}
+            />
+          </ErrorBoundary>
         </div>
       )}
 
@@ -596,18 +599,20 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
             setSearchQuery={setSearchQuery}
             onNewClinicClick={() => setIsCreateModalOpen(true)}
           />
-          <ClinicTable
-            clinics={filteredClinics}
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-            onToggleStatus={handleToggleStatus}
-            onTopup={handleTopup}
-            topupAmounts={topupAmounts}
-            setTopupAmounts={setTopupAmounts}
-            onToggleTrial={handleToggleTrial}
-            trialDates={trialDates}
-            onTrialDateChange={handleTrialDateChange}
-          />
+          <ErrorBoundary name="Clinic Table">
+            <ClinicTable
+              clinics={filteredClinics}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteClick}
+              onToggleStatus={handleToggleStatus}
+              onTopup={handleTopup}
+              topupAmounts={topupAmounts}
+              setTopupAmounts={setTopupAmounts}
+              onToggleTrial={handleToggleTrial}
+              trialDates={trialDates}
+              onTrialDateChange={handleTrialDateChange}
+            />
+          </ErrorBoundary>
         </div>
       )}
 
@@ -623,40 +628,42 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
           {paymentRequests.length === 0 ? (
             <p className="text-gray-500">No pending requests.</p>
           ) : (
-            <div className="grid gap-4">
-              {paymentRequests.map(req => (
-                <div key={req.id} className="bg-white p-6 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="font-bold text-lg">{req.clinics?.name}</h3>
-                    <p className="text-sm text-gray-500">Requested: {new Date(req.created_at).toLocaleString()}</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-bold">₹{req.amount}</span>
-                      {req.transaction_id && <span className="text-sm text-gray-600 font-mono">Txn: {req.transaction_id}</span>}
+            <ErrorBoundary name="Payment Requests">
+              <div className="grid gap-4">
+                {paymentRequests.map(req => (
+                  <div key={req.id} className="bg-white p-6 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-lg">{req.clinics?.name}</h3>
+                      <p className="text-sm text-gray-500">Requested: {new Date(req.created_at).toLocaleString()}</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-bold">₹{req.amount}</span>
+                        {req.transaction_id && <span className="text-sm text-gray-600 font-mono">Txn: {req.transaction_id}</span>}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-4">
-                    <a href={req.screenshot_url} target="_blank" rel="noopener noreferrer" className="block w-24 h-24 border rounded overflow-hidden bg-gray-100 hover:opacity-80 transition">
-                      <img src={req.screenshot_url} alt="Proof" className="w-full h-full object-cover" />
-                    </a>
-                    <div className="flex flex-col gap-2">
-                      <button
-                        onClick={() => handleRequestAction(req.id, 'approve', req.amount)}
-                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-medium"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleRequestAction(req.id, 'reject')}
-                        className="bg-red-100 text-red-600 px-4 py-2 rounded hover:bg-red-200 font-medium"
-                      >
-                        Reject
-                      </button>
+                    <div className="flex items-center gap-4">
+                      <a href={req.screenshot_url} target="_blank" rel="noopener noreferrer" className="block w-24 h-24 border rounded overflow-hidden bg-gray-100 hover:opacity-80 transition">
+                        <img src={req.screenshot_url} alt="Proof" className="w-full h-full object-cover" />
+                      </a>
+                      <div className="flex flex-col gap-2">
+                        <button
+                          onClick={() => handleRequestAction(req.id, 'approve', req.amount)}
+                          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-medium"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleRequestAction(req.id, 'reject')}
+                          className="bg-red-100 text-red-600 px-4 py-2 rounded hover:bg-red-200 font-medium"
+                        >
+                          Reject
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </ErrorBoundary>
           )}
         </div>
       )}

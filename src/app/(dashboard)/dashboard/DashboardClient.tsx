@@ -43,7 +43,7 @@ export function DashboardClient({
   initialServedTokens,
   serverTime
 }: DashboardClientProps) {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 

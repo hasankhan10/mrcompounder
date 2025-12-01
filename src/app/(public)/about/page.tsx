@@ -24,13 +24,13 @@ export default function AboutUsPage() {
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="prose lg:prose-lg max-w-none">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Our Story: The <span className="font-bengali">"দাদা, এখন কার সিরিয়াল?"</span> Problem</h2>
-            <p>
+            <p className='text-lg'>
               Anyone who has visited a local clinic in India knows the scene: a crowded room, a stressed compounder shouting names, and patients anxiously asking, "Is it my turn yet?". We've been there, and we knew there had to be a better way.
             </p>
-            <p>
+            <p className='text-lg'>
               {APP_NAME} was born from this simple observation. We saw the chaos of paper tokens and notebooks and imagined a future where technology could create a calm, efficient, and respectful environment for everyone—staff, doctors, and most importantly, patients.
             </p>
-            <p>
+            <p className='text-lg'>
               We didn't want to force a complex system. No app downloads, no complicated logins. Just a simple, web-based solution that works on the phones people already have in their pockets.
             </p>
           </div>
@@ -47,19 +47,19 @@ export default function AboutUsPage() {
           <div className="grid md:grid-cols-3 gap-10">
             <div className="bg-white p-8 rounded-xl shadow-md border border-gray-200">
               <h3 className="text-2xl font-semibold mb-4 text-gray-800">Simplicity First</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-lg">
                 Technology should be an invisible helper, not a hurdle. Our platform is designed to be intuitive for everyone, from compounders to patients of all ages.
               </p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-md border border-gray-200">
               <h3 className="text-2xl font-semibold mb-4 text-gray-800">Reliability is Key</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-lg">
                 Clinics are busy, critical environments. Our system is built to be robust and dependable, even with slow or unstable internet connections.
               </p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-md border border-gray-200">
               <h3 className="text-2xl font-semibold mb-4 text-gray-800">Meaningful Impact</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-lg">
                 We are driven by the desire to make a tangible difference. Reducing stress, improving efficiency, and bringing order to the healthcare experience is our ultimate goal.
               </p>
             </div>

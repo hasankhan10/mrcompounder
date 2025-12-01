@@ -50,15 +50,15 @@ export default function PricingPage() {
                 <div className="mt-20 grid md:grid-cols-3 gap-8 text-left max-w-5xl mx-auto">
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="font-bold text-lg mb-2 text-blue-800">How do I pay?</h3>
-                        <p className="text-gray-600">You recharge your clinic's wallet (like a prepaid SIM). ₹1 is deducted for each patient token generated.</p>
+                        <p className="text-gray-600 text-lg">You recharge your clinic's wallet (like a prepaid SIM). ₹1 is deducted for each patient token generated.</p>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="font-bold text-lg mb-2 text-blue-800">What if I have 0 balance?</h3>
-                        <p className="text-gray-600">The system will pause new token generation until you top-up. We send alerts when your balance is low.</p>
+                        <p className="text-gray-600 text-lg">The system will pause new token generation until you top-up. We send alerts when your balance is low.</p>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="font-bold text-lg mb-2 text-blue-800">Is the trial really free?</h3>
-                        <p className="text-gray-600">Yes. We give you free credits to test the system for 14 days. No payment info needed upfront.</p>
+                        <p className="text-gray-600 text-lg">Yes. We give you free credits to test the system for 14 days. No payment info needed upfront.</p>
                     </div>
                 </div>
             </div>

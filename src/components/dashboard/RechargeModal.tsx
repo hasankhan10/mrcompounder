@@ -16,7 +16,7 @@ export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
     const [amount, setAmount] = useState('');
     const [file, setFile] = useState<File | null>(null);
     const [submitting, setSubmitting] = useState(false);
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
 
     useEffect(() => {
         if (isOpen) {

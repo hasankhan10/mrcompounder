@@ -66,7 +66,7 @@ export default function ContactUsPage() {
               </svg>
               <div>
                 <p className="text-lg font-semibold">Email Us</p>
-                <p className="text-gray-600">support@clinicline.in</p>
+                <p className="text-gray-600">Update Soon...</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -77,7 +77,7 @@ export default function ContactUsPage() {
                 <p className="text-lg font-semibold">WhatsApp Us</p>
                 <p className="text-gray-600">
                   <a href="https://wa.me/917001717263" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    +917001717263 (Click to Chat)
+                    (Click to Chat)
                   </a>
                 </p>
               </div>

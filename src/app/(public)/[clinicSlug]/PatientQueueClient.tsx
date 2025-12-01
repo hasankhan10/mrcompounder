@@ -17,7 +17,7 @@ interface PatientQueueClientProps {
 }
 
 export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const { clinic, activeQueue } = initialData;
 
   // State

@@ -15,7 +15,7 @@ export function NavbarAuth({ initialUser, initialRole }: NavbarAuthProps) {
     const [user, setUser] = useState<any>(initialUser || null);
     const [role, setRole] = useState<string | null>(initialRole || null);
     const [loading, setLoading] = useState(false);
-    const supabase = createClient();
+    const [supabase] = useState(() => createClient());
     const router = useRouter();
 
     useEffect(() => {
