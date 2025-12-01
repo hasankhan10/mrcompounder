@@ -14,13 +14,15 @@ interface StartSessionCardProps {
     setDoctorName: (name: string) => void;
     doctorImage: File | null;
     setDoctorImage: (file: File | null) => void;
+    doctorArrivalTime: string;
+    setDoctorArrivalTime: (time: string) => void;
     isLoading: boolean;
     onSubmit: (e: FormEvent) => void;
     recentDoctors?: RecentDoctor[];
     onSelectRecent?: (doctor: RecentDoctor) => void;
 }
 
-export function StartSessionCard({ doctorName, setDoctorName, doctorImage, setDoctorImage, isLoading, onSubmit, recentDoctors = [], onSelectRecent }: StartSessionCardProps) {
+export function StartSessionCard({ doctorName, setDoctorName, doctorImage, setDoctorImage, doctorArrivalTime, setDoctorArrivalTime, isLoading, onSubmit, recentDoctors = [], onSelectRecent }: StartSessionCardProps) {
     return (
         <div className="max-w-md mx-auto mt-12">
             <Card className="border-none shadow-xl bg-white">
@@ -74,6 +76,15 @@ export function StartSessionCard({ doctorName, setDoctorName, doctorImage, setDo
                                 onChange={(e) => setDoctorName(e.target.value)}
                                 required
                                 className="text-lg bg-gray-50 border-gray-200 text-gray-900 focus:bg-white transition-colors"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Arrival Time</label>
+                            <Input
+                                placeholder="e.g. 5:00 PM"
+                                value={doctorArrivalTime}
+                                onChange={(e) => setDoctorArrivalTime(e.target.value)}
+                                className="text-lg bg-gray-50 border-gray-200"
                             />
                         </div>
                         <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6 shadow-md hover:shadow-lg transition-all" disabled={isLoading}>

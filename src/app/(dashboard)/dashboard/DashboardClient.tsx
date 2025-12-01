@@ -6,13 +6,15 @@ import { createClient } from '@/lib/supabase-client';
 import { Clinic, Queue, Token } from '@/lib/types';
 import { toast } from 'sonner';
 import { RechargeModal } from '@/components/dashboard/RechargeModal';
-import { PieChart, Settings, Users, LayoutDashboard, History, PlusCircle } from 'lucide-react';
+import { PieChart, Settings, Users, LayoutDashboard, History, PlusCircle, IndianRupee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Components
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
 import { PageLoading } from '@/components/shared/PageLoading';
 import { PageError } from '@/components/shared/PageError';
+import { QueueDisplaySkeleton, HistorySkeleton } from '@/components/skeletons/DashboardSkeletons';
+import { Skeleton } from '@/components/ui/skeleton';
 import { StartSessionCard } from '@/components/dashboard/StartSessionCard';
 import { RegisterPatientCard } from '@/components/dashboard/RegisterPatientCard';
 import { SessionStatusCard } from '@/components/dashboard/SessionStatusCard';
@@ -63,18 +65,19 @@ export function DashboardClient({
   const [waitingTokens, setWaitingTokens] = useState<Token[]>(initialWaitingTokens);
   const [servedTokens, setServedTokens] = useState<Token[]>(initialServedTokens);
   const [pastSessions, setPastSessions] = useState<Queue[]>([]);
-  const [lowBalanceWarning, setLowBalanceWarning] = useState(
-    (initialClinic?.prepaid_balance || 0) < 50 && !isTrialActive(initialClinic, new Date(serverTime))
-  );
+  // Low balance warning removed for postpaid model
 
   // Form state
   const [newDoctorName, setNewDoctorName] = useState('');
   const [newDoctorImage, setNewDoctorImage] = useState<File | null>(null);
+  const [newDoctorArrivalTime, setNewDoctorArrivalTime] = useState('');
   const [selectedExistingImage, setSelectedExistingImage] = useState<string | null>(null);
   const [recentDoctors, setRecentDoctors] = useState<any[]>([]);
   const [newPatientPhone, setNewPatientPhone] = useState('');
   const [newPatientName, setNewPatientName] = useState('');
+  const [newPatientPurpose, setNewPatientPurpose] = useState('');
   const [formIsLoading, setFormIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleLogout = async () => {
     try {
@@ -113,7 +116,7 @@ export function DashboardClient({
         console.error('Failed to fetch recent doctors', error);
       }
     };
-    fetchRecentDoctors();
+    fetchRecentDoctors().finally(() => setIsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -148,10 +151,6 @@ export function DashboardClient({
 
           // Update local state
           setClinic(updatedClinic);
-          // Update low balance warning if needed (assuming threshold is 50 or similar)
-          setLowBalanceWarning(
-            updatedClinic.prepaid_balance < 50 && !isTrialActive(updatedClinic)
-          );
         }
       )
       .on(
@@ -309,7 +308,7 @@ export function DashboardClient({
       const response = await fetch('/api/dashboard/session/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ doctorName: newDoctorName, doctorImageUrl }),
+        body: JSON.stringify({ doctorName: newDoctorName, doctorImageUrl, doctorArrivalTime: newDoctorArrivalTime }),
       });
 
       if (!response.ok) {
@@ -321,6 +320,7 @@ export function DashboardClient({
       setActiveQueue(newQueue);
       setNewDoctorName('');
       setNewDoctorImage(null);
+      setNewDoctorArrivalTime('');
       setSelectedExistingImage(null);
       toast.success('Session started successfully');
     } catch (err: any) {
@@ -404,6 +404,7 @@ export function DashboardClient({
 
     const name = newPatientName;
     const phone = newPatientPhone;
+    const purpose = newPatientPurpose;
 
     // Clear inputs immediately for speed
     setNewPatientName('');
@@ -442,7 +443,8 @@ export function DashboardClient({
         body: JSON.stringify({
           queueId: activeQueue.id,
           phone: phone,
-          patientName: name
+          patientName: name,
+          purpose
         }),
       });
 
@@ -455,13 +457,14 @@ export function DashboardClient({
 
       // Replace temp token with real one
       setWaitingTokens(prev => prev.map(t => t.id === tempId ? newToken : t));
-      toast.success(`Token #${newToken.token_number} confirmed`);
+      toast.success(`Token #${newToken.token_number} generated`);
 
     } catch (err: any) {
       // Revert on error
       setWaitingTokens(prev => prev.filter(t => t.id !== tempId));
       setNewPatientName(name);
       setNewPatientPhone(phone);
+      setNewPatientPurpose(purpose);
       toast.error(err.message);
     }
   };
@@ -497,10 +500,10 @@ export function DashboardClient({
       newServed = [servedToken, ...newServed];
 
       // Optimistic Balance
-      // Optimistic Balance
+      // Optimistic Billing
       if (clinic && !isTrialActive(clinic)) {
-        const newBalance = (clinic.prepaid_balance || 0) - 1;
-        setClinic({ ...clinic, prepaid_balance: newBalance });
+        const newDue = (clinic.current_due || 0) + 1;
+        setClinic({ ...clinic, current_due: newDue });
       }
     }
 
@@ -537,8 +540,6 @@ export function DashboardClient({
       // To avoid "jumping", we can ignore the response data if it matches our expectation,
       // or just let the Real-time handler do the final sync.
 
-      // However, the Real-time handler might arrive BEFORE or AFTER this response.
-      // If we update state here again, it might cause a flicker.
       // Best practice: Trust Optimistic, let Real-time fix drift.
 
     } catch (err: any) {
@@ -607,16 +608,16 @@ export function DashboardClient({
                   </span>
                 ) : (
                   <>
-                    <span className={`${lowBalanceWarning ? 'text-red-600 font-bold' : 'text-gray-700'}`}>
-                      Balance: ₹{clinic.prepaid_balance}
+                    <span className="text-red-600 font-bold">
+                      Current Bill: ₹{clinic.current_due}
                     </span>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-8 text-xs gap-1 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                      className="h-8 text-xs gap-1 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
                       onClick={() => setIsRechargeModalOpen(true)}
                     >
-                      <PlusCircle className="w-3 h-3" /> Add
+                      <IndianRupee className="w-3 h-3" /> Pay Bill
                     </Button>
                   </>
                 )}
@@ -624,13 +625,17 @@ export function DashboardClient({
             </div>
           </div>
 
-          {lowBalanceWarning && (
-            <div className="bg-red-50 text-red-700 px-6 py-3 rounded-lg border border-red-100 flex items-center">
-              ⚠️ Warning: Low balance. Please recharge to continue serving tokens.
+          {isLoading ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="space-y-8">
+                <Skeleton className="h-64 w-full rounded-2xl" />
+              </div>
+              <QueueDisplaySkeleton />
+              <div className="space-y-8">
+                <Skeleton className="h-96 w-full rounded-2xl" />
+              </div>
             </div>
-          )}
-
-          {!activeQueue || activeQueue.status === 'waiting' ? (
+          ) : !activeQueue || activeQueue.status === 'waiting' ? (
             <div className="flex flex-col items-center justify-center h-96 bg-white rounded-xl border border-dashed border-gray-300">
               <div className="bg-blue-50 p-4 rounded-full mb-4">
                 <LayoutDashboard className="w-8 h-8 text-blue-600" />
@@ -682,7 +687,12 @@ export function DashboardClient({
             <p className="text-gray-500 mt-1">Start sessions and register new patients.</p>
           </div>
 
-          {!activeQueue ? (
+          {isLoading ? (
+            <div className="space-y-8">
+              <Skeleton className="h-64 w-full rounded-2xl" />
+              <Skeleton className="h-96 w-full rounded-2xl" />
+            </div>
+          ) : !activeQueue ? (
             <>
               <StartSessionCard
                 doctorName={newDoctorName}
@@ -692,6 +702,8 @@ export function DashboardClient({
                   setNewDoctorImage(file);
                   if (file) setSelectedExistingImage(null);
                 }}
+                doctorArrivalTime={newDoctorArrivalTime}
+                setDoctorArrivalTime={setNewDoctorArrivalTime}
                 isLoading={formIsLoading}
                 onSubmit={handleStartSession}
                 recentDoctors={recentDoctors}
@@ -739,6 +751,8 @@ export function DashboardClient({
                 setPatientName={setNewPatientName}
                 patientPhone={newPatientPhone}
                 setPatientPhone={setNewPatientPhone}
+                patientPurpose={newPatientPurpose}
+                setPatientPurpose={setNewPatientPurpose}
                 isLoading={formIsLoading}
                 isSessionActive={['active', 'waiting'].includes(activeQueue.status)}
                 onSubmit={handleRegisterPatient}
@@ -768,7 +782,9 @@ export function DashboardClient({
             <p className="text-gray-500 mt-1">View records of past clinic sessions.</p>
           </div>
 
-          {pastSessions.length === 0 ? (
+          {isLoading ? (
+            <HistorySkeleton />
+          ) : pastSessions.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl border border-dashed border-gray-300">
               <p className="text-gray-500">No past sessions found.</p>
             </div>

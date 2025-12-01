@@ -46,7 +46,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
             <Button asChild size="lg" className="bg-white text-blue-700 hover:bg-gray-100 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
-              <Link href="/demo">Try Demo</Link>
+              <Link href="/contact">Try Demo</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-700 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
               <Link href="/contact">Book Free Setup</Link>
@@ -153,6 +153,29 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* For Clinic Owners Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 text-center mb-12">For Clinic Owners: The Business Impact</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {[
+              { title: "Increase Patient Retention", desc: "Patients who wait comfortably are 3x more likely to return and recommend your clinic.", icon: "📈" },
+              { title: "Streamline Operations", desc: "Reduce front-desk workload by 40%. Let your staff focus on care, not crowd control.", icon: "⚡" },
+              { title: "Real-time Analytics", desc: "Track daily footfall, peak hours, and doctor performance to optimize scheduling.", icon: "📊" },
+              { title: "Premium Brand Image", desc: "Stand out as a modern, patient-centric facility in your neighborhood.", icon: "🏥" }
+            ].map((item, index) => (
+              <div key={index} className="flex items-start p-8 rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 transform hover:-translate-y-1">
+                <div className="text-4xl mr-6 bg-blue-50 w-20 h-20 flex items-center justify-center rounded-2xl flex-shrink-0 shadow-inner">{item.icon}</div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                  <p className="text-gray-600 leading-relaxed text-lg">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Why India Needs This Section */}
       <section className="py-20 bg-blue-700 text-white">
         <div className="container mx-auto px-4 text-center">
@@ -182,7 +205,7 @@ export default function HomePage() {
               <p className="text-2xl text-gray-800 font-semibold">per patient served</p>
             </div>
             <p className="text-lg text-gray-600 leading-relaxed mb-4">
-              Our simple prepaid balance system means you only pay for what you use. No hidden fees, no complex subscriptions.
+              Our simple postpaid billing system means you use now and pay later. No hidden fees, no complex subscriptions.
             </p>
             <div className="mb-8">
               <span className="inline-block bg-green-100 text-green-800 text-sm font-bold px-4 py-2 rounded-full animate-pulse">

@@ -48,19 +48,19 @@ export async function POST(request: NextRequest) {
             .eq('id', requestId);
         if (updateError) throw updateError;
 
-        // 2. Get Clinic Balance
+        // 2. Get Clinic Due
         const { data: clinic } = await supabaseAdmin
             .from('clinics')
-            .select('prepaid_balance')
+            .select('current_due')
             .eq('id', req.clinic_id)
             .single();
 
-        const newBalance = (clinic?.prepaid_balance || 0) + req.amount;
+        const newDue = (clinic?.current_due || 0) - req.amount;
 
-        // 3. Update Clinic Balance
+        // 3. Update Clinic Due
         await supabaseAdmin
             .from('clinics')
-            .update({ prepaid_balance: newBalance })
+            .update({ current_due: newDue })
             .eq('id', req.clinic_id);
 
         // 4. Create Transaction
@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
                 clinic_id: req.clinic_id,
                 type: 'topup',
                 amount: req.amount,
-                balance_before: clinic?.prepaid_balance || 0,
-                balance_after: newBalance,
+                balance_before: clinic?.current_due || 0,
+                balance_after: newDue,
                 description: `Approved Request #${requestId.slice(0, 8)}`,
                 metadata: { request_id: requestId, approved_by: user.id }
             });

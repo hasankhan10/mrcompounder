@@ -2,6 +2,7 @@
 import { APP_NAME } from '@/lib/config';
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 export default function AboutUsPage() {
@@ -35,7 +36,13 @@ export default function AboutUsPage() {
             </p>
           </div>
           <div className="hidden md:block">
-            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Doctor with technology" className="rounded-xl shadow-lg" />
+            <Image
+              src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              alt="Doctor with technology"
+              width={600}
+              height={400}
+              className="rounded-xl shadow-lg"
+            />
           </div>
         </div>
       </section>

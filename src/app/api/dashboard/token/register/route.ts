@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
         queue_id: body.queueId,
         phone: body.phone,
         patient_name: body.patientName,
+        purpose: body.purpose,
         token_number: nextTokenNumber,
         status: 'waiting'
       })

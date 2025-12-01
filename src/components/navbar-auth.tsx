@@ -62,7 +62,7 @@ export function NavbarAuth({ initialUser, initialRole }: NavbarAuthProps) {
         );
     }
 
-    if (user) {
+    if (user && role) {
         return (
             <Button onClick={handleDashboardClick} variant="ghost" className="text-blue-600 cursor-pointer hover:bg-blue-50 font-bold border border-blue-100">
                 Dashboard

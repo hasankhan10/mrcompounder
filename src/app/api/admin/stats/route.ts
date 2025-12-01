@@ -30,7 +30,8 @@ export async function GET(request: NextRequest) {
         const { count: totalPatientsToday } = await supabaseAdmin
             .from('tokens')
             .select('*', { count: 'exact', head: true })
-            .gte('created_at', today.toISOString());
+            .eq('status', 'served')
+            .gte('updated_at', today.toISOString());
 
         // Total Revenue (Sum of all approved payment requests)
         const { data: approvedRequests } = await supabaseAdmin
@@ -59,21 +60,11 @@ export async function GET(request: NextRequest) {
 
         const lastMonthRevenue = lastMonthRequests?.reduce((sum, req) => sum + (req.amount || 0), 0) || 0;
 
-        // Today's Revenue
-        const { data: todayRequests } = await supabaseAdmin
-            .from('payment_requests')
-            .select('amount')
-            .eq('status', 'approved')
-            .gte('updated_at', today.toISOString());
-
-        const todayRevenue = todayRequests?.reduce((sum, req) => sum + (req.amount || 0), 0) || 0;
-
         return NextResponse.json({
             totalClinics: totalClinics || 0,
             totalPatientsToday: totalPatientsToday || 0,
             totalRevenue,
-            lastMonthRevenue,
-            todayRevenue
+            lastMonthRevenue
         });
 
     } catch (error: any) {

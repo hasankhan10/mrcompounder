@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createClient } from '@/lib/supabase-client';
 import { toast } from 'sonner';
+import { PatientViewSkeleton } from '@/components/skeletons/DashboardSkeletons';
 
 interface InitialData {
   clinic: Clinic | null;
@@ -192,6 +193,10 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
 
   if (!clinic) return <div className="p-10 text-center">Clinic not found</div>;
 
+  if (isLoading && !myToken) {
+    return <PatientViewSkeleton />;
+  }
+
   // 1. Login View
   if (!myToken) {
     return (
@@ -285,6 +290,11 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
                   <div className="flex flex-col items-center justify-center h-full">
                     <p className="text-6xl mb-4">👨‍⚕️</p>
                     <p className="text-xl font-bold text-gray-700">Doctor has not arrived yet</p>
+                    {queue.doctor_arrival_time && (
+                      <p className="text-lg font-semibold text-blue-600 mt-1">
+                        Arriving at: {queue.doctor_arrival_time}
+                      </p>
+                    )}
                     <p className="text-sm text-gray-500 mt-2">Please wait for the session to start.</p>
                   </div>
                 ) : queue?.status === 'paused' ? (

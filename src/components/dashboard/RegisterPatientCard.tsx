@@ -10,6 +10,8 @@ interface RegisterPatientCardProps {
     setPatientName: (name: string) => void;
     patientPhone: string;
     setPatientPhone: (phone: string) => void;
+    patientPurpose: string;
+    setPatientPurpose: (purpose: string) => void;
     isLoading: boolean;
     isSessionActive: boolean;
     onSubmit: (e: FormEvent) => void;
@@ -22,6 +24,8 @@ export function RegisterPatientCard({
     setPatientName,
     patientPhone,
     setPatientPhone,
+    patientPurpose,
+    setPatientPurpose,
     isLoading,
     isSessionActive,
     onSubmit
@@ -68,6 +72,15 @@ export function RegisterPatientCard({
                                 value={patientPhone}
                                 onChange={(e) => setPatientPhone(e.target.value)}
                                 required
+                                className="text-lg bg-gray-50"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Purpose</label>
+                            <Input
+                                placeholder="e.g. Fever, Checkup"
+                                value={patientPurpose}
+                                onChange={(e) => setPatientPurpose(e.target.value)}
                                 className="text-lg bg-gray-50"
                             />
                         </div>

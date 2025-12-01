@@ -44,20 +44,21 @@ export async function POST(request: NextRequest) {
       // 1. Get current balance AND trial status
       const { data: clinic } = await supabase
         .from('clinics')
-        .select('prepaid_balance, trial_ends_at')
+        .select('current_due, trial_end_date')
         .eq('id', served.clinic_id)
         .single();
 
       if (clinic) {
-        const isTrialActive = clinic.trial_ends_at && new Date(clinic.trial_ends_at) > new Date();
+        const isTrialActive = clinic.trial_end_date && new Date(clinic.trial_end_date) > new Date();
 
         if (!isTrialActive) {
-          const newBalance = (clinic.prepaid_balance || 0) - 1;
+          const currentDue = clinic.current_due || 0;
+          const newDue = currentDue + 1;
 
-          // 2. Update balance
+          // 2. Update current_due
           await supabase
             .from('clinics')
-            .update({ prepaid_balance: newBalance })
+            .update({ current_due: newDue })
             .eq('id', served.clinic_id);
 
           // 3. Record transaction
@@ -67,8 +68,9 @@ export async function POST(request: NextRequest) {
               clinic_id: served.clinic_id,
               amount: 1,
               type: 'usage',
-              description: `Token #${served.token_number} served`,
-              created_at: new Date().toISOString()
+              balance_before: currentDue,
+              balance_after: newDue,
+              metadata: { description: `Token #${served.token_number} served` }
             });
         }
       }

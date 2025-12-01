@@ -48,23 +48,23 @@ export async function PATCH(
       return NextResponse.json(updatedClinic);
     }
 
-    // 3. Handle Top-up (Balance Update) (Admin Context)
+    // 3. Handle Pay Bill (Balance Update) (Admin Context)
     if (body.topupAmount) {
-      // Fetch current balance
+      // Fetch current due
       const { data: clinic, error: fetchError } = await supabaseAdmin
         .from('clinics')
-        .select('prepaid_balance')
+        .select('current_due')
         .eq('id', clinicId)
         .single();
 
       if (fetchError || !clinic) throw new Error('Clinic not found');
 
-      const newBalance = clinic.prepaid_balance + body.topupAmount;
+      const newDue = (clinic.current_due || 0) - body.topupAmount;
 
-      // Update balance
+      // Update due
       const { data: updatedClinic, error: updateError } = await supabaseAdmin
         .from('clinics')
-        .update({ prepaid_balance: newBalance })
+        .update({ current_due: newDue })
         .eq('id', clinicId)
         .select()
         .single();
@@ -78,8 +78,8 @@ export async function PATCH(
           clinic_id: clinicId,
           type: 'topup',
           amount: body.topupAmount,
-          balance_before: clinic.prepaid_balance,
-          balance_after: newBalance,
+          balance_before: clinic.current_due || 0,
+          balance_after: newDue,
           metadata: { created_by: user.id }
         });
 

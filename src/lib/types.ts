@@ -14,7 +14,7 @@ export interface Clinic {
   name: string;
   slug: string;
   logo_url?: string;
-  prepaid_balance: number;
+  current_due: number;
   is_active: boolean;
   trial_start_date?: string; // timestamp
   trial_end_date?: string; // timestamp
@@ -35,6 +35,7 @@ export interface Queue {
   clinic_id: string; // uuid
   doctor_name?: string;
   doctor_image_url?: string;
+  doctor_arrival_time?: string; // Added field
   session_date: string; // date
   status: QueueStatus;
   ended_at?: string; // timestamp
@@ -47,6 +48,7 @@ export interface Token {
   queue_id: string; // uuid
   phone: string;
   patient_name?: string;
+  purpose?: string; // Added purpose field
   token_number: number; // serial
   status: TokenStatus;
   called_at?: string; // timestamp
@@ -120,6 +122,7 @@ export type UpdateClinicResponse = Clinic;
 export interface StartSessionRequest {
   doctorName: string;
   doctorImageUrl?: string;
+  doctorArrivalTime?: string; // Added field
 }
 export type StartSessionResponse = Queue;
 
@@ -141,6 +144,7 @@ export interface RegisterTokenRequest {
   queueId: string;
   phone: string;
   patientName?: string;
+  purpose?: string; // Added purpose field
 }
 export type RegisterTokenResponse = Token;
 

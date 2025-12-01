@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
       clinic_id: clinicId,
       doctor_name: body.doctorName,
       doctor_image_url: body.doctorImageUrl,
+      doctor_arrival_time: body.doctorArrivalTime,
       status: 'waiting', // Start in waiting mode
       session_date: new Date().toISOString().split('T')[0],
     })

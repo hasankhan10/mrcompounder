@@ -18,6 +18,7 @@ import { ClinicTable } from '@/components/admin/ClinicTable';
 import { CreateClinicDialog } from '@/components/admin/CreateClinicDialog';
 import { EditClinicDialog } from '@/components/admin/EditClinicDialog';
 import { DeleteClinicAlert } from '@/components/admin/DeleteClinicAlert';
+import { StatsGridSkeleton, ClinicTableSkeleton, PaymentRequestsSkeleton } from '@/components/skeletons/DashboardSkeletons';
 import { FileUpload } from '@/components/ui/file-upload';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 
@@ -43,9 +44,11 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     totalClinics: 0,
     totalPatientsToday: 0,
     totalRevenue: 0,
-    lastMonthRevenue: 0,
-    todayRevenue: 0
+    lastMonthRevenue: 0
   });
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [isLoadingClinics, setIsLoadingClinics] = useState(false);
+  const [isLoadingPayments, setIsLoadingPayments] = useState(false);
 
   // UPI Settings State
   const [upiSettings, setUpiSettings] = useState({ upi_id: '', qr_code_url: '' });
@@ -80,8 +83,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       if (action === 'approve' && amount) {
         setStats(prev => ({
           ...prev,
-          totalRevenue: prev.totalRevenue + amount,
-          todayRevenue: prev.todayRevenue + amount
+          totalRevenue: prev.totalRevenue + amount
         }));
       }
 
@@ -131,6 +133,34 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     };
   }, [supabase]);
 
+  // Realtime Subscription for Stats (Tokens)
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-stats-tokens')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'tokens',
+          filter: 'status=eq.served'
+        },
+        (payload) => {
+          // Increment total patients served today
+          // We assume this update marks the token as served
+          setStats(prev => ({
+            ...prev,
+            totalPatientsToday: prev.totalPatientsToday + 1
+          }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase]);
+
   const handleSaveSettings = async (e: FormEvent) => {
     e.preventDefault();
     setSettingsLoading(true);
@@ -166,13 +196,15 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const navItems: NavItem[] = [
     { label: 'Overview', value: 'overview', icon: LayoutDashboard },
     { label: 'Clinics', value: 'clinics', icon: Building2 },
-    { label: 'Payment Requests', value: 'payment-requests', icon: IndianRupee },
+    { label: 'Bill Payments', value: 'payment-requests', icon: IndianRupee },
     { label: 'UPI Settings', value: 'upi-settings', icon: QrCode },
     { label: 'Settings', value: 'settings', icon: Settings },
   ];
 
   // Fetch Stats Helper
+  // Fetch Stats Helper
   const fetchStats = async () => {
+    setIsLoadingStats(true);
     try {
       const res = await fetch('/api/admin/stats');
       if (res.ok) {
@@ -181,6 +213,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       }
     } catch (error) {
       console.error('Failed to fetch stats', error);
+    } finally {
+      setIsLoadingStats(false);
     }
   };
 
@@ -204,6 +238,17 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   useEffect(() => {
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'payment-requests') {
+      setIsLoadingPayments(true);
+      fetch('/api/admin/recharge/requests')
+        .then(res => res.json())
+        .then(data => setPaymentRequests(data))
+        .catch(err => console.error(err))
+        .finally(() => setIsLoadingPayments(false));
+    }
+  }, [activeTab]);
 
   // Real-time Subscriptions
   useEffect(() => {
@@ -475,13 +520,13 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       const updatedClinic = await response.json();
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       setTopupAmounts(prev => ({ ...prev, [id]: '' }));
-      toast.success(`Added ₹${amount} to balance`);
+      toast.success(`Payment of ₹${amount} recorded`);
 
       // Optimistic update
       setStats(prev => ({
         ...prev,
         totalRevenue: prev.totalRevenue + amount,
-        todayRevenue: prev.todayRevenue + amount
+
       }));
 
       // Refresh stats
@@ -581,13 +626,16 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
             <p className="text-gray-500 mt-1">Welcome back, Admin. Here's what's happening today.</p>
           </div>
           <ErrorBoundary name="Admin Stats">
-            <AdminStatsGrid
-              totalClinics={stats.totalClinics}
-              totalPatientsToday={stats.totalPatientsToday}
-              totalRevenue={stats.totalRevenue}
-              lastMonthRevenue={stats.lastMonthRevenue}
-              todayRevenue={stats.todayRevenue}
-            />
+            {isLoadingStats ? (
+              <StatsGridSkeleton />
+            ) : (
+              <AdminStatsGrid
+                totalClinics={stats.totalClinics}
+                totalPatientsToday={stats.totalPatientsToday}
+                totalRevenue={stats.totalRevenue}
+                lastMonthRevenue={stats.lastMonthRevenue}
+              />
+            )}
           </ErrorBoundary>
         </div>
       )}
@@ -600,18 +648,22 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
             onNewClinicClick={() => setIsCreateModalOpen(true)}
           />
           <ErrorBoundary name="Clinic Table">
-            <ClinicTable
-              clinics={filteredClinics}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteClick}
-              onToggleStatus={handleToggleStatus}
-              onTopup={handleTopup}
-              topupAmounts={topupAmounts}
-              setTopupAmounts={setTopupAmounts}
-              onToggleTrial={handleToggleTrial}
-              trialDates={trialDates}
-              onTrialDateChange={handleTrialDateChange}
-            />
+            {isLoadingClinics ? (
+              <ClinicTableSkeleton />
+            ) : (
+              <ClinicTable
+                clinics={filteredClinics}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+                onToggleStatus={handleToggleStatus}
+                onTopup={handleTopup}
+                topupAmounts={topupAmounts}
+                setTopupAmounts={setTopupAmounts}
+                onToggleTrial={handleToggleTrial}
+                trialDates={trialDates}
+                onTrialDateChange={handleTrialDateChange}
+              />
+            )}
           </ErrorBoundary>
         </div>
       )}
@@ -624,11 +676,13 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
       {activeTab === 'payment-requests' && (
         <div className="space-y-6 animate-fade-in-up">
-          <h2 className="text-2xl font-bold">Pending Payment Requests</h2>
-          {paymentRequests.length === 0 ? (
+          <h2 className="text-2xl font-bold">Pending Bill Payments</h2>
+          {isLoadingPayments ? (
+            <PaymentRequestsSkeleton />
+          ) : paymentRequests.length === 0 ? (
             <p className="text-gray-500">No pending requests.</p>
           ) : (
-            <ErrorBoundary name="Payment Requests">
+            <ErrorBoundary name="Bill Payments">
               <div className="grid gap-4">
                 {paymentRequests.map(req => (
                   <div key={req.id} className="bg-white p-6 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">

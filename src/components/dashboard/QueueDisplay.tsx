@@ -46,12 +46,18 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                         <div className="text-8xl font-bold mb-6 tracking-tighter">
                             {currentToken?.token_number || '--'}
                         </div>
+                        {currentToken && (
+                            <div className="mb-6 text-blue-50">
+                                <div className="text-xl font-bold">{currentToken.patient_name}</div>
+                                {currentToken.purpose && <div className="text-sm opacity-80">{currentToken.purpose}</div>}
+                            </div>
+                        )}
                         <div className="flex justify-center gap-4">
                             <Button
                                 size="lg"
                                 className={`font-bold text-lg px-8 py-6 shadow-xl ${isLastPatient
-                                        ? 'bg-white text-green-600 hover:bg-green-50'
-                                        : 'bg-white text-blue-600 hover:bg-blue-50'
+                                    ? 'bg-white text-green-600 hover:bg-green-50'
+                                    : 'bg-white text-blue-600 hover:bg-blue-50'
                                     }`}
                                 onClick={onCallNext}
                                 disabled={(!isLastPatient && pendingTokens.length === 0) || !isSessionActive}
@@ -84,7 +90,12 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                                     <div key={token.id} className={`p-3 rounded-lg border flex justify-between items-center ${token.status === 'called' ? 'bg-blue-50 border-blue-200 ring-1 ring-blue-300' : 'bg-white border-gray-100'}`}>
                                         <div>
                                             <span className={`font-bold text-lg ${token.status === 'called' ? 'text-blue-700' : 'text-gray-700'}`}>#{token.token_number}</span>
-                                            {token.patient_name && <span className="ml-2 text-gray-600">{token.patient_name}</span>}
+                                            {token.patient_name && (
+                                                <div className="ml-2 inline-block">
+                                                    <span className="text-gray-600 block">{token.patient_name}</span>
+                                                    {token.purpose && <span className="text-xs text-gray-400 block -mt-0.5">{token.purpose}</span>}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <div className="text-sm text-gray-400">{token.phone}</div>

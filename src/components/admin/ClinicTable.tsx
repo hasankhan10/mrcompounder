@@ -39,7 +39,7 @@ export function ClinicTable({
                         <TableHead className="w-[250px]">Clinic Details</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Served Today</TableHead>
-                        <TableHead>Balance</TableHead>
+                        <TableHead>Current Bill</TableHead>
                         <TableHead>Trial Period</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -87,7 +87,7 @@ export function ClinicTable({
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <div className="font-medium text-gray-900">₹{clinic.prepaid_balance}</div>
+                                    <div className="font-medium text-red-600">₹{clinic.current_due}</div>
                                 </TableCell>
                                 <TableCell>
                                     <div className="space-y-2">

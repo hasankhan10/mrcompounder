@@ -17,20 +17,21 @@ export default function PricingPage() {
                     <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-green-500"></div>
 
                     <div className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Pay-As-You-Go</h2>
-                        <div className="flex items-baseline justify-center gap-2 mt-6">
-                            <span className="text-7xl font-extrabold text-green-600">₹1</span>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Postpaid Billing</h2>
+                        <div className="flex items-baseline justify-center gap-1 mt-6">
+                            <span className="text-4xl font-extrabold text-green-600">₹</span>
+                            <span className="text-7xl font-extrabold text-green-600">1</span>
                             <span className="text-xl text-gray-500 font-medium">/ patient</span>
                         </div>
-                        <p className="text-gray-500 mt-4 text-sm">Prepaid balance system. Top-up as needed.</p>
+                        <p className="text-gray-500 mt-4 text-sm">Use now, pay later. Monthly billing cycle.</p>
                     </div>
 
                     <div className="space-y-4 mb-10 text-left">
                         {[
                             "Unlimited Doctors & Staff",
-                            "Unlimited alarm Alerts",
+                            "Unlimited SMS/WhatsApp Alerts",
                             "14-Day Free Trial",
-                            "Cancel Anytime (Refundable Balance)"
+                            "No Upfront Cost"
                         ].map((feature, i) => (
                             <div key={i} className="flex items-center gap-3">
                                 <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
@@ -50,15 +51,15 @@ export default function PricingPage() {
                 <div className="mt-20 grid md:grid-cols-3 gap-8 text-left max-w-5xl mx-auto">
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="font-bold text-lg mb-2 text-blue-800">How do I pay?</h3>
-                        <p className="text-gray-600 text-lg">You recharge your clinic's wallet (like a prepaid SIM). ₹1 is deducted for each patient token generated.</p>
+                        <p className="text-gray-600 text-lg">At the end of the month, you'll receive a bill based on patients served. You can pay via UPI/Bank Transfer to clear dues.</p>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 className="font-bold text-lg mb-2 text-blue-800">What if I have 0 balance?</h3>
-                        <p className="text-gray-600 text-lg">The system will pause new token generation until you top-up. We send alerts when your balance is low.</p>
+                        <h3 className="font-bold text-lg mb-2 text-blue-800">What if I don't pay?</h3>
+                        <p className="text-gray-600 text-lg">If the bill is not cleared by the deadline, your account may be temporarily paused until payment is made.</p>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="font-bold text-lg mb-2 text-blue-800">Is the trial really free?</h3>
-                        <p className="text-gray-600 text-lg">Yes. We give you free credits to test the system for 14 days. No payment info needed upfront.</p>
+                        <p className="text-gray-600 text-lg">Yes. You can use the full system for 14 days without generating any bill. It's completely on us.</p>
                     </div>
                 </div>
             </div>

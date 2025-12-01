@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       .insert({
         name,
         slug,
-        prepaid_balance: initialBalance || 0,
+        current_due: 0,
         logo_url: logoUrl || null,
         is_active: true,
       })

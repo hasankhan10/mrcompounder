@@ -7,10 +7,9 @@ interface AdminStatsGridProps {
     totalPatientsToday: number;
     totalRevenue: number;
     lastMonthRevenue: number;
-    todayRevenue: number;
 }
 
-export function AdminStatsGrid({ totalClinics, totalPatientsToday, totalRevenue, lastMonthRevenue, todayRevenue }: AdminStatsGridProps) {
+export function AdminStatsGrid({ totalClinics, totalPatientsToday, totalRevenue, lastMonthRevenue }: AdminStatsGridProps) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="border-none shadow-md bg-gradient-to-br from-blue-500 to-blue-600 text-white overflow-hidden relative hover-lift">
@@ -62,22 +61,7 @@ export function AdminStatsGrid({ totalClinics, totalPatientsToday, totalRevenue,
                 </CardContent>
             </Card>
 
-            <Card className="border-none shadow-md bg-white hover-lift" style={{ animationDelay: '0.3s' }}>
-                <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-gray-500 font-medium mb-1">Current Day Revenue</p>
-                            <h3 className="text-4xl font-bold text-gray-900">₹{todayRevenue}</h3>
-                        </div>
-                        <div className="bg-orange-100 p-3 rounded-xl">
-                            <Activity className="w-6 h-6 text-orange-600" />
-                        </div>
-                    </div>
-                    <div className="mt-4 flex items-center text-gray-400 text-sm">
-                        Today's earnings
-                    </div>
-                </CardContent>
-            </Card>
+
 
             <Card className="border-none shadow-md bg-white hover-lift" style={{ animationDelay: '0.4s' }}>
                 <CardContent className="p-6">

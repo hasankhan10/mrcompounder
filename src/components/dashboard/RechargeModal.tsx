@@ -89,10 +89,10 @@ export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md bg-white max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Recharge Your Wallet</DialogTitle>
+                    <DialogTitle>Pay Your Bill</DialogTitle>
                     <DialogDescription>
                         1. Scan QR / Pay to UPI ID.<br />
-                        2. Fill the form below to request top-up.
+                        2. Fill the form below to clear your dues.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -149,7 +149,7 @@ export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
                             onClick={handleSubmit}
                             disabled={submitting}
                         >
-                            {submitting ? 'Submitting...' : 'Submit Payment Request'}
+                            {submitting ? 'Submitting...' : 'Submit Payment Proof'}
                         </Button>
                     </div>
                 </div>
