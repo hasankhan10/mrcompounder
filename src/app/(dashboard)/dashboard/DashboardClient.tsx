@@ -579,6 +579,13 @@ export function DashboardClient({
     { label: 'Settings', value: 'settings', icon: Settings },
   ];
 
+  const getBalanceColor = () => {
+    const day = new Date().getDate();
+    if (day <= 10) return 'text-green-600';
+    if (day <= 20) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
   const trialActive = isTrialActive(clinic, mounted ? new Date() : new Date(serverTime));
 
   return (
@@ -608,8 +615,9 @@ export function DashboardClient({
                   </span>
                 ) : (
                   <>
-                    <span className="text-red-600 font-bold">
-                      Current Bill: ₹{clinic.current_due}
+                    <span className="font-bold flex items-center gap-1">
+                      <span className="text-gray-900">Current Bill:</span>
+                      <span className={getBalanceColor()}>₹{clinic.current_due}</span>
                     </span>
                     <Button
                       size="sm"
@@ -623,142 +631,50 @@ export function DashboardClient({
                 )}
               </div>
             </div>
-          </div>
+          </div >
 
-          {isLoading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="space-y-8">
-                <Skeleton className="h-64 w-full rounded-2xl" />
-              </div>
-              <QueueDisplaySkeleton />
-              <div className="space-y-8">
-                <Skeleton className="h-96 w-full rounded-2xl" />
-              </div>
-            </div>
-          ) : !activeQueue || activeQueue.status === 'waiting' ? (
-            <div className="flex flex-col items-center justify-center h-96 bg-white rounded-xl border border-dashed border-gray-300">
-              <div className="bg-blue-50 p-4 rounded-full mb-4">
-                <LayoutDashboard className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">
-                {activeQueue ? 'Session Not Started' : 'No Active Session'}
-              </h3>
-              <p className="text-gray-500 mt-2 mb-6">
-                {activeQueue
-                  ? 'Doctor has not started the session yet. Go to Patient Booking to manage the queue.'
-                  : 'Start a new session to begin managing the queue.'}
-              </p>
-              <Button onClick={() => setActiveTab('patient-booking')} className="bg-blue-600 hover:bg-blue-700">
-                Go to Patient Booking
-              </Button>
-            </div>
-          ) : (
-            /* Active Session Dashboard */
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Column: Controls */}
-              <div className="space-y-8">
-                <SessionStatusCard
-                  status={activeQueue.status as 'active' | 'paused'}
-                  doctorName={activeQueue.doctor_name || 'Unknown Doctor'}
-                  onToggleBreak={handleToggleBreak}
-                  onEndSession={handleEndSession}
-                />
-              </div>
-
-              {/* Middle Column: Current Token Display */}
-              <QueueDisplay
-                doctorName={activeQueue.doctor_name}
-                doctorImageUrl={activeQueue.doctor_image_url}
-                waitingTokens={waitingTokens}
-                servedTokens={servedTokens}
-                onCallNext={handleCallNext}
-                isSessionActive={activeQueue.status === 'active'}
-                onDeleteToken={handleDeleteToken}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {activeTab === 'patient-booking' && (
-        <div className="space-y-8 animate-fade-in-up">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Patient Booking</h1>
-            <p className="text-gray-500 mt-1">Start sessions and register new patients.</p>
-          </div>
-
-          {isLoading ? (
-            <div className="space-y-8">
-              <Skeleton className="h-64 w-full rounded-2xl" />
-              <Skeleton className="h-96 w-full rounded-2xl" />
-            </div>
-          ) : !activeQueue ? (
-            <>
-              <StartSessionCard
-                doctorName={newDoctorName}
-                setDoctorName={setNewDoctorName}
-                doctorImage={newDoctorImage}
-                setDoctorImage={(file) => {
-                  setNewDoctorImage(file);
-                  if (file) setSelectedExistingImage(null);
-                }}
-                doctorArrivalTime={newDoctorArrivalTime}
-                setDoctorArrivalTime={setNewDoctorArrivalTime}
-                isLoading={formIsLoading}
-                onSubmit={handleStartSession}
-                recentDoctors={recentDoctors}
-                onSelectRecent={(doc) => {
-                  setNewDoctorName(doc.name);
-                  setSelectedExistingImage(doc.imageUrl);
-                  setNewDoctorImage(null);
-                  toast.info(`Selected ${doc.name}`);
-                }}
-              />
-            </>
-          ) : (
-            <>
-              {activeQueue.status === 'waiting' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center mb-8 animate-pulse">
-                  <h3 className="text-xl font-bold text-blue-900 mb-2">Doctor is Arriving?</h3>
-                  <p className="text-blue-700 mb-6">Booking is open. Click below when the doctor is ready to see patients.</p>
-                  <div className="flex flex-col md:flex-row justify-center gap-4">
-                    <Button
-                      size="lg"
-                      onClick={handleActivateSession}
-                      disabled={formIsLoading}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-12 py-6 shadow-lg transform transition cursor-pointer hover:scale-105"
-                    >
-                      {formIsLoading ? 'Starting...' : 'Start Session'}
-                    </Button>
-
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={handleEndSession}
-                      disabled={formIsLoading}
-                      className="bg-white hover:bg-red-50 text-red-600 border-red-200 font-bold text-lg px-8 py-6 shadow-sm transform transition cursor-pointer hover:scale-105"
-                    >
-                      Cancel Session
-                    </Button>
-                  </div>
+          {
+            isLoading ? (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" >
+                <div className="space-y-8">
+                  <Skeleton className="h-64 w-full rounded-2xl" />
                 </div>
-              )}
+                <QueueDisplaySkeleton />
+                <div className="space-y-8">
+                  <Skeleton className="h-96 w-full rounded-2xl" />
+                </div>
+              </div>
+            ) : !activeQueue || activeQueue.status === 'waiting' ? (
+              <div className="flex flex-col items-center justify-center h-96 bg-white rounded-xl border border-dashed border-gray-300">
+                <div className="bg-blue-50 p-4 rounded-full mb-4">
+                  <LayoutDashboard className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {activeQueue ? 'Session Not Started' : 'No Active Session'}
+                </h3>
+                <p className="text-gray-500 mt-2 mb-6">
+                  {activeQueue
+                    ? 'Doctor has not started the session yet. Go to Patient Booking to manage the queue.'
+                    : 'Start a new session to begin managing the queue.'}
+                </p>
+                <Button onClick={() => setActiveTab('patient-booking')} className="bg-blue-600 hover:bg-blue-700">
+                  Go to Patient Booking
+                </Button>
+              </div>
+            ) : (
+              /* Active Session Dashboard */
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column: Controls */}
+                <div className="space-y-8">
+                  <SessionStatusCard
+                    status={activeQueue.status as 'active' | 'paused'}
+                    doctorName={activeQueue.doctor_name || 'Unknown Doctor'}
+                    onToggleBreak={handleToggleBreak}
+                    onEndSession={handleEndSession}
+                  />
+                </div>
 
-              <RegisterPatientCard
-                doctorName={activeQueue.doctor_name}
-                doctorImageUrl={activeQueue.doctor_image_url}
-                patientName={newPatientName}
-                setPatientName={setNewPatientName}
-                patientPhone={newPatientPhone}
-                setPatientPhone={setNewPatientPhone}
-                patientPurpose={newPatientPurpose}
-                setPatientPurpose={setNewPatientPurpose}
-                isLoading={formIsLoading}
-                isSessionActive={['active', 'waiting'].includes(activeQueue.status)}
-                onSubmit={handleRegisterPatient}
-              />
-
-              <div className="mt-8">
+                {/* Middle Column: Current Token Display */}
                 <QueueDisplay
                   doctorName={activeQueue.doctor_name}
                   doctorImageUrl={activeQueue.doctor_image_url}
@@ -767,68 +683,168 @@ export function DashboardClient({
                   onCallNext={handleCallNext}
                   isSessionActive={activeQueue.status === 'active'}
                   onDeleteToken={handleDeleteToken}
-                  showControls={false}
                 />
               </div>
-            </>
-          )}
-        </div>
+            )
+          }
+        </div >
       )}
 
-      {activeTab === 'history' && (
-        <div className="space-y-8 animate-fade-in-up">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Session History</h1>
-            <p className="text-gray-500 mt-1">View records of past clinic sessions.</p>
-          </div>
-
-          {isLoading ? (
-            <HistorySkeleton />
-          ) : pastSessions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl border border-dashed border-gray-300">
-              <p className="text-gray-500">No past sessions found.</p>
+      {
+        activeTab === 'patient-booking' && (
+          <div className="space-y-8 animate-fade-in-up">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Patient Booking</h1>
+              <p className="text-gray-500 mt-1">Start sessions and register new patients.</p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {pastSessions.map((session) => (
-                <div key={session.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow max-w-sm">
-                  {session.doctor_image_url ? (
-                    <img src={session.doctor_image_url} alt={session.doctor_name} className="w-16 h-16 rounded-full object-cover border border-gray-200" />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 font-bold text-xl">
-                      {session.doctor_name?.charAt(0)}
-                    </div>
-                  )}
-                  <div>
-                    <h3 className="font-bold text-gray-900 text-lg">{session.doctor_name}</h3>
-                    <p className="text-sm text-gray-500 mb-1">{new Date(session.created_at).toLocaleDateString()}</p>
-                    <div className="flex items-center gap-2">
-                      <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium">
-                        Ended
-                      </span>
-                      <span className="text-xs text-gray-500 font-medium">
-                        {/* @ts-ignore */}
-                        {session.served_count || 0} Patients Served
-                      </span>
+
+            {isLoading ? (
+              <div className="space-y-8">
+                <Skeleton className="h-64 w-full rounded-2xl" />
+                <Skeleton className="h-96 w-full rounded-2xl" />
+              </div>
+            ) : !activeQueue ? (
+              <>
+                <StartSessionCard
+                  doctorName={newDoctorName}
+                  setDoctorName={setNewDoctorName}
+                  doctorImage={newDoctorImage}
+                  setDoctorImage={(file) => {
+                    setNewDoctorImage(file);
+                    if (file) setSelectedExistingImage(null);
+                  }}
+                  doctorArrivalTime={newDoctorArrivalTime}
+                  setDoctorArrivalTime={setNewDoctorArrivalTime}
+                  isLoading={formIsLoading}
+                  onSubmit={handleStartSession}
+                  recentDoctors={recentDoctors}
+                  onSelectRecent={(doc) => {
+                    setNewDoctorName(doc.name);
+                    setSelectedExistingImage(doc.imageUrl);
+                    setNewDoctorImage(null);
+                    toast.info(`Selected ${doc.name}`);
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                {activeQueue.status === 'waiting' && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center mb-8 animate-pulse">
+                    <h3 className="text-xl font-bold text-blue-900 mb-2">Doctor is Arriving?</h3>
+                    <p className="text-blue-700 mb-6">Booking is open. Click below when the doctor is ready to see patients.</p>
+                    <div className="flex flex-col md:flex-row justify-center gap-4">
+                      <Button
+                        size="lg"
+                        onClick={handleActivateSession}
+                        disabled={formIsLoading}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-12 py-6 shadow-lg transform transition cursor-pointer hover:scale-105"
+                      >
+                        {formIsLoading ? 'Starting...' : 'Start Session'}
+                      </Button>
+
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        onClick={handleEndSession}
+                        disabled={formIsLoading}
+                        className="bg-white hover:bg-red-50 text-red-600 border-red-200 font-bold text-lg px-8 py-6 shadow-sm transform transition cursor-pointer hover:scale-105"
+                      >
+                        Cancel Session
+                      </Button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                )}
 
-      {activeTab === 'settings' && (
-        <div className="flex items-center justify-center h-full text-gray-500">
-          Settings coming soon...
-        </div>
-      )}
+                <RegisterPatientCard
+                  doctorName={activeQueue.doctor_name}
+                  doctorImageUrl={activeQueue.doctor_image_url}
+                  patientName={newPatientName}
+                  setPatientName={setNewPatientName}
+                  patientPhone={newPatientPhone}
+                  setPatientPhone={setNewPatientPhone}
+                  patientPurpose={newPatientPurpose}
+                  setPatientPurpose={setNewPatientPurpose}
+                  isLoading={formIsLoading}
+                  isSessionActive={['active', 'waiting'].includes(activeQueue.status)}
+                  onSubmit={handleRegisterPatient}
+                />
+
+                <div className="mt-8">
+                  <QueueDisplay
+                    doctorName={activeQueue.doctor_name}
+                    doctorImageUrl={activeQueue.doctor_image_url}
+                    waitingTokens={waitingTokens}
+                    servedTokens={servedTokens}
+                    onCallNext={handleCallNext}
+                    isSessionActive={activeQueue.status === 'active'}
+                    onDeleteToken={handleDeleteToken}
+                    showControls={false}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        )
+      }
+
+      {
+        activeTab === 'history' && (
+          <div className="space-y-8 animate-fade-in-up">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Session History</h1>
+              <p className="text-gray-500 mt-1">View records of past clinic sessions.</p>
+            </div>
+
+            {isLoading ? (
+              <HistorySkeleton />
+            ) : pastSessions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl border border-dashed border-gray-300">
+                <p className="text-gray-500">No past sessions found.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pastSessions.map((session) => (
+                  <div key={session.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow max-w-sm">
+                    {session.doctor_image_url ? (
+                      <img src={session.doctor_image_url} alt={session.doctor_name} className="w-16 h-16 rounded-full object-cover border border-gray-200" />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 font-bold text-xl">
+                        {session.doctor_name?.charAt(0)}
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-lg">{session.doctor_name}</h3>
+                      <p className="text-sm text-gray-500 mb-1">{new Date(session.created_at).toLocaleDateString()}</p>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium">
+                          Ended
+                        </span>
+                        <span className="text-xs text-gray-500 font-medium">
+                          {/* @ts-ignore */}
+                          {session.served_count || 0} Patients Served
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      }
+
+      {
+        activeTab === 'settings' && (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            Settings coming soon...
+          </div>
+        )
+      }
 
       <RechargeModal
         isOpen={isRechargeModalOpen}
         onOpenChange={setIsRechargeModalOpen}
       />
-    </DashboardShell>
+    </DashboardShell >
   );
 }

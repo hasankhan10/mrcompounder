@@ -26,14 +26,29 @@ export async function GET(request: NextRequest) {
             .from('clinics')
             .select('*', { count: 'exact', head: true });
 
-        // Total Patients Today
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const { count: totalPatientsToday } = await supabaseAdmin
-            .from('tokens')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'served')
-            .gte('updated_at', today.toISOString());
+        // Total Patients Served Today (via Session Date)
+        const todayIST = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); // YYYY-MM-DD
+
+        // 1. Get IDs of queues for today
+        const { data: todayQueues } = await supabaseAdmin
+            .from('queues')
+            .select('id')
+            .eq('session_date', todayIST);
+
+        let totalPatientsToday = 0;
+
+        if (todayQueues && todayQueues.length > 0) {
+            const queueIds = todayQueues.map(q => q.id);
+
+            // 2. Count served tokens in these queues
+            const { count } = await supabaseAdmin
+                .from('tokens')
+                .select('*', { count: 'exact', head: true })
+                .in('queue_id', queueIds)
+                .eq('status', 'served');
+
+            totalPatientsToday = count || 0;
+        }
 
         // Total Revenue (Sum of all approved payment requests)
         const { data: approvedRequests } = await supabaseAdmin

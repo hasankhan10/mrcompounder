@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Token } from '@/lib/types';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface QueueDisplayProps {
     doctorName?: string;
@@ -43,8 +44,18 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                         <h3 className={isLastPatient ? "text-green-100 font-medium mb-2" : "text-blue-100 font-medium mb-2"}>
                             {isLastPatient ? 'Finishing Session' : 'Current Token'}
                         </h3>
-                        <div className="text-8xl font-bold mb-6 tracking-tighter">
-                            {currentToken?.token_number || '--'}
+                        <div className="text-8xl font-bold mb-6 tracking-tighter overflow-hidden h-32 flex items-center justify-center">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={currentToken?.token_number || 'none'}
+                                    initial={{ y: 50, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    exit={{ y: -50, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeOut" }}
+                                >
+                                    {currentToken?.token_number || '--'}
+                                </motion.div>
+                            </AnimatePresence>
                         </div>
                         {currentToken && (
                             <div className="mb-6 text-blue-50">

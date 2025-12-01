@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { createClient } from '@/lib/supabase-client';
 import { toast } from 'sonner';
 import { PatientViewSkeleton } from '@/components/skeletons/DashboardSkeletons';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface InitialData {
   clinic: Clinic | null;
@@ -305,8 +306,18 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
                   </div>
                 ) : (
                   <>
-                    <div className="text-8xl font-black text-gray-900 tracking-tighter">
-                      {currentToken ? currentToken.token_number : '--'}
+                    <div className="text-8xl font-black text-gray-900 tracking-tighter overflow-hidden h-32 flex items-center justify-center">
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={currentToken ? currentToken.token_number : 'none'}
+                          initial={{ y: 50, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -50, opacity: 0 }}
+                          transition={{ duration: 0.3, ease: "easeOut" }}
+                        >
+                          {currentToken ? currentToken.token_number : '--'}
+                        </motion.div>
+                      </AnimatePresence>
                     </div>
                     <p className="text-gray-400 mt-2 text-sm">
                       {currentToken ? 'Currently in consultation' : 'Waiting for next patient...'}
