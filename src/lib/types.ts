@@ -54,6 +54,7 @@ export interface Token {
   called_at?: string; // timestamp
   served_at?: string; // timestamp
   is_booked_online?: boolean;
+  is_present?: boolean;
 }
 
 export interface Transaction {

@@ -92,7 +92,12 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                                             <span className={`font-bold text-lg ${token.status === 'called' ? 'text-blue-700' : 'text-gray-700'}`}>#{token.token_number}</span>
                                             {token.patient_name && (
                                                 <div className="ml-2 inline-block">
-                                                    <span className="text-gray-600 block">{token.patient_name}</span>
+                                                    <span className="text-gray-600 block flex items-center gap-2">
+                                                        {token.patient_name}
+                                                        {token.is_present && (
+                                                            <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" title="Present at Clinic"></span>
+                                                        )}
+                                                    </span>
                                                     {token.purpose && <span className="text-xs text-gray-400 block -mt-0.5">{token.purpose}</span>}
                                                 </div>
                                             )}

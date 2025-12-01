@@ -58,6 +58,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No booking found for this number in the current session.' }, { status: 404 });
         }
 
+        // Mark as present if not already
+        if (!token.is_present) {
+            await supabaseAdmin
+                .from('tokens')
+                .update({ is_present: true })
+                .eq('id', token.id);
+            token.is_present = true;
+        }
+
         const currentToken = currentTokenResult.data;
 
         // Sliding Window Data

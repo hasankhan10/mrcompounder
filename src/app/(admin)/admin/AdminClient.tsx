@@ -203,8 +203,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
   // Fetch Stats Helper
   // Fetch Stats Helper
-  const fetchStats = async () => {
-    setIsLoadingStats(true);
+  const fetchStats = async (showLoading = true) => {
+    if (showLoading) setIsLoadingStats(true);
     try {
       const res = await fetch('/api/admin/stats');
       if (res.ok) {
@@ -214,7 +214,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     } catch (error) {
       console.error('Failed to fetch stats', error);
     } finally {
-      setIsLoadingStats(false);
+      if (showLoading) setIsLoadingStats(false);
     }
   };
 
@@ -263,13 +263,13 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
               if (prev.some(c => c.id === payload.new.id)) return prev;
               return [...prev, payload.new as Clinic];
             });
-            fetchStats();
+            fetchStats(false);
           } else if (payload.eventType === 'UPDATE') {
             setClinics((prev) => prev.map((c) => (c.id === payload.new.id ? (payload.new as Clinic) : c)));
-            fetchStats();
+            fetchStats(false);
           } else if (payload.eventType === 'DELETE') {
             setClinics((prev) => prev.filter((c) => c.id !== payload.old.id));
-            fetchStats();
+            fetchStats(false);
           }
         }
       )
@@ -277,7 +277,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'tokens' },
         () => {
-          fetchStats(); // Update patient count
+          fetchStats(false); // Update patient count
           fetchClinicStats(); // Update per-clinic served count
         }
       )
@@ -285,14 +285,14 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'transactions' },
         () => {
-          fetchStats(); // Update revenue (from topups)
+          fetchStats(false); // Update revenue (from topups)
         }
       )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'payment_requests' },
         () => {
-          fetchStats(); // Update revenue (from approved requests)
+          fetchStats(false); // Update revenue (from approved requests)
           // Also refresh the payment requests list if we are on that tab
           if (activeTab === 'payment-requests') {
             fetch('/api/admin/recharge/requests')
