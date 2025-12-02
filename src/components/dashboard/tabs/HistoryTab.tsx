@@ -26,7 +26,7 @@ export function HistoryTab({ pastSessions, isLoading }: HistoryTabProps) {
                     {pastSessions.map((session) => (
                         <div key={session.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow max-w-sm">
                             {session.doctor_image_url ? (
-                                <Image src={session.doctor_image_url} alt={session.doctor_name} width={64} height={64} className="w-16 h-16 rounded-full object-cover border border-gray-200" />
+                                <Image src={session.doctor_image_url} alt={session.doctor_name || 'Doctor'} width={64} height={64} className="w-16 h-16 rounded-full object-cover border border-gray-200" />
                             ) : (
                                 <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 font-bold text-xl">
                                     {session.doctor_name?.charAt(0)}
