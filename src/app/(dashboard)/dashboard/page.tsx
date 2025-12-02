@@ -22,31 +22,29 @@ export default async function DashboardPage() {
   // Fetch all data in parallel
   const [
     { data: clinic },
-    { data: activeQueue }
+    { data: activeQueues }
   ] = await Promise.all([
     supabase.from('clinics').select('*').eq('id', clinicId).single(),
-    supabase.from('queues').select('*').eq('clinic_id', clinicId).neq('status', 'ended').order('created_at', { ascending: false }).limit(1).single()
+    supabase.from('queues').select('*').eq('clinic_id', clinicId).neq('status', 'ended').order('created_at', { ascending: false })
   ]);
 
   if (!clinic) redirect('/');
 
-  let waitingTokens: any[] = [];
-  let servedTokens: any[] = [];
+  let allTokens: any[] = [];
 
-  if (activeQueue) {
-    const { data: tokensData } = await supabase.from('tokens').select('*').eq('queue_id', activeQueue.id).order('token_number', { ascending: true });
+  if (activeQueues && activeQueues.length > 0) {
+    const queueIds = activeQueues.map((q: any) => q.id);
+    const { data: tokensData } = await supabase.from('tokens').select('*').in('queue_id', queueIds).order('token_number', { ascending: true });
     if (tokensData) {
-      waitingTokens = tokensData.filter(token => token.status === 'waiting' || token.status === 'called');
-      servedTokens = tokensData.filter(token => token.status === 'served' || token.status === 'no_show');
+      allTokens = tokensData;
     }
   }
 
   return (
     <DashboardClient
       initialClinic={clinic}
-      initialQueue={activeQueue}
-      initialWaitingTokens={waitingTokens}
-      initialServedTokens={servedTokens}
+      initialActiveQueues={activeQueues || []}
+      initialTokens={allTokens}
       serverTime={new Date().toISOString()}
     />
   );

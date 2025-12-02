@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
     const supabase = await createServerSupabaseClient();
 
     // 1. Auth Check
@@ -22,32 +21,18 @@ export async function GET(request: NextRequest) {
         return new NextResponse(JSON.stringify({ error: 'Clinic not found' }), { status: 404 });
     }
 
-    // 3. Fetch Ended Queues
+    // 3. Fetch History (Ended sessions)
     const { data: history, error } = await supabase
         .from('queues')
         .select('*')
         .eq('clinic_id', profile.clinic_id)
         .eq('status', 'ended')
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(50); // Limit to last 50 sessions for performance
 
     if (error) {
         return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
     }
 
-    // Fetch counts for each queue
-    const historyWithCounts = await Promise.all(history.map(async (queue) => {
-        const { count } = await supabase
-            .from('tokens')
-            .select('*', { count: 'exact', head: true })
-            .eq('queue_id', queue.id)
-            .eq('status', 'served');
-
-        return {
-            ...queue,
-            served_count: count || 0
-        };
-    }));
-
-    return NextResponse.json(historyWithCounts, { status: 200 });
+    return NextResponse.json(history);
 }

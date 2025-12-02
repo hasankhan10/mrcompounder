@@ -1,30 +1,26 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { Clinic, Queue, Token } from '@/lib/types';
 import { toast } from 'sonner';
 import { RechargeModal } from '@/components/dashboard/RechargeModal';
-import { PieChart, Settings, Users, LayoutDashboard, History, PlusCircle, IndianRupee } from 'lucide-react';
+import { PieChart, Settings, Users, History, IndianRupee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Components
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
 import { PageLoading } from '@/components/shared/PageLoading';
 import { PageError } from '@/components/shared/PageError';
-import { QueueDisplaySkeleton, HistorySkeleton } from '@/components/skeletons/DashboardSkeletons';
-import { Skeleton } from '@/components/ui/skeleton';
-import { StartSessionCard } from '@/components/dashboard/StartSessionCard';
-import { RegisterPatientCard } from '@/components/dashboard/RegisterPatientCard';
-import { SessionStatusCard } from '@/components/dashboard/SessionStatusCard';
-import { QueueDisplay } from '@/components/dashboard/QueueDisplay';
+import { OverviewTab } from '@/components/dashboard/tabs/OverviewTab';
+import { BookingTab } from '@/components/dashboard/tabs/BookingTab';
+import { HistoryTab } from '@/components/dashboard/tabs/HistoryTab';
 
 interface DashboardClientProps {
   initialClinic: Clinic | null;
-  initialQueue: Queue | null;
-  initialWaitingTokens: Token[];
-  initialServedTokens: Token[];
+  initialActiveQueues: Queue[];
+  initialTokens: Token[];
   serverTime: string;
 }
 
@@ -40,9 +36,8 @@ const isTrialActive = (c: Clinic | null, nowDate?: Date) => {
 
 export function DashboardClient({
   initialClinic,
-  initialQueue,
-  initialWaitingTokens,
-  initialServedTokens,
+  initialActiveQueues,
+  initialTokens,
   serverTime
 }: DashboardClientProps) {
   const [supabase] = useState(() => createClient());
@@ -61,10 +56,17 @@ export function DashboardClient({
 
   // Data state
   const [clinic, setClinic] = useState<Clinic | null>(initialClinic);
-  const [activeQueue, setActiveQueue] = useState<Queue | null>(initialQueue);
-  const [waitingTokens, setWaitingTokens] = useState<Token[]>(initialWaitingTokens);
-  const [servedTokens, setServedTokens] = useState<Token[]>(initialServedTokens);
+  const [activeQueues, setActiveQueues] = useState<Queue[]>(initialActiveQueues);
+  const [tokens, setTokens] = useState<Token[]>(initialTokens);
   const [pastSessions, setPastSessions] = useState<Queue[]>([]);
+
+  // Selection State
+  const [selectedQueueId, setSelectedQueueId] = useState<string | null>(null);
+
+  // Derived Data
+  const activeQueue = activeQueues.find(q => q.id === selectedQueueId) || null;
+  const waitingTokens = tokens.filter(t => t.queue_id === selectedQueueId && (t.status === 'waiting' || t.status === 'called')).sort((a, b) => a.token_number - b.token_number);
+  const servedTokens = tokens.filter(t => t.queue_id === selectedQueueId && (t.status === 'served' || t.status === 'no_show')).sort((a, b) => b.served_at!.localeCompare(a.served_at!));
   // Low balance warning removed for postpaid model
 
   // Form state
@@ -120,10 +122,10 @@ export function DashboardClient({
   }, []);
 
   useEffect(() => {
-    if (!activeQueue) {
+    if (activeTab === 'history' && pastSessions.length === 0) {
       fetchHistory();
     }
-  }, [activeQueue]);
+  }, [activeTab]);
 
   // Real-time subscription for clinic updates
   // Real-time subscription for clinic updates
@@ -164,37 +166,35 @@ export function DashboardClient({
         (payload) => {
           if (payload.eventType === 'INSERT') {
             const newQueue = payload.new as Queue;
-            // If we don't have an active queue, and this one is active/waiting/paused
-            if (!activeQueue && newQueue.status !== 'ended') {
-              setActiveQueue(newQueue);
-            }
-            // If inserted as ended, add to history
-            if (newQueue.status === 'ended') {
+            if (newQueue.status !== 'ended') {
+              setActiveQueues(prev => {
+                if (prev.some(q => q.id === newQueue.id)) return prev;
+                return [newQueue, ...prev];
+              });
+            } else {
               setPastSessions(prev => [newQueue, ...prev]);
             }
           } else if (payload.eventType === 'UPDATE') {
             const updatedQueue = payload.new as Queue;
 
-            // 1. Handle Active Queue
-            if (activeQueue && activeQueue.id === updatedQueue.id) {
-              if (updatedQueue.status === 'ended') {
-                // Session ended remotely
-                setActiveQueue(null);
-                setWaitingTokens([]);
-                setServedTokens([]);
-                toast.info('Session ended.');
-              } else {
-                setActiveQueue(updatedQueue);
-              }
-            }
-
-            // 2. Handle History
             if (updatedQueue.status === 'ended') {
+              // Move from active to history
+              setActiveQueues(prev => prev.filter(q => q.id !== updatedQueue.id));
               setPastSessions(prev => {
                 const exists = prev.find(q => q.id === updatedQueue.id);
-                if (exists) {
-                  return prev.map(q => q.id === updatedQueue.id ? updatedQueue : q);
-                }
+                if (exists) return prev.map(q => q.id === updatedQueue.id ? updatedQueue : q);
+                return [updatedQueue, ...prev];
+              });
+
+              if (selectedQueueId === updatedQueue.id) {
+                setSelectedQueueId(null);
+                toast.info('Session ended.');
+              }
+            } else {
+              // Update active queue
+              setActiveQueues(prev => {
+                const exists = prev.find(q => q.id === updatedQueue.id);
+                if (exists) return prev.map(q => q.id === updatedQueue.id ? updatedQueue : q);
                 return [updatedQueue, ...prev];
               });
             }
@@ -206,74 +206,67 @@ export function DashboardClient({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [clinic?.id, supabase, router, activeQueue]);
+  }, [clinic?.id, supabase, router, selectedQueueId]);
 
-  // Real-time tokens subscription
+  // Real-time tokens subscription (Global for this clinic's active queues)
+  const pendingUpdates = useRef<{ type: string, payload: any }[]>([]);
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    if (!activeQueue) return;
+    if (activeQueues.length === 0) return;
+
+    const processUpdates = () => {
+      if (pendingUpdates.current.length === 0) return;
+
+      const updates = [...pendingUpdates.current];
+      pendingUpdates.current = []; // Clear queue
+
+      setTokens((prev) => {
+        let newTokens = [...prev];
+        updates.forEach(update => {
+          if (update.type === 'INSERT') {
+            const newToken = update.payload.new as Token;
+            if (!newTokens.find(t => t.id === newToken.id)) {
+              newTokens.push(newToken);
+            }
+          } else if (update.type === 'UPDATE') {
+            const updatedToken = update.payload.new as Token;
+            newTokens = newTokens.map(t => t.id === updatedToken.id ? updatedToken : t);
+          } else if (update.type === 'DELETE') {
+            const deletedId = update.payload.old.id;
+            newTokens = newTokens.filter(t => t.id !== deletedId);
+          }
+        });
+        return newTokens;
+      });
+    };
 
     const channel = supabase
-      .channel(`tokens-${activeQueue.id}`)
+      .channel(`tokens-clinic-${clinic?.id}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'tokens',
-          filter: `queue_id=eq.${activeQueue.id}`,
+          filter: `clinic_id=eq.${clinic?.id}`,
         },
         (payload) => {
-          const eventType = payload.eventType;
+          // Push to queue
+          pendingUpdates.current.push({ type: payload.eventType, payload });
 
-          if (eventType === 'INSERT') {
-            const newToken = payload.new as Token;
-            setWaitingTokens((prev) => {
-              if (prev.find(t => t.id === newToken.id)) return prev;
-              return [...prev, newToken];
-            });
-          } else if (eventType === 'UPDATE') {
-            const updatedToken = payload.new as Token;
-
-            // Handle waiting tokens
-            setWaitingTokens((prev) => {
-              const exists = prev.find(t => t.id === updatedToken.id);
-              if (exists) {
-                if (updatedToken.status === 'served' || updatedToken.status === 'no_show') {
-                  return prev.filter(t => t.id !== updatedToken.id);
-                }
-                return prev.map(t => t.id === updatedToken.id ? updatedToken : t);
-              }
-              // If it wasn't in waiting but now is (unlikely but possible), add it
-              if (updatedToken.status === 'waiting' || updatedToken.status === 'called') {
-                return [...prev, updatedToken];
-              }
-              return prev;
-            });
-
-            // Handle served tokens
-            setServedTokens((prev) => {
-              const exists = prev.find(t => t.id === updatedToken.id);
-              if (exists) {
-                return prev.map(t => t.id === updatedToken.id ? updatedToken : t);
-              }
-              if (updatedToken.status === 'served' || updatedToken.status === 'no_show') {
-                return [updatedToken, ...prev];
-              }
-              return prev;
-            });
-          } else if (eventType === 'DELETE') {
-            const deletedId = payload.old.id;
-            setWaitingTokens((prev) => prev.filter(t => t.id !== deletedId));
-            setServedTokens((prev) => prev.filter(t => t.id !== deletedId));
-          }
+          // Debounce
+          if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+          debounceTimeout.current = setTimeout(processUpdates, 100);
         }
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
-  }, [activeQueue?.id, supabase]);
+  }, [clinic?.id, supabase, activeQueues.length]);
 
   // Handlers
   const handleStartSession = async (e: FormEvent) => {
@@ -317,7 +310,8 @@ export function DashboardClient({
       }
 
       const newQueue = await response.json();
-      setActiveQueue(newQueue);
+      setActiveQueues(prev => [newQueue, ...prev]);
+      setSelectedQueueId(newQueue.id);
       setNewDoctorName('');
       setNewDoctorImage(null);
       setNewDoctorArrivalTime('');
@@ -344,7 +338,7 @@ export function DashboardClient({
       if (!response.ok) throw new Error('Failed to toggle break');
 
       const updatedQueue = await response.json();
-      setActiveQueue(updatedQueue);
+      setActiveQueues(prev => prev.map(q => q.id === updatedQueue.id ? updatedQueue : q));
       toast.success(newStatus === 'paused' ? 'Session paused' : 'Session resumed');
     } catch (err: any) {
       toast.error(err.message);
@@ -364,9 +358,8 @@ export function DashboardClient({
 
       if (!response.ok) throw new Error('Failed to end session');
 
-      setActiveQueue(null);
-      setWaitingTokens([]);
-      setServedTokens([]);
+      setActiveQueues(prev => prev.filter(q => q.id !== activeQueue.id));
+      setSelectedQueueId(null);
       setNewDoctorName('');
       toast.success('Session ended');
       setActiveTab('history');
@@ -388,7 +381,7 @@ export function DashboardClient({
       if (!response.ok) throw new Error('Failed to activate session');
 
       const updatedQueue = await response.json();
-      setActiveQueue({ ...activeQueue, ...updatedQueue });
+      setActiveQueues(prev => prev.map(q => q.id === updatedQueue.id ? { ...q, ...updatedQueue } : q));
       toast.success('Session started! You can now call patients.');
       setActiveTab('overview');
     } catch (err: any) {
@@ -432,7 +425,7 @@ export function DashboardClient({
     };
 
     // Optimistic Update
-    setWaitingTokens(prev => [...prev, tempToken]);
+    setTokens(prev => [...prev, tempToken]);
     // Don't block the UI
     // setFormIsLoading(true); 
 
@@ -456,12 +449,12 @@ export function DashboardClient({
       const newToken = await response.json();
 
       // Replace temp token with real one
-      setWaitingTokens(prev => prev.map(t => t.id === tempId ? newToken : t));
+      setTokens(prev => prev.map(t => t.id === tempId ? newToken : t));
       toast.success(`Token #${newToken.token_number} generated`);
 
     } catch (err: any) {
       // Revert on error
-      setWaitingTokens(prev => prev.filter(t => t.id !== tempId));
+      setTokens(prev => prev.filter(t => t.id !== tempId));
       setNewPatientName(name);
       setNewPatientPhone(phone);
       setNewPatientPurpose(purpose);
@@ -473,8 +466,7 @@ export function DashboardClient({
     if (!activeQueue) return;
 
     // Snapshot for rollback
-    const prevWaiting = [...waitingTokens];
-    const prevServed = [...servedTokens];
+    const prevTokens = [...tokens];
     const prevClinic = clinic ? { ...clinic } : null;
 
     // Logic to determine next state
@@ -490,16 +482,12 @@ export function DashboardClient({
     }
 
     // Optimistic Updates
-    let newWaiting = [...waitingTokens];
-    let newServed = [...servedTokens];
+    let newTokens = [...tokens];
 
     // 1. Serve Current
     if (currentCalled) {
-      const servedToken = { ...currentCalled, status: 'served' as const };
-      newWaiting = newWaiting.filter(t => t.id !== currentCalled.id);
-      newServed = [servedToken, ...newServed];
+      newTokens = newTokens.map(t => t.id === currentCalled.id ? { ...t, status: 'served' } : t);
 
-      // Optimistic Balance
       // Optimistic Billing
       if (clinic && !isTrialActive(clinic)) {
         const newDue = (clinic.current_due || 0) + 1;
@@ -510,14 +498,13 @@ export function DashboardClient({
     // 2. Call Next
     if (nextInLine) {
       const calledToken = { ...nextInLine, status: 'called' as const };
-      newWaiting = newWaiting.map(t => t.id === nextInLine.id ? calledToken : t);
+      newTokens = newTokens.map(t => t.id === nextInLine.id ? calledToken : t);
       toast.success(`Calling Token #${calledToken.token_number}`);
     } else {
       toast.info('Patient served. Queue is empty.');
     }
 
-    setWaitingTokens(newWaiting);
-    setServedTokens(newServed);
+    setTokens(newTokens);
 
     try {
       const response = await fetch('/api/dashboard/token/call-next', {
@@ -534,18 +521,11 @@ export function DashboardClient({
         throw new Error(err.error || 'Failed to call next token');
       }
 
-      // The server returns the actual updated tokens.
-      // We can update state with them to be sure, or trust our optimistic update.
-      // Since we have Real-time subscription, that will also fire and update state.
-      // To avoid "jumping", we can ignore the response data if it matches our expectation,
-      // or just let the Real-time handler do the final sync.
-
       // Best practice: Trust Optimistic, let Real-time fix drift.
 
     } catch (err: any) {
       // Rollback
-      setWaitingTokens(prevWaiting);
-      setServedTokens(prevServed);
+      setTokens(prevTokens);
       if (prevClinic) setClinic(prevClinic);
       toast.error(err.message);
     }
@@ -561,7 +541,7 @@ export function DashboardClient({
 
       if (!response.ok) throw new Error('Failed to delete token');
 
-      setWaitingTokens(waitingTokens.filter(t => t.id !== tokenId));
+      setTokens(prev => prev.filter(t => t.id !== tokenId));
       toast.success('Patient removed from queue');
     } catch (err: any) {
       toast.error(err.message);
@@ -587,6 +567,9 @@ export function DashboardClient({
   };
 
   const trialActive = isTrialActive(clinic, mounted ? new Date() : new Date(serverTime));
+
+
+
 
   return (
     <DashboardShell
@@ -631,207 +614,73 @@ export function DashboardClient({
                 )}
               </div>
             </div>
-          </div >
+          </div>
 
-          {
-            isLoading ? (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" >
-                <div className="space-y-8">
-                  <Skeleton className="h-64 w-full rounded-2xl" />
-                </div>
-                <QueueDisplaySkeleton />
-                <div className="space-y-8">
-                  <Skeleton className="h-96 w-full rounded-2xl" />
-                </div>
-              </div>
-            ) : !activeQueue || activeQueue.status === 'waiting' ? (
-              <div className="flex flex-col items-center justify-center h-96 bg-white rounded-xl border border-dashed border-gray-300">
-                <div className="bg-blue-50 p-4 rounded-full mb-4">
-                  <LayoutDashboard className="w-8 h-8 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">
-                  {activeQueue ? 'Session Not Started' : 'No Active Session'}
-                </h3>
-                <p className="text-gray-500 mt-2 mb-6">
-                  {activeQueue
-                    ? 'Doctor has not started the session yet. Go to Patient Booking to manage the queue.'
-                    : 'Start a new session to begin managing the queue.'}
-                </p>
-                <Button onClick={() => setActiveTab('patient-booking')} className="bg-blue-600 hover:bg-blue-700">
-                  Go to Patient Booking
-                </Button>
-              </div>
-            ) : (
-              /* Active Session Dashboard */
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column: Controls */}
-                <div className="space-y-8">
-                  <SessionStatusCard
-                    status={activeQueue.status as 'active' | 'paused'}
-                    doctorName={activeQueue.doctor_name || 'Unknown Doctor'}
-                    onToggleBreak={handleToggleBreak}
-                    onEndSession={handleEndSession}
-                  />
-                </div>
-
-                {/* Middle Column: Current Token Display */}
-                <QueueDisplay
-                  doctorName={activeQueue.doctor_name}
-                  doctorImageUrl={activeQueue.doctor_image_url}
-                  waitingTokens={waitingTokens}
-                  servedTokens={servedTokens}
-                  onCallNext={handleCallNext}
-                  isSessionActive={activeQueue.status === 'active'}
-                  onDeleteToken={handleDeleteToken}
-                />
-              </div>
-            )
-          }
-        </div >
+          <OverviewTab
+            isLoading={isLoading}
+            activeQueues={activeQueues}
+            tokens={tokens}
+            selectedQueueId={selectedQueueId}
+            setSelectedQueueId={setSelectedQueueId}
+            setActiveTab={setActiveTab}
+            activeQueue={activeQueue}
+            waitingTokens={waitingTokens}
+            servedTokens={servedTokens}
+            onToggleBreak={handleToggleBreak}
+            onEndSession={handleEndSession}
+            onCallNext={handleCallNext}
+            onDeleteToken={handleDeleteToken}
+          />
+        </div>
       )}
 
-      {
-        activeTab === 'patient-booking' && (
-          <div className="space-y-8 animate-fade-in-up">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Patient Booking</h1>
-              <p className="text-gray-500 mt-1">Start sessions and register new patients.</p>
-            </div>
-
-            {isLoading ? (
-              <div className="space-y-8">
-                <Skeleton className="h-64 w-full rounded-2xl" />
-                <Skeleton className="h-96 w-full rounded-2xl" />
-              </div>
-            ) : !activeQueue ? (
-              <>
-                <StartSessionCard
-                  doctorName={newDoctorName}
-                  setDoctorName={setNewDoctorName}
-                  doctorImage={newDoctorImage}
-                  setDoctorImage={(file) => {
-                    setNewDoctorImage(file);
-                    if (file) setSelectedExistingImage(null);
-                  }}
-                  doctorArrivalTime={newDoctorArrivalTime}
-                  setDoctorArrivalTime={setNewDoctorArrivalTime}
-                  isLoading={formIsLoading}
-                  onSubmit={handleStartSession}
-                  recentDoctors={recentDoctors}
-                  onSelectRecent={(doc) => {
-                    setNewDoctorName(doc.name);
-                    setSelectedExistingImage(doc.imageUrl);
-                    setNewDoctorImage(null);
-                    toast.info(`Selected ${doc.name}`);
-                  }}
-                />
-              </>
-            ) : (
-              <>
-                {activeQueue.status === 'waiting' && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center mb-8 animate-pulse">
-                    <h3 className="text-xl font-bold text-blue-900 mb-2">Doctor is Arriving?</h3>
-                    <p className="text-blue-700 mb-6">Booking is open. Click below when the doctor is ready to see patients.</p>
-                    <div className="flex flex-col md:flex-row justify-center gap-4">
-                      <Button
-                        size="lg"
-                        onClick={handleActivateSession}
-                        disabled={formIsLoading}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-12 py-6 shadow-lg transform transition cursor-pointer hover:scale-105"
-                      >
-                        {formIsLoading ? 'Starting...' : 'Start Session'}
-                      </Button>
-
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        onClick={handleEndSession}
-                        disabled={formIsLoading}
-                        className="bg-white hover:bg-red-50 text-red-600 border-red-200 font-bold text-lg px-8 py-6 shadow-sm transform transition cursor-pointer hover:scale-105"
-                      >
-                        Cancel Session
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                <RegisterPatientCard
-                  doctorName={activeQueue.doctor_name}
-                  doctorImageUrl={activeQueue.doctor_image_url}
-                  patientName={newPatientName}
-                  setPatientName={setNewPatientName}
-                  patientPhone={newPatientPhone}
-                  setPatientPhone={setNewPatientPhone}
-                  patientPurpose={newPatientPurpose}
-                  setPatientPurpose={setNewPatientPurpose}
-                  isLoading={formIsLoading}
-                  isSessionActive={['active', 'waiting'].includes(activeQueue.status)}
-                  onSubmit={handleRegisterPatient}
-                />
-
-                <div className="mt-8">
-                  <QueueDisplay
-                    doctorName={activeQueue.doctor_name}
-                    doctorImageUrl={activeQueue.doctor_image_url}
-                    waitingTokens={waitingTokens}
-                    servedTokens={servedTokens}
-                    onCallNext={handleCallNext}
-                    isSessionActive={activeQueue.status === 'active'}
-                    onDeleteToken={handleDeleteToken}
-                    showControls={false}
-                  />
-                </div>
-              </>
-            )}
+      {activeTab === 'patient-booking' && (
+        <div className="space-y-8 animate-fade-in-up">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Patient Booking</h1>
+            <p className="text-gray-500 mt-1">Start sessions and register new patients.</p>
           </div>
-        )
-      }
 
-      {
-        activeTab === 'history' && (
-          <div className="space-y-8 animate-fade-in-up">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Session History</h1>
-              <p className="text-gray-500 mt-1">View records of past clinic sessions.</p>
-            </div>
+          <BookingTab
+            isLoading={isLoading}
+            activeQueues={activeQueues}
+            tokens={tokens}
+            selectedQueueId={selectedQueueId}
+            setSelectedQueueId={setSelectedQueueId}
+            activeQueue={activeQueue}
+            waitingTokens={waitingTokens}
+            servedTokens={servedTokens}
+            formIsLoading={formIsLoading}
+            onStartSession={handleStartSession}
+            onActivateSession={handleActivateSession}
+            onEndSession={handleEndSession}
+            onRegisterPatient={handleRegisterPatient}
+            onCallNext={handleCallNext}
+            onDeleteToken={handleDeleteToken}
+            newDoctorName={newDoctorName}
+            setNewDoctorName={setNewDoctorName}
+            newDoctorImage={newDoctorImage}
+            setNewDoctorImage={setNewDoctorImage}
+            setSelectedExistingImage={setSelectedExistingImage}
+            newDoctorArrivalTime={newDoctorArrivalTime}
+            setNewDoctorArrivalTime={setNewDoctorArrivalTime}
+            recentDoctors={recentDoctors}
+            newPatientName={newPatientName}
+            setNewPatientName={setNewPatientName}
+            newPatientPhone={newPatientPhone}
+            setNewPatientPhone={setNewPatientPhone}
+            newPatientPurpose={newPatientPurpose}
+            setNewPatientPurpose={setNewPatientPurpose}
+          />
+        </div>
+      )}
 
-            {isLoading ? (
-              <HistorySkeleton />
-            ) : pastSessions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl border border-dashed border-gray-300">
-                <p className="text-gray-500">No past sessions found.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {pastSessions.map((session) => (
-                  <div key={session.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow max-w-sm">
-                    {session.doctor_image_url ? (
-                      <img src={session.doctor_image_url} alt={session.doctor_name} className="w-16 h-16 rounded-full object-cover border border-gray-200" />
-                    ) : (
-                      <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 font-bold text-xl">
-                        {session.doctor_name?.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <h3 className="font-bold text-gray-900 text-lg">{session.doctor_name}</h3>
-                      <p className="text-sm text-gray-500 mb-1">{new Date(session.created_at).toLocaleDateString()}</p>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium">
-                          Ended
-                        </span>
-                        <span className="text-xs text-gray-500 font-medium">
-                          {/* @ts-ignore */}
-                          {session.served_count || 0} Patients Served
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )
-      }
+      {activeTab === 'history' && (
+        <HistoryTab
+          pastSessions={pastSessions}
+          isLoading={isLoading}
+        />
+      )}
 
       {
         activeTab === 'settings' && (

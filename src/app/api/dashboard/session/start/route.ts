@@ -38,17 +38,7 @@ export async function POST(request: NextRequest) {
 
   const clinicId = profile.clinic_id;
 
-  // 3. Check for existing active/waiting session
-  const { data: existingQueue } = await supabase
-    .from('queues')
-    .select('*')
-    .eq('clinic_id', clinicId)
-    .in('status', ['active', 'waiting', 'paused'])
-    .maybeSingle();
 
-  if (existingQueue) {
-    return new NextResponse(JSON.stringify({ error: 'A session is already active or waiting.' }), { status: 400 });
-  }
 
   // 4. Create New Queue
   const { data: newQueue, error } = await supabase
