@@ -27,8 +27,8 @@ export async function GET(request: Request) {
         .select('*')
         .eq('clinic_id', profile.clinic_id)
         .eq('status', 'ended')
-        .order('created_at', { ascending: false })
-        .limit(50); // Limit to last 50 sessions for performance
+        .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+        .order('created_at', { ascending: false });
 
     if (error) {
         return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });

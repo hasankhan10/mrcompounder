@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, FormEvent, useRef } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { Clinic, Queue, Token } from '@/lib/types';
@@ -16,6 +16,8 @@ import { PageError } from '@/components/shared/PageError';
 import { OverviewTab } from '@/components/dashboard/tabs/OverviewTab';
 import { BookingTab } from '@/components/dashboard/tabs/BookingTab';
 import { HistoryTab } from '@/components/dashboard/tabs/HistoryTab';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
+import { dashboardService } from '@/services/dashboard';
 
 interface DashboardClientProps {
   initialClinic: Clinic | null;
@@ -95,11 +97,8 @@ export function DashboardClient({
   // Fetch history
   const fetchHistory = async () => {
     try {
-      const res = await fetch('/api/dashboard/history');
-      if (res.ok) {
-        const data = await res.json();
-        setPastSessions(data);
-      }
+      const data = await dashboardService.fetchHistory();
+      setPastSessions(data);
     } catch (error) {
       console.error('Failed to fetch history', error);
     }
@@ -108,11 +107,8 @@ export function DashboardClient({
   // Fetch recent doctors
   const fetchRecentDoctors = async () => {
     try {
-      const res = await fetch('/api/dashboard/doctors/recent');
-      if (res.ok) {
-        const data = await res.json();
-        setRecentDoctors(data);
-      }
+      const data = await dashboardService.fetchRecentDoctors();
+      setRecentDoctors(data);
     } catch (error) {
       console.error('Failed to fetch recent doctors', error);
     }
@@ -131,145 +127,19 @@ export function DashboardClient({
   }, [activeTab]);
 
   // Real-time subscription for clinic updates
-  // Real-time subscription for clinic updates
-  useEffect(() => {
-    if (!clinic) return;
-
-    const channel = supabase
-      .channel('dashboard-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'clinics',
-          filter: `id=eq.${clinic.id}`,
-        },
-        async (payload) => {
-          const updatedClinic = payload.new as Clinic;
-
-          // Check for deactivation
-          if (updatedClinic.is_active === false) {
-            await handleLogout();
-            return;
-          }
-
-          // Update local state
-          setClinic(updatedClinic);
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'queues',
-          filter: `clinic_id=eq.${clinic.id}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const newQueue = payload.new as Queue;
-            if (newQueue.status !== 'ended') {
-              setActiveQueues(prev => {
-                if (prev.some(q => q.id === newQueue.id)) return prev;
-                return [newQueue, ...prev];
-              });
-            } else {
-              setPastSessions(prev => [newQueue, ...prev]);
-            }
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedQueue = payload.new as Queue;
-
-            if (updatedQueue.status === 'ended') {
-              // Move from active to history
-              setActiveQueues(prev => prev.filter(q => q.id !== updatedQueue.id));
-              setPastSessions(prev => {
-                const exists = prev.find(q => q.id === updatedQueue.id);
-                if (exists) return prev.map(q => q.id === updatedQueue.id ? updatedQueue : q);
-                return [updatedQueue, ...prev];
-              });
-
-              if (selectedQueueId === updatedQueue.id) {
-                setSelectedQueueId(null);
-                toast.info('Session ended.');
-              }
-            } else {
-              // Update active queue
-              setActiveQueues(prev => {
-                const exists = prev.find(q => q.id === updatedQueue.id);
-                if (exists) return prev.map(q => q.id === updatedQueue.id ? updatedQueue : q);
-                return [updatedQueue, ...prev];
-              });
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [clinic?.id, supabase, router, selectedQueueId]);
-
-  // Real-time tokens subscription (Global for this clinic's active queues)
-  const pendingUpdates = useRef<{ type: string, payload: any }[]>([]);
-  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (activeQueues.length === 0) return;
-
-    const processUpdates = () => {
-      if (pendingUpdates.current.length === 0) return;
-
-      const updates = [...pendingUpdates.current];
-      pendingUpdates.current = []; // Clear queue
-
-      setTokens((prev) => {
-        let newTokens = [...prev];
-        updates.forEach(update => {
-          if (update.type === 'INSERT') {
-            const newToken = update.payload.new as Token;
-            if (!newTokens.find(t => t.id === newToken.id)) {
-              newTokens.push(newToken);
-            }
-          } else if (update.type === 'UPDATE') {
-            const updatedToken = update.payload.new as Token;
-            newTokens = newTokens.map(t => t.id === updatedToken.id ? updatedToken : t);
-          } else if (update.type === 'DELETE') {
-            const deletedId = update.payload.old.id;
-            newTokens = newTokens.filter(t => t.id !== deletedId);
-          }
-        });
-        return newTokens;
-      });
-    };
-
-    const channel = supabase
-      .channel(`tokens-clinic-${clinic?.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tokens',
-          filter: `clinic_id=eq.${clinic?.id}`,
-        },
-        (payload) => {
-          // Push to queue
-          pendingUpdates.current.push({ type: payload.eventType, payload });
-
-          // Debounce
-          if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-          debounceTimeout.current = setTimeout(processUpdates, 100);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    };
-  }, [clinic?.id, supabase, activeQueues.length]);
+  // Real-time subscription
+  useRealtimeDashboard({
+    supabase,
+    clinic,
+    activeQueues,
+    selectedQueueId,
+    setClinic,
+    setActiveQueues,
+    setPastSessions,
+    setTokens,
+    router,
+    setSelectedQueueId
+  });
 
   // Handlers
   const handleStartSession = async (e: FormEvent) => {
@@ -301,18 +171,11 @@ export function DashboardClient({
         doctorImageUrl = publicUrl;
       }
 
-      const response = await fetch('/api/dashboard/session/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ doctorName: newDoctorName, doctorImageUrl, doctorArrivalTime: newDoctorArrivalTime }),
+      const newQueue = await dashboardService.startSession({
+        doctorName: newDoctorName,
+        doctorImageUrl,
+        doctorArrivalTime: newDoctorArrivalTime
       });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || 'Failed to start session');
-      }
-
-      const newQueue = await response.json();
       setActiveQueues(prev => [newQueue, ...prev]);
       setSelectedQueueId(newQueue.id);
       setNewDoctorName('');
@@ -332,15 +195,7 @@ export function DashboardClient({
     const newStatus = activeQueue.status === 'active' ? 'paused' : 'active';
 
     try {
-      const response = await fetch('/api/dashboard/session/toggle-break', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: activeQueue.id, newStatus }),
-      });
-
-      if (!response.ok) throw new Error('Failed to toggle break');
-
-      const updatedQueue = await response.json();
+      const updatedQueue = await dashboardService.toggleBreak(activeQueue.id, newStatus);
       setActiveQueues(prev => prev.map(q => q.id === updatedQueue.id ? updatedQueue : q));
       toast.success(newStatus === 'paused' ? 'Session paused' : 'Session resumed');
     } catch (err: any) {
@@ -353,13 +208,7 @@ export function DashboardClient({
     if (!confirm('Are you sure you want to end the session? This will clear the current queue.')) return;
 
     try {
-      const response = await fetch('/api/dashboard/session/end', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: activeQueue.id }),
-      });
-
-      if (!response.ok) throw new Error('Failed to end session');
+      await dashboardService.endSession(activeQueue.id);
 
       setActiveQueues(prev => prev.filter(q => q.id !== activeQueue.id));
       setSelectedQueueId(null);
@@ -375,15 +224,7 @@ export function DashboardClient({
     if (!activeQueue) return;
     setFormIsLoading(true);
     try {
-      const response = await fetch('/api/dashboard/session/activate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: activeQueue.id }),
-      });
-
-      if (!response.ok) throw new Error('Failed to activate session');
-
-      const updatedQueue = await response.json();
+      const updatedQueue = await dashboardService.activateSession(activeQueue.id);
       setActiveQueues(prev => prev.map(q => q.id === updatedQueue.id ? { ...q, ...updatedQueue } : q));
       toast.success('Session started! You can now call patients.');
       setActiveTab('overview');
@@ -433,23 +274,12 @@ export function DashboardClient({
     // setFormIsLoading(true); 
 
     try {
-      const response = await fetch('/api/dashboard/token/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          queueId: activeQueue.id,
-          phone: phone,
-          patientName: name,
-          purpose
-        }),
+      const newToken = await dashboardService.registerPatient({
+        queueId: activeQueue.id,
+        phone: phone,
+        patientName: name,
+        purpose
       });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || 'Failed to register token');
-      }
-
-      const newToken = await response.json();
 
       // Replace temp token with real one
       setTokens(prev => prev.map(t => t.id === tempId ? newToken : t));
@@ -519,19 +349,7 @@ export function DashboardClient({
     setTokens(newTokens);
 
     try {
-      const response = await fetch('/api/dashboard/token/call-next', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          queueId: targetQueueId,
-          currentCalledTokenId: currentCalled?.id
-        }),
-      });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || 'Failed to call next token');
-      }
+      await dashboardService.callNext(targetQueueId, currentCalled?.id);
 
       // Best practice: Trust Optimistic, let Real-time fix drift.
 
@@ -547,11 +365,7 @@ export function DashboardClient({
     if (!confirm('Are you sure you want to remove this patient from the queue?')) return;
 
     try {
-      const response = await fetch(`/api/dashboard/token/${tokenId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) throw new Error('Failed to delete token');
+      await dashboardService.deleteToken(tokenId);
 
       setTokens(prev => prev.filter(t => t.id !== tokenId));
       toast.success('Patient removed from queue');

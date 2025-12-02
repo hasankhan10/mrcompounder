@@ -70,7 +70,7 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                                     ? 'bg-white text-green-600 hover:bg-green-50'
                                     : 'bg-white text-blue-600 hover:bg-blue-50'
                                     }`}
-                                onClick={onCallNext}
+                                onClick={() => onCallNext()}
                                 disabled={(!isLastPatient && pendingTokens.length === 0) || !isSessionActive}
                             >
                                 {isLastPatient ? 'Serve & Finish' : 'Call Next Token'}

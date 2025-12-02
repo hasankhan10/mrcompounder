@@ -1,7 +1,7 @@
 'use client';
 
 import { APP_NAME } from '@/lib/config';
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { Clinic } from '@/lib/types';
@@ -21,6 +21,8 @@ import { DeleteClinicAlert } from '@/components/admin/DeleteClinicAlert';
 import { StatsGridSkeleton, ClinicTableSkeleton, PaymentRequestsSkeleton } from '@/components/skeletons/DashboardSkeletons';
 import { FileUpload } from '@/components/ui/file-upload';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { adminService } from '@/services/admin';
+import { useAdminRealtime } from '@/hooks/useAdminRealtime';
 
 interface AdminClientProps {
   initialClinics: Clinic[];
@@ -61,8 +63,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   // Fetch Payment Requests
   useEffect(() => {
     if (activeTab === 'payment-requests') {
-      fetch('/api/admin/recharge/requests')
-        .then(res => res.json())
+      adminService.fetchPaymentRequests()
         .then(data => setPaymentRequests(data))
         .catch(err => console.error(err));
     }
@@ -70,12 +71,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
   const handleRequestAction = async (requestId: string, action: 'approve' | 'reject', amount?: number) => {
     try {
-      const res = await fetch('/api/admin/recharge/approve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestId, action })
-      });
-      if (!res.ok) throw new Error('Action failed');
+      await adminService.approvePaymentRequest(requestId, action);
 
       toast.success(`Request ${action}d`);
       setPaymentRequests(prev => prev.filter(r => r.id !== requestId));
@@ -96,8 +92,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   // Fetch UPI Settings
   useEffect(() => {
     if (activeTab === 'upi-settings') {
-      fetch('/api/admin/settings')
-        .then(res => res.json())
+      adminService.fetchSettings()
         .then(data => setUpiSettings({
           upi_id: data.upi_id || '',
           qr_code_url: data.qr_code_url || ''
@@ -106,60 +101,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     }
   }, [activeTab]);
 
-  // Realtime Subscription for Clinics
-  useEffect(() => {
-    const channel = supabase
-      .channel('admin-clinics-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'clinics',
-        },
-        (payload) => {
-          const updatedClinic = payload.new as Clinic;
-          setClinics((prevClinics) =>
-            prevClinics.map((clinic) =>
-              clinic.id === updatedClinic.id ? { ...clinic, ...updatedClinic } : clinic
-            )
-          );
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase]);
-
-  // Realtime Subscription for Stats (Tokens)
-  useEffect(() => {
-    const channel = supabase
-      .channel('admin-stats-tokens')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'tokens',
-          filter: 'status=eq.served'
-        },
-        (payload) => {
-          // Increment total patients served today
-          // We assume this update marks the token as served
-          setStats(prev => ({
-            ...prev,
-            totalPatientsToday: prev.totalPatientsToday + 1
-          }));
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase]);
+  // ... (Realtime blocks will be removed next)
 
   const handleSaveSettings = async (e: FormEvent) => {
     e.preventDefault();
@@ -175,13 +117,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         url = data.publicUrl;
       }
 
-      const res = await fetch('/api/admin/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...upiSettings, qr_code_url: url })
-      });
-
-      if (!res.ok) throw new Error('Failed to save');
+      await adminService.saveSettings({ ...upiSettings, qr_code_url: url });
 
       setUpiSettings(prev => ({ ...prev, qr_code_url: url }));
       setQrFile(null);
@@ -203,36 +139,30 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
   // Fetch Stats Helper
   // Fetch Stats Helper
-  const fetchStats = async (showLoading = true) => {
+  const fetchStats = useCallback(async (showLoading = true) => {
     if (showLoading) setIsLoadingStats(true);
     try {
-      const res = await fetch('/api/admin/stats');
-      if (res.ok) {
-        const data = await res.json();
-        setStats(data);
-      }
+      const data = await adminService.fetchStats();
+      setStats(data);
     } catch (error) {
       console.error('Failed to fetch stats', error);
     } finally {
       if (showLoading) setIsLoadingStats(false);
     }
-  };
+  }, []);
 
   // Fetch Clinic Stats Map (Served Today)
-  const fetchClinicStats = async () => {
+  const fetchClinicStats = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/clinics/stats-map');
-      if (res.ok) {
-        const counts = await res.json();
-        setClinics(prev => prev.map(c => ({
-          ...c,
-          served_today_count: counts[c.id] || 0
-        })));
-      }
+      const counts = await adminService.fetchClinicStatsMap();
+      setClinics(prev => prev.map(c => ({
+        ...c,
+        served_today_count: counts[c.id] || 0
+      })));
     } catch (error) {
       console.error('Failed to fetch clinic stats', error);
     }
-  };
+  }, []);
 
   // Initial Fetch
   useEffect(() => {
@@ -251,63 +181,15 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   }, [activeTab]);
 
   // Real-time Subscriptions
-  useEffect(() => {
-    const channel = supabase
-      .channel('admin-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'clinics' },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setClinics((prev) => {
-              if (prev.some(c => c.id === payload.new.id)) return prev;
-              return [...prev, payload.new as Clinic];
-            });
-            fetchStats(false);
-          } else if (payload.eventType === 'UPDATE') {
-            setClinics((prev) => prev.map((c) => (c.id === payload.new.id ? (payload.new as Clinic) : c)));
-            fetchStats(false);
-          } else if (payload.eventType === 'DELETE') {
-            setClinics((prev) => prev.filter((c) => c.id !== payload.old.id));
-            fetchStats(false);
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'tokens' },
-        () => {
-          fetchStats(false); // Update patient count
-          fetchClinicStats(); // Update per-clinic served count
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'transactions' },
-        () => {
-          fetchStats(false); // Update revenue (from topups)
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'payment_requests' },
-        () => {
-          fetchStats(false); // Update revenue (from approved requests)
-          // Also refresh the payment requests list if we are on that tab
-          if (activeTab === 'payment-requests') {
-            fetch('/api/admin/recharge/requests')
-              .then(res => res.json())
-              .then(data => setPaymentRequests(data))
-              .catch(err => console.error(err));
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase]);
+  useAdminRealtime({
+    supabase,
+    setClinics,
+    setStats,
+    setPaymentRequests,
+    activeTab,
+    fetchStats,
+    fetchClinicStats
+  });
 
   // Modal/Dialog state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -362,24 +244,13 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       }
 
       // 2. Create Clinic
-      const response = await fetch('/api/admin/clinics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newClinicName,
-          slug: newClinicSlug,
-          logoUrl: logoUrl,
-          compounderEmail: newClinicEmail,
-          compounderPassword: newClinicPassword
-        }),
+      const { clinic: newClinic } = await adminService.createClinic({
+        name: newClinicName,
+        slug: newClinicSlug,
+        logoUrl: logoUrl,
+        compounderEmail: newClinicEmail,
+        compounderPassword: newClinicPassword
       });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || 'Failed to create clinic');
-      }
-
-      const { clinic: newClinic } = await response.json();
       setClinics(prev => {
         if (prev.some(c => c.id === newClinic.id)) return prev;
         return [...prev, newClinic];
@@ -436,23 +307,12 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         logoUrl = publicUrl;
       }
 
-      const response = await fetch(`/api/admin/clinics/${selectedClinic.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newClinicName,
-          slug: newClinicSlug,
-          logo_url: logoUrl,
-          password: newClinicPassword || undefined // Only send if changed
-        }),
+      const updatedClinic = await adminService.updateClinic(selectedClinic.id, {
+        name: newClinicName,
+        slug: newClinicSlug,
+        logo_url: logoUrl,
+        password: newClinicPassword || undefined
       });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || 'Failed to update clinic');
-      }
-
-      const updatedClinic = await response.json();
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       setIsEditModalOpen(false);
       toast.success('Clinic updated successfully');
@@ -476,11 +336,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     if (!selectedClinic) return;
 
     try {
-      const response = await fetch(`/api/admin/clinics/${selectedClinic.id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) throw new Error('Failed to delete clinic');
+      await adminService.deleteClinic(selectedClinic.id);
 
       setClinics(clinics.filter(c => c.id !== selectedClinic.id));
       setIsDeleteAlertOpen(false);
@@ -492,15 +348,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const response = await fetch(`/api/admin/clinics/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isActive: !currentStatus }), // Fixed key
-      });
-
-      if (!response.ok) throw new Error('Failed to update status');
-
-      const updatedClinic = await response.json();
+      const updatedClinic = await adminService.toggleStatus(id, !currentStatus);
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       toast.success(`Clinic ${!currentStatus ? 'activated' : 'deactivated'}`);
     } catch (err: any) {
@@ -516,15 +364,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     }
 
     try {
-      const response = await fetch(`/api/admin/clinics/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topupAmount: amount }),
-      });
-
-      if (!response.ok) throw new Error('Failed to top-up');
-
-      const updatedClinic = await response.json();
+      const updatedClinic = await adminService.topupClinic(id, amount);
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       setTopupAmounts(prev => ({ ...prev, [id]: '' }));
       toast.success(`Payment of ₹${amount} recorded`);
@@ -559,13 +399,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     if (!isActive) {
       // Turn off trial
       try {
-        const response = await fetch(`/api/admin/clinics/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trialStartDate: null, trialEndDate: null }),
-        });
-        if (!response.ok) throw new Error('Failed to disable trial');
-        const updatedClinic = await response.json();
+        const updatedClinic = await adminService.toggleTrial(id, null, null);
         setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
         toast.success('Trial mode disabled');
       } catch (err: any) {
@@ -591,13 +425,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       }
 
       try {
-        const response = await fetch(`/api/admin/clinics/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trialStartDate: start, trialEndDate: end }),
-        });
-        if (!response.ok) throw new Error('Failed to enable trial');
-        const updatedClinic = await response.json();
+        const updatedClinic = await adminService.toggleTrial(id, start, end);
         setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
         toast.success('Trial mode enabled');
       } catch (err: any) {
