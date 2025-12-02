@@ -79,7 +79,7 @@ export function DashboardClient({
   const [newPatientName, setNewPatientName] = useState('');
   const [newPatientPurpose, setNewPatientPurpose] = useState('');
   const [formIsLoading, setFormIsLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -106,20 +106,23 @@ export function DashboardClient({
   };
 
   // Fetch recent doctors
-  useEffect(() => {
-    const fetchRecentDoctors = async () => {
-      try {
-        const res = await fetch('/api/dashboard/doctors/recent');
-        if (res.ok) {
-          const data = await res.json();
-          setRecentDoctors(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch recent doctors', error);
+  const fetchRecentDoctors = async () => {
+    try {
+      const res = await fetch('/api/dashboard/doctors/recent');
+      if (res.ok) {
+        const data = await res.json();
+        setRecentDoctors(data);
       }
-    };
-    fetchRecentDoctors().finally(() => setIsLoading(false));
-  }, []);
+    } catch (error) {
+      console.error('Failed to fetch recent doctors', error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'patient-booking' && recentDoctors.length === 0) {
+      fetchRecentDoctors();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     if (activeTab === 'history' && pastSessions.length === 0) {
