@@ -1,4 +1,5 @@
 import React, { FormEvent } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -36,11 +37,15 @@ export function RegisterPatientCard({
             {/* Doctor Info Header */}
             <div className="flex flex-col items-center mb-6">
                 {doctorImageUrl ? (
-                    <img
-                        src={doctorImageUrl}
-                        alt={doctorName}
-                        className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg mb-3"
-                    />
+                    <div className="relative w-24 h-24 mb-3">
+                        <Image
+                            src={doctorImageUrl}
+                            alt={doctorName || 'Doctor'}
+                            fill
+                            className="rounded-full object-cover border-4 border-white shadow-lg"
+                            unoptimized
+                        />
+                    </div>
                 ) : (
                     <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mb-3 shadow-inner">
                         <span className="text-2xl font-bold text-blue-600">{doctorName?.charAt(0)}</span>

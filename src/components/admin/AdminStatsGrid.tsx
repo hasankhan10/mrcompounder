@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Building2, Users, IndianRupee, Activity } from 'lucide-react';
+import { Building2, Users, IndianRupee } from 'lucide-react';
 
 interface AdminStatsGridProps {
     totalClinics: number;

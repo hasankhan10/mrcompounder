@@ -15,7 +15,7 @@ export default function AboutUsPage() {
             Bringing Calm to Clinics, One Patient at a Time.
           </h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            We are a team dedicated to solving real-world problems with simple, effective technology. We believe waiting for a doctor shouldn't be a stressful experience.
+            We are a team dedicated to solving real-world problems with simple, effective technology. We believe waiting for a doctor shouldn&apos;t be a stressful experience.
           </p>
         </div>
       </section>
@@ -24,15 +24,15 @@ export default function AboutUsPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="prose lg:prose-lg max-w-none">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Our Story: The <span className="font-bengali">"দাদা, এখন কার সিরিয়াল?"</span> Problem</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Our Story: The <span className="font-bengali">&quot;দাদা, এখন কার সিরিয়াল?&quot;</span> Problem</h2>
             <p className='text-lg'>
-              Anyone who has visited a local clinic in India knows the scene: a crowded room, a stressed compounder shouting names, and patients anxiously asking, "Is it my turn yet?". We've been there, and we knew there had to be a better way.
+              Anyone who has visited a local clinic in India knows the scene: a crowded room, a stressed compounder shouting names, and patients anxiously asking, &quot;Is it my turn yet?&quot;. We&apos;ve been there, and we knew there had to be a better way.
             </p>
             <p className='text-lg'>
               {APP_NAME} was born from this simple observation. We saw the chaos of paper tokens and notebooks and imagined a future where technology could create a calm, efficient, and respectful environment for everyone—staff, doctors, and most importantly, patients.
             </p>
             <p className='text-lg'>
-              We didn't want to force a complex system. No app downloads, no complicated logins. Just a simple, web-based solution that works on the phones people already have in their pockets.
+              We didn&apos;t want to force a complex system. No app downloads, no complicated logins. Just a simple, web-based solution that works on the phones people already have in their pockets.
             </p>
           </div>
           <div className="hidden md:block">

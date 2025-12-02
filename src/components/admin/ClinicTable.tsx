@@ -1,19 +1,16 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Edit, Trash2, IndianRupee } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { Clinic } from '@/lib/types';
+import Image from 'next/image';
 
 interface ClinicTableProps {
     clinics: Clinic[];
     onEdit: (clinic: Clinic) => void;
     onDelete: (id: string) => void;
     onToggleStatus: (id: string, currentStatus: boolean) => void;
-    onTopup: (id: string) => void;
-    topupAmounts: { [key: string]: string };
-    setTopupAmounts: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
     onToggleTrial: (id: string, isActive: boolean) => void;
     trialDates: { [key: string]: { start: string, end: string } };
     onTrialDateChange: (id: string, type: 'start' | 'end', value: string) => void;
@@ -24,9 +21,6 @@ export function ClinicTable({
     onEdit,
     onDelete,
     onToggleStatus,
-    onTopup,
-    topupAmounts,
-    setTopupAmounts,
     onToggleTrial,
     trialDates,
     onTrialDateChange
@@ -57,7 +51,9 @@ export function ClinicTable({
                                 <TableCell>
                                     <div className="flex items-center space-x-3">
                                         {clinic.logo_url ? (
-                                            <img src={clinic.logo_url} alt={clinic.name || 'Clinic'} className="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+                                            <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-gray-100">
+                                                <Image src={clinic.logo_url} alt={clinic.name || 'Clinic'} fill className="object-cover" unoptimized />
+                                            </div>
                                         ) : (
                                             <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
                                                 {(clinic.name || '?').charAt(0)}

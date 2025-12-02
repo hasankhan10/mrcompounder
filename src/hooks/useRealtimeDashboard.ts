@@ -30,9 +30,11 @@ export function useRealtimeDashboard({
     setSelectedQueueId
 }: UseRealtimeDashboardProps) {
 
+    const clinicId = clinic?.id;
+
     // Real-time subscription for clinic updates
     useEffect(() => {
-        if (!clinic) return;
+        if (!clinicId) return;
 
         const channel = supabase
             .channel('dashboard-realtime')
@@ -42,7 +44,7 @@ export function useRealtimeDashboard({
                     event: 'UPDATE',
                     schema: 'public',
                     table: 'clinics',
-                    filter: `id=eq.${clinic.id}`,
+                    filter: `id=eq.${clinicId}`,
                 },
                 async (payload) => {
                     const updatedClinic = payload.new as Clinic;
@@ -64,7 +66,7 @@ export function useRealtimeDashboard({
                     event: '*',
                     schema: 'public',
                     table: 'queues',
-                    filter: `clinic_id=eq.${clinic.id}`,
+                    filter: `clinic_id=eq.${clinicId}`,
                 },
                 (payload) => {
                     if (payload.eventType === 'INSERT') {
@@ -109,10 +111,10 @@ export function useRealtimeDashboard({
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [clinic?.id, supabase, router, selectedQueueId]);
+    }, [clinicId, supabase, router, selectedQueueId, setClinic, setActiveQueues, setPastSessions, setSelectedQueueId]);
 
     // Real-time tokens subscription (Global for this clinic's active queues)
-    const pendingUpdates = useRef<{ type: string, payload: any }[]>([]);
+    const pendingUpdates = useRef<{ type: string, payload: unknown }[]>([]);
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
@@ -128,15 +130,18 @@ export function useRealtimeDashboard({
                 let newTokens = [...prev];
                 updates.forEach(update => {
                     if (update.type === 'INSERT') {
-                        const newToken = update.payload.new as Token;
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const newToken = (update.payload as any).new as Token;
                         if (!newTokens.find(t => t.id === newToken.id)) {
                             newTokens.push(newToken);
                         }
                     } else if (update.type === 'UPDATE') {
-                        const updatedToken = update.payload.new as Token;
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const updatedToken = (update.payload as any).new as Token;
                         newTokens = newTokens.map(t => t.id === updatedToken.id ? updatedToken : t);
                     } else if (update.type === 'DELETE') {
-                        const deletedId = update.payload.old.id;
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const deletedId = (update.payload as any).old.id;
                         newTokens = newTokens.filter(t => t.id !== deletedId);
                     }
                 });
@@ -145,14 +150,14 @@ export function useRealtimeDashboard({
         };
 
         const channel = supabase
-            .channel(`tokens-clinic-${clinic?.id}`)
+            .channel(`tokens-clinic-${clinicId}`)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
                     table: 'tokens',
-                    filter: `clinic_id=eq.${clinic?.id}`,
+                    filter: `clinic_id=eq.${clinicId}`,
                 },
                 (payload) => {
                     // Push to queue
@@ -169,5 +174,5 @@ export function useRealtimeDashboard({
             supabase.removeChannel(channel);
             if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
         };
-    }, [clinic?.id, supabase, activeQueues.length]);
+    }, [clinicId, supabase, activeQueues.length, setTokens]);
 }

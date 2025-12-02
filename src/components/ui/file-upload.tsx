@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { Upload, X, FileText, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 interface FileUploadProps {
     onChange: (file: File | null) => void;
@@ -74,7 +75,9 @@ export function FileUpload({ onChange, value, accept, className, label = "SVG, P
                     <div className="flex items-center gap-3 p-4 w-full h-full animate-fade-in">
                         <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center shadow-sm border border-gray-100 flex-shrink-0">
                             {value.type.startsWith('image/') ? (
-                                <img src={URL.createObjectURL(value)} alt="Preview" className="w-full h-full object-cover rounded-lg" />
+                                <div className="relative w-full h-full">
+                                    <Image src={URL.createObjectURL(value)} alt="Preview" fill className="object-cover rounded-lg" unoptimized />
+                                </div>
                             ) : (
                                 <FileText className="w-6 h-6 text-blue-500" />
                             )}

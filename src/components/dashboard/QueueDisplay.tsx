@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Token } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 interface QueueDisplayProps {
     doctorName?: string;
@@ -25,7 +26,9 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
             {/* Doctor Header */}
             <div className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                 {doctorImageUrl ? (
-                    <img src={doctorImageUrl} alt={doctorName} className="w-12 h-12 rounded-full object-cover border border-gray-200" />
+                    <div className="relative w-12 h-12 rounded-full overflow-hidden border border-gray-200">
+                        <Image src={doctorImageUrl} alt={doctorName || 'Doctor'} fill className="object-cover" unoptimized />
+                    </div>
                 ) : (
                     <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
                         {doctorName?.charAt(0)}

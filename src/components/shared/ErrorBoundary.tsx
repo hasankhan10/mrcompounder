@@ -43,7 +43,7 @@ export class ErrorBoundary extends Component<Props, State> {
                     <div>
                         <h3 className="text-lg font-semibold text-red-900">Something went wrong</h3>
                         <p className="text-sm text-red-700 mt-1 max-w-md">
-                            We couldn't load this section. It might be a temporary connection issue.
+                            We couldn&apos;t load this section. It might be a temporary connection issue.
                         </p>
                         {process.env.NODE_ENV === 'development' && this.state.error && (
                             <pre className="mt-2 text-xs text-left bg-red-100 p-2 rounded overflow-auto max-w-xs mx-auto">

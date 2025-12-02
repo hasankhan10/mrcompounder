@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { LayoutDashboard, Menu, LogOut, ChevronRight, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 export interface NavItem {
     label: string;
@@ -24,26 +26,37 @@ interface DashboardShellProps {
     userType: 'admin' | 'clinic';
 }
 
-export function DashboardShell({
+interface SidebarContentProps {
+    title: string;
+    logoUrl?: string | null;
+    subtitle?: string;
+    navItems: NavItem[];
+    activeTab: string;
+    onTabChange: (tab: string) => void;
+    setIsMobileOpen: (open: boolean) => void;
+    router: AppRouterInstance;
+    onLogout: () => void;
+}
+
+function SidebarContent({
     title,
     logoUrl,
     subtitle,
     navItems,
     activeTab,
     onTabChange,
-    onLogout,
-    children,
-    userType
-}: DashboardShellProps) {
-    const router = useRouter();
-    const [isMobileOpen, setIsMobileOpen] = React.useState(false);
-
-    const SidebarContent = () => (
+    setIsMobileOpen,
+    router,
+    onLogout
+}: SidebarContentProps) {
+    return (
         <div className="flex flex-col h-full bg-white border-r border-gray-200 w-64">
             <div className="p-6 border-b border-gray-100">
                 <div className="flex items-center space-x-3">
                     {logoUrl ? (
-                        <img src={logoUrl} alt="Logo" className="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+                        <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-gray-100">
+                            <Image src={logoUrl} alt="Logo" fill className="object-cover" />
+                        </div>
                     ) : (
                         <div className="bg-blue-600 p-2 rounded-lg">
                             <LayoutDashboard className="w-5 h-5 text-white" />
@@ -100,12 +113,38 @@ export function DashboardShell({
             </div>
         </div>
     );
+}
+
+export function DashboardShell({
+    title,
+    logoUrl,
+    subtitle,
+    navItems,
+    activeTab,
+    onTabChange,
+    onLogout,
+    children
+}: DashboardShellProps) {
+    const router = useRouter();
+    const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+
+
 
     return (
         <div className="min-h-screen bg-gray-50/50 flex">
             {/* Desktop Sidebar */}
             <aside className="hidden md:block h-screen sticky top-0">
-                <SidebarContent />
+                <SidebarContent
+                    title={title}
+                    logoUrl={logoUrl}
+                    subtitle={subtitle}
+                    navItems={navItems}
+                    activeTab={activeTab}
+                    onTabChange={onTabChange}
+                    setIsMobileOpen={setIsMobileOpen}
+                    router={router}
+                    onLogout={onLogout}
+                />
             </aside>
 
             {/* Mobile Sidebar (Sheet) */}
@@ -118,7 +157,17 @@ export function DashboardShell({
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-64">
                         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                        <SidebarContent />
+                        <SidebarContent
+                            title={title}
+                            logoUrl={logoUrl}
+                            subtitle={subtitle}
+                            navItems={navItems}
+                            activeTab={activeTab}
+                            onTabChange={onTabChange}
+                            setIsMobileOpen={setIsMobileOpen}
+                            router={router}
+                            onLogout={onLogout}
+                        />
                     </SheetContent>
                 </Sheet>
             </div>

@@ -20,7 +20,7 @@ export async function GET() {
   // Fetch all data in parallel
   const [
     { data: clinic, error: clinicError },
-    { data: activeQueue, error: queueError }
+    { data: activeQueue }
   ] = await Promise.all([
     supabase.from('clinics').select('*').eq('id', clinicId).single(),
     supabase.from('queues').select('*').eq('clinic_id', clinicId).order('created_at', { ascending: false }).limit(1).single()

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 
-export async function GET(request: Request) {
+export async function GET() {
     const supabase = await createServerSupabaseClient();
 
     // 1. Auth Check

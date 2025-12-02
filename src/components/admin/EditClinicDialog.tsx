@@ -1,4 +1,5 @@
 import React, { FormEvent, useState } from 'react';
+import Image from 'next/image';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +17,6 @@ interface EditClinicDialogProps {
     slug: string;
     setSlug: (val: string) => void;
     logoUrl: string;
-    setLogoUrl: (val: string) => void;
     logoFile: File | null;
     setLogoFile: (file: File | null) => void;
     password: string;
@@ -25,7 +25,7 @@ interface EditClinicDialogProps {
 
 export function EditClinicDialog({
     isOpen, onOpenChange, onSubmit, isLoading,
-    name, setName, slug, setSlug, logoUrl, setLogoUrl, logoFile, setLogoFile,
+    name, setName, slug, setSlug, logoUrl, logoFile, setLogoFile,
     password, setPassword
 }: EditClinicDialogProps) {
     const [showPassword, setShowPassword] = useState(false);
@@ -55,7 +55,9 @@ export function EditClinicDialog({
                         <Label htmlFor="edit-logo">Clinic Logo</Label>
                         {logoUrl && (
                             <div className="mb-2">
-                                <img src={logoUrl} alt="Current Logo" className="h-10 w-10 rounded object-cover border" />
+                                <div className="mb-2 relative h-10 w-10">
+                                    <Image src={logoUrl} alt="Current Logo" fill className="rounded object-cover border" unoptimized />
+                                </div>
                             </div>
                         )}
                         <FileUpload

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import type { CreateClinicRequest, ListClinicsResponse } from '@/lib/types';
+import type { CreateClinicRequest } from '@/lib/types';
 
 // TODO: Implement authentication and authorization check for super_admin
 
@@ -12,7 +12,7 @@ import type { CreateClinicRequest, ListClinicsResponse } from '@/lib/types';
  * @tags Admin
  * @return {ListClinicsResponse} 200 - Success response
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   const supabase = await createServerSupabaseClient();
 
   // Check Auth
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body: CreateClinicRequest = await request.json();
-    const { name, slug, initialBalance, compounderEmail, compounderPassword, logoUrl } = body;
+    const { name, slug, compounderEmail, compounderPassword, logoUrl } = body;
 
     // Validate required fields
     if (!name || !slug || !compounderEmail || !compounderPassword) {
@@ -140,8 +140,9 @@ export async function POST(request: NextRequest) {
       clinic: newClinic,
     }, { status: 201 });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Unexpected error:', error);
-    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+    const message = error instanceof Error ? error.message : 'Internal Server Error';
+    return new NextResponse(JSON.stringify({ error: message }), { status: 500 });
   }
 }

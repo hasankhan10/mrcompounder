@@ -2,7 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import type { UpdateClinicRequest, UpdateClinicResponse } from '@/lib/types';
+import type { UpdateClinicRequest } from '@/lib/types';
 
 /**
  * PATCH /api/admin/clinics/{clinicId}
@@ -90,7 +90,7 @@ export async function PATCH(
 
     // 4. Handle Trial Period Update (Admin Context)
     if (body.trialStartDate !== undefined || body.trialEndDate !== undefined) {
-      const updateData: any = {};
+      const updateData: Record<string, string | null> = {};
       if (body.trialStartDate !== undefined) updateData.trial_start_date = body.trialStartDate;
       if (body.trialEndDate !== undefined) updateData.trial_end_date = body.trialEndDate;
 
@@ -110,7 +110,7 @@ export async function PATCH(
 
     // 5. Handle General Info Update (Name, Slug, Logo) & Password
     if (body.name || body.slug || body.logoUrl || body.password) {
-      const updateData: any = {};
+      const updateData: Record<string, string> = {};
       if (body.name) updateData.name = body.name;
       if (body.slug) updateData.slug = body.slug;
       if (body.logoUrl) updateData.logo_url = body.logoUrl;

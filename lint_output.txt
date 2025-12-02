@@ -1,0 +1,49 @@
+
+> clinicline@0.1.0 lint
+> eslint
+
+
+M:\MrCompounder\mrcompounder\src\app\(admin)\admin\AdminClient.tsx
+  167:6  warning  React Hook useEffect has a missing dependency: 'fetchStats'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+M:\MrCompounder\mrcompounder\src\app\(dashboard)\dashboard\page.tsx
+  34:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+M:\MrCompounder\mrcompounder\src\app\(dashboard)\layout.tsx
+  5:10  warning  'Profile' is defined but never used  @typescript-eslint/no-unused-vars
+
+M:\MrCompounder\mrcompounder\src\app\(public)\[clinicSlug]\page.tsx
+  4:25  warning  'Token' is defined but never used  @typescript-eslint/no-unused-vars
+
+M:\MrCompounder\mrcompounder\src\app\(public)\login\page.tsx
+  48:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  86:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+M:\MrCompounder\mrcompounder\src\app\api\admin\clinics\[clinicId]\route.ts
+   93:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+M:\MrCompounder\mrcompounder\src\app\api\admin\clinics\stats-map\route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+M:\MrCompounder\mrcompounder\src\app\api\admin\stats\route.ts
+  4:15  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+M:\MrCompounder\mrcompounder\src\app\api\cron\archive\route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+M:\MrCompounder\mrcompounder\src\app\api\dashboard\doctors\recent\route.ts
+  2:15  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+M:\MrCompounder\mrcompounder\src\components\admin\AdminStatsGrid.tsx
+  3:41  warning  'Activity' is defined but never used  @typescript-eslint/no-unused-vars
+
+M:\MrCompounder\mrcompounder\src\components\dashboard\QueueDisplay.tsx
+  28:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+M:\MrCompounder\mrcompounder\src\components\dashboard\RegisterPatientCard.tsx
+  39:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+✖ 16 problems (6 errors, 10 warnings)
+

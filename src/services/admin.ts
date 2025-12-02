@@ -1,4 +1,4 @@
-import { Clinic } from '@/lib/types';
+import { CreateClinicRequest, UpdateClinicRequest } from '@/lib/types';
 
 export const adminService = {
     async fetchPaymentRequests() {
@@ -45,7 +45,7 @@ export const adminService = {
         return res.json();
     },
 
-    async createClinic(data: any) {
+    async createClinic(data: CreateClinicRequest) {
         const res = await fetch('/api/admin/clinics', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -58,7 +58,7 @@ export const adminService = {
         return res.json();
     },
 
-    async updateClinic(id: string, data: any) {
+    async updateClinic(id: string, data: UpdateClinicRequest) {
         const res = await fetch(`/api/admin/clinics/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -88,6 +88,6 @@ export const adminService = {
     },
 
     async toggleTrial(id: string, startDate: string | null, endDate: string | null) {
-        return this.updateClinic(id, { trialStartDate: startDate, trialEndDate: endDate });
+        return this.updateClinic(id, { trialStartDate: startDate || undefined, trialEndDate: endDate || undefined });
     }
 };

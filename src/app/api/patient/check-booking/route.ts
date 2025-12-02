@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         const activeQueueIds = activeQueues.map(q => q.id);
 
         // 2. Find Patient Tokens in ANY of the active queues
-        const { data: tokens, error: tokenError } = await supabaseAdmin
+        const { data: tokens } = await supabaseAdmin
             .from('tokens')
             .select('*')
             .in('queue_id', activeQueueIds)
@@ -92,7 +92,8 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ bookings: validBookings });
 
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

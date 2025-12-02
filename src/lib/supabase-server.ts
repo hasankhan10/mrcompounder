@@ -18,7 +18,7 @@ export async function createServerSupabaseClient() {
         set(name: string, value: string, options: CookieOptions) {
           try {
             cookieStore.set({ name, value, ...options });
-          } catch (error) {
+          } catch {
             // This error is expected when trying to set a cookie from a Server Component.
             // It can be safely ignored.
           }
@@ -26,7 +26,7 @@ export async function createServerSupabaseClient() {
         remove(name: string, options: CookieOptions) {
           try {
             cookieStore.set({ name, value: '', ...options });
-          } catch (error) {
+          } catch {
             // This error is expected when trying to remove a cookie from a Server Component.
             // It can be safely ignored.
           }

@@ -51,15 +51,15 @@ export default function PricingPage() {
                 <div className="mt-20 grid md:grid-cols-3 gap-8 text-left max-w-5xl mx-auto">
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="font-bold text-lg mb-2 text-blue-800">How do I pay?</h3>
-                        <p className="text-gray-600 text-lg">At the end of the month, you'll receive a bill based on patients served. You can pay via UPI/Bank Transfer to clear dues.</p>
+                        <p className="text-gray-600 text-lg">At the end of the month, you&apos;ll receive a bill based on patients served. You can pay via UPI/Bank Transfer to clear dues.</p>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 className="font-bold text-lg mb-2 text-blue-800">What if I don't pay?</h3>
+                        <h3 className="font-bold text-lg mb-2 text-blue-800">What if I don&apos;t pay?</h3>
                         <p className="text-gray-600 text-lg">If the bill is not cleared by the deadline, your account may be temporarily paused until payment is made.</p>
                     </div>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="font-bold text-lg mb-2 text-blue-800">Is the trial really free?</h3>
-                        <p className="text-gray-600 text-lg">Yes. You can use the full system for 14 days without generating any bill. It's completely on us.</p>
+                        <p className="text-gray-600 text-lg">Yes. You can use the full system for 14 days without generating any bill. It&apos;s completely on us.</p>
                     </div>
                 </div>
             </div>

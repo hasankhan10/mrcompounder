@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { redirect } from 'next/navigation';
 import { AdminClient } from './AdminClient';
+import { getTodayIST } from '@/lib/date-utils';
 
 export default async function AdminPage() {
   const supabase = await createServerSupabaseClient();
@@ -24,7 +25,7 @@ export default async function AdminPage() {
     .order('created_at', { ascending: false });
 
   // Calculate Served Today
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getTodayIST();
 
   // 1. Get queues for today
   const { data: queues } = await supabaseAdmin
@@ -33,7 +34,7 @@ export default async function AdminPage() {
     .eq('session_date', todayStr);
 
   // 2. Get served tokens for these queues
-  let clinicCounts: Record<string, number> = {};
+  const clinicCounts: Record<string, number> = {};
 
   if (queues && queues.length > 0) {
     const queueIds = queues.map(q => q.id);

@@ -4,15 +4,16 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase-client';
 import { useEffect, useState } from 'react';
+import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
 interface NavbarAuthProps {
-    initialUser?: any;
+    initialUser?: User | null;
     initialRole?: string | null;
 }
 
 export function NavbarAuth({ initialUser, initialRole }: NavbarAuthProps) {
-    const [user, setUser] = useState<any>(initialUser || null);
+    const [user, setUser] = useState<User | null>(initialUser || null);
     const [role, setRole] = useState<string | null>(initialRole || null);
     const [loading, setLoading] = useState(false);
     const [supabase] = useState(() => createClient());

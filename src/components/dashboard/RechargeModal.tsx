@@ -5,6 +5,7 @@ import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase-client';
 import { FileUpload } from '@/components/ui/file-upload';
+import Image from 'next/image';
 
 interface RechargeModalProps {
     isOpen: boolean;
@@ -23,7 +24,7 @@ export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
             const fetchSettings = async () => {
                 const { data } = await supabase.from('system_settings').select('*');
                 if (data) {
-                    const map = data.reduce((acc: any, curr) => {
+                    const map = data.reduce((acc: Record<string, string>, curr) => {
                         acc[curr.key] = curr.value;
                         return acc;
                     }, {});
@@ -35,7 +36,7 @@ export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
             };
             fetchSettings();
         }
-    }, [isOpen]);
+    }, [isOpen, supabase]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(settings.upi_id);
@@ -78,8 +79,8 @@ export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
             // Reset form
             setAmount('');
             setFile(null);
-        } catch (err: any) {
-            toast.error(err.message);
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setSubmitting(false);
         }
@@ -101,7 +102,9 @@ export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
                     <div className="flex flex-col items-center space-y-4 w-full">
                         <div className="w-64 h-64 bg-white rounded-xl shadow-sm border-2 border-gray-100 p-2 flex items-center justify-center">
                             {settings.qr_code_url ? (
-                                <img src={settings.qr_code_url} alt="Payment QR" className="w-full h-full object-contain rounded-lg" />
+                                <div className="relative w-full h-full">
+                                    <Image src={settings.qr_code_url} alt="Payment QR" fill className="object-contain rounded-lg" />
+                                </div>
                             ) : (
                                 <div className="text-center text-gray-400">
                                     <p className="text-sm">QR Code Loading...</p>

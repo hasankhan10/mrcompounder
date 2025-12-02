@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { StartSessionRequest, StartSessionResponse } from '@/lib/types';
+import { StartSessionRequest } from '@/lib/types';
 
-// TODO: Implement authentication and authorization check for compounder
-// TODO: Get clinic_id from user's session
+import { getTodayIST } from '@/lib/date-utils';
 
 /**
  * POST /api/dashboard/session/start
@@ -49,7 +48,7 @@ export async function POST(request: NextRequest) {
       doctor_image_url: body.doctorImageUrl,
       doctor_arrival_time: body.doctorArrivalTime,
       status: 'waiting', // Start in waiting mode
-      session_date: new Date().toISOString().split('T')[0],
+      session_date: getTodayIST(),
     })
     .select()
     .single();

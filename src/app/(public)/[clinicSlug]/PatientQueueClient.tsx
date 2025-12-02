@@ -1,13 +1,18 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Clinic, Queue, Token } from '@/lib/types';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Clinic, Queue, Token, BookingData } from '@/lib/types';
 import { createClient } from '@/lib/supabase-client';
 import { toast } from 'sonner';
 import { PatientViewSkeleton } from '@/components/skeletons/DashboardSkeletons';
 import { PatientLogin } from '@/components/patient/PatientLogin';
 import { PatientBookingSelection } from '@/components/patient/PatientBookingSelection';
 import { PatientLiveQueue } from '@/components/patient/PatientLiveQueue';
+
+interface InitialData {
+  clinic: Clinic | null;
+  activeQueue: Queue | null;
+}
 
 interface InitialData {
   clinic: Clinic | null;
@@ -29,7 +34,7 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
 
   // Dashboard State
   const [myToken, setMyToken] = useState<Token | null>(null);
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<BookingData[]>([]);
   const [currentToken, setCurrentToken] = useState<Token | null>(null);
   const [lastServedTokenNumber, setLastServedTokenNumber] = useState<number>(0);
   const [queue, setQueue] = useState<Queue | null>(activeQueue);
@@ -100,12 +105,12 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queue?.id, supabase]); // Only re-subscribe if queue ID changes
+  }, [queue, supabase]); // Only re-subscribe if queue ID changes
 
 
-  const [lastServedTokens, setLastServedTokens] = useState<any[]>([]);
+  const [lastServedTokens, setLastServedTokens] = useState<Token[]>([]);
 
-  const fetchBookingStatus = async (phoneNumber: string) => {
+  const fetchBookingStatus = useCallback(async (phoneNumber: string) => {
     if (!clinic) return;
     setIsLoading(true);
     setError(null);
@@ -130,7 +135,7 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
 
       if (data.bookings && data.bookings.length > 0) {
         // Filter out completed visits (served/no_show)
-        const activeBookings = data.bookings.filter((b: any) =>
+        const activeBookings = data.bookings.filter((b: BookingData) =>
           b.token.status !== 'served' && b.token.status !== 'no_show'
         );
 
@@ -151,9 +156,11 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
         } else {
           // All bookings are completed. Show the most recently served one.
           // Sort by served_at desc (if available) or updated_at
-          const lastCompleted = data.bookings.sort((a: any, b: any) =>
-            new Date(b.token.updated_at).getTime() - new Date(a.token.updated_at).getTime()
-          )[0];
+          const lastCompleted = data.bookings.sort((a: BookingData, b: BookingData) => {
+            const timeA = new Date(a.token.served_at || a.token.created_at).getTime();
+            const timeB = new Date(b.token.served_at || b.token.created_at).getTime();
+            return timeB - timeA;
+          })[0];
 
           const b = lastCompleted;
           setMyToken(b.token);
@@ -175,12 +182,12 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
       // Persist Phone
       localStorage.setItem('clinicline_patient_phone', phoneNumber);
 
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [clinic]);
 
   // Auto-login on mount
   useEffect(() => {
@@ -189,7 +196,7 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
       setPhone(savedPhone);
       fetchBookingStatus(savedPhone);
     }
-  }, [clinic]);
+  }, [clinic, fetchBookingStatus]);
 
   const handleCheckBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,8 +226,8 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
     let avgTimePerPatient = 5; // Default fallback
     if (lastServedTokens.length >= 2) {
       // lastServedTokens is sorted DESC (newest first)
-      const newest = new Date(lastServedTokens[0].served_at).getTime();
-      const oldest = new Date(lastServedTokens[lastServedTokens.length - 1].served_at).getTime();
+      const newest = new Date(lastServedTokens[0].served_at || Date.now()).getTime();
+      const oldest = new Date(lastServedTokens[lastServedTokens.length - 1].served_at || Date.now()).getTime();
       const timeSpanMinutes = (newest - oldest) / (1000 * 60);
       const count = lastServedTokens.length - 1; // Intervals
 

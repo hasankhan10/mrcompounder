@@ -3,7 +3,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
-import { Clinic, Queue, Token } from '@/lib/types';
+import { Clinic, Queue, Token, RecentDoctor } from '@/lib/types';
 import { toast } from 'sonner';
 import { RechargeModal } from '@/components/dashboard/RechargeModal';
 import { PieChart, Settings, Users, History, IndianRupee } from 'lucide-react';
@@ -11,8 +11,7 @@ import { Button } from '@/components/ui/button';
 
 // Components
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
-import { PageLoading } from '@/components/shared/PageLoading';
-import { PageError } from '@/components/shared/PageError';
+
 import { OverviewTab } from '@/components/dashboard/tabs/OverviewTab';
 import { BookingTab } from '@/components/dashboard/tabs/BookingTab';
 import { HistoryTab } from '@/components/dashboard/tabs/HistoryTab';
@@ -25,6 +24,8 @@ interface DashboardClientProps {
   initialTokens: Token[];
   serverTime: string;
 }
+
+
 
 // Helper to check if trial is currently active
 const isTrialActive = (c: Clinic | null, nowDate?: Date) => {
@@ -51,8 +52,6 @@ export function DashboardClient({
   }, []);
 
   // Page-level state
-  const [pageIsLoading, setPageIsLoading] = useState(false);
-  const [pageError, setPageError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
 
@@ -76,12 +75,12 @@ export function DashboardClient({
   const [newDoctorImage, setNewDoctorImage] = useState<File | null>(null);
   const [newDoctorArrivalTime, setNewDoctorArrivalTime] = useState('');
   const [selectedExistingImage, setSelectedExistingImage] = useState<string | null>(null);
-  const [recentDoctors, setRecentDoctors] = useState<any[]>([]);
+  const [recentDoctors, setRecentDoctors] = useState<RecentDoctor[]>([]);
   const [newPatientPhone, setNewPatientPhone] = useState('');
   const [newPatientName, setNewPatientName] = useState('');
   const [newPatientPurpose, setNewPatientPurpose] = useState('');
   const [formIsLoading, setFormIsLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
 
   const handleLogout = async () => {
     try {
@@ -118,13 +117,13 @@ export function DashboardClient({
     if (activeTab === 'patient-booking' && recentDoctors.length === 0) {
       fetchRecentDoctors();
     }
-  }, [activeTab]);
+  }, [activeTab, recentDoctors.length]);
 
   useEffect(() => {
     if (activeTab === 'history' && pastSessions.length === 0) {
       fetchHistory();
     }
-  }, [activeTab]);
+  }, [activeTab, pastSessions.length]);
 
   // Real-time subscription for clinic updates
   // Real-time subscription
@@ -183,8 +182,8 @@ export function DashboardClient({
       setNewDoctorArrivalTime('');
       setSelectedExistingImage(null);
       toast.success('Session started successfully');
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setFormIsLoading(false);
     }
@@ -198,8 +197,8 @@ export function DashboardClient({
       const updatedQueue = await dashboardService.toggleBreak(activeQueue.id, newStatus);
       setActiveQueues(prev => prev.map(q => q.id === updatedQueue.id ? updatedQueue : q));
       toast.success(newStatus === 'paused' ? 'Session paused' : 'Session resumed');
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -215,8 +214,8 @@ export function DashboardClient({
       setNewDoctorName('');
       toast.success('Session ended');
       setActiveTab('history');
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -228,8 +227,8 @@ export function DashboardClient({
       setActiveQueues(prev => prev.map(q => q.id === updatedQueue.id ? { ...q, ...updatedQueue } : q));
       toast.success('Session started! You can now call patients.');
       setActiveTab('overview');
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setFormIsLoading(false);
     }
@@ -285,13 +284,13 @@ export function DashboardClient({
       setTokens(prev => prev.map(t => t.id === tempId ? newToken : t));
       toast.success(`Token #${newToken.token_number} generated`);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Revert on error
       setTokens(prev => prev.filter(t => t.id !== tempId));
       setNewPatientName(name);
       setNewPatientPhone(phone);
       setNewPatientPurpose(purpose);
-      toast.error(err.message);
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -353,11 +352,11 @@ export function DashboardClient({
 
       // Best practice: Trust Optimistic, let Real-time fix drift.
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Rollback
       setTokens(prevTokens);
       if (prevClinic) setClinic(prevClinic);
-      toast.error(err.message);
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -369,13 +368,12 @@ export function DashboardClient({
 
       setTokens(prev => prev.filter(t => t.id !== tokenId));
       toast.success('Patient removed from queue');
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
-  if (pageIsLoading) return <PageLoading message="Loading Dashboard..." />;
-  if (pageError) return <PageError message={pageError} />;
+
   if (!clinic) return null;
 
   const navItems: NavItem[] = [
@@ -443,7 +441,7 @@ export function DashboardClient({
           </div>
 
           <OverviewTab
-            isLoading={isLoading}
+            isLoading={false}
             activeQueues={activeQueues}
             tokens={tokens}
             selectedQueueId={selectedQueueId}
@@ -468,7 +466,7 @@ export function DashboardClient({
           </div>
 
           <BookingTab
-            isLoading={isLoading}
+            isLoading={false}
             activeQueues={activeQueues}
             tokens={tokens}
             selectedQueueId={selectedQueueId}
@@ -504,7 +502,7 @@ export function DashboardClient({
       {activeTab === 'history' && (
         <HistoryTab
           pastSessions={pastSessions}
-          isLoading={isLoading}
+          isLoading={false}
         />
       )}
 

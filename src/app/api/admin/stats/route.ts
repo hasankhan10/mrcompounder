@@ -1,11 +1,11 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { getTodayIST } from '@/lib/date-utils';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     const supabase = await createServerSupabaseClient();
 
     // 1. Auth Check
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
             .select('*', { count: 'exact', head: true });
 
         // Total Patients Served Today (via Session Date)
-        const todayIST = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); // YYYY-MM-DD
+        const todayIST = getTodayIST(); // YYYY-MM-DD
 
         // 1. Get IDs of queues for today
         const { data: todayQueues } = await supabaseAdmin
@@ -84,7 +84,8 @@ export async function GET(request: NextRequest) {
             lastMonthRevenue
         });
 
-    } catch (error: any) {
-        return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Internal Server Error';
+        return new NextResponse(JSON.stringify({ error: message }), { status: 500 });
     }
 }

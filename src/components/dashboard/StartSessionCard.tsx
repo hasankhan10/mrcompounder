@@ -5,10 +5,8 @@ import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Loader2 } from 'lucide-react';
 
-interface RecentDoctor {
-    name: string;
-    imageUrl: string | null;
-}
+import Image from 'next/image';
+import { RecentDoctor } from '@/lib/types';
 
 interface StartSessionCardProps {
     doctorName: string;
@@ -42,16 +40,16 @@ export function StartSessionCard({ doctorName, setDoctorName, doctorImage, setDo
                                         onClick={() => onSelectRecent?.(doc)}
                                         className="flex flex-col items-center min-w-[72px] group"
                                     >
-                                        <div className="w-14 h-14 rounded-full border-2 border-gray-100 group-hover:border-blue-500 transition-colors overflow-hidden mb-1">
-                                            {doc.imageUrl ? (
-                                                <img src={doc.imageUrl} alt={doc.name} className="w-full h-full object-cover" />
+                                        <div className="w-14 h-14 rounded-full border-2 border-gray-100 group-hover:border-blue-500 transition-colors overflow-hidden mb-1 relative">
+                                            {doc.doctor_image_url ? (
+                                                <Image src={doc.doctor_image_url} alt={doc.doctor_name} fill className="object-cover" />
                                             ) : (
                                                 <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 font-bold text-lg">
-                                                    {doc.name.charAt(0)}
+                                                    {doc.doctor_name.charAt(0)}
                                                 </div>
                                             )}
                                         </div>
-                                        <span className="text-xs text-gray-600 truncate w-full text-center group-hover:text-blue-600">{doc.name}</span>
+                                        <span className="text-xs text-gray-600 truncate w-full text-center group-hover:text-blue-600">{doc.doctor_name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -60,7 +58,7 @@ export function StartSessionCard({ doctorName, setDoctorName, doctorImage, setDo
 
                     <form onSubmit={onSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Doctor's Image</label>
+                            <label className="text-sm font-medium text-gray-700">Doctor&apos;s Image</label>
                             <FileUpload
                                 value={doctorImage}
                                 onChange={setDoctorImage}
@@ -69,7 +67,7 @@ export function StartSessionCard({ doctorName, setDoctorName, doctorImage, setDo
                             />
                         </div>
                         <div className="space-y-2">
-                            <label htmlFor="doctorName" className="text-sm font-medium text-gray-700">Doctor's Name</label>
+                            <label htmlFor="doctorName" className="text-sm font-medium text-gray-700">Doctor&apos;s Name</label>
                             <Input
                                 id="doctorName"
                                 placeholder="e.g. Dr. Smith"

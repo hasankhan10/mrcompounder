@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     // Auth check (optional but recommended, assuming middleware handles it or we check here)
     // For speed, we'll skip strict user check here if middleware covers /admin, 
     // but let's be safe and check header or just rely on the fact it's an admin route.
@@ -41,7 +41,8 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(clinicCounts);
 
-    } catch (error: any) {
-        return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Internal Server Error';
+        return new NextResponse(JSON.stringify({ error: message }), { status: 500 });
     }
 }

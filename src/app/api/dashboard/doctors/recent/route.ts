@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     const supabase = await createServerSupabaseClient();
 
     // 1. Auth Check
@@ -43,8 +42,8 @@ export async function GET(request: NextRequest) {
     sessions.forEach(session => {
         if (session.doctor_name && !uniqueDoctors.has(session.doctor_name)) {
             uniqueDoctors.set(session.doctor_name, {
-                name: session.doctor_name,
-                imageUrl: session.doctor_image_url
+                doctor_name: session.doctor_name,
+                doctor_image_url: session.doctor_image_url
             });
         }
     });

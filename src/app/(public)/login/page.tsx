@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import { Profile } from '@/lib/types';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -45,7 +44,7 @@ export default function LoginPage() {
         .from('profiles')
         .select('role, clinic_id')
         .eq('id', signInData.user.id)
-        .single() as { data: Profile | null, error: any };
+        .single();
 
       if (profileError || !profile) {
         throw new Error('Could not retrieve user profile. Please contact support.');
@@ -83,8 +82,9 @@ export default function LoginPage() {
         router.push('/');
       }
 
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An error occurred';
+      setError(message);
       setIsLoading(false);
     }
   };

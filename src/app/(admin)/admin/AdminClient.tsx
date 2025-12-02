@@ -4,21 +4,21 @@ import { APP_NAME } from '@/lib/config';
 import { useState, useEffect, FormEvent, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
-import { Clinic } from '@/lib/types';
+import { Clinic, PaymentRequest } from '@/lib/types';
 import { toast } from 'sonner';
 import { LayoutDashboard, Building2, Settings, QrCode, IndianRupee } from 'lucide-react';
+import Image from 'next/image';
 
 // Components
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
-import { PageLoading } from '@/components/shared/PageLoading';
-import { PageError } from '@/components/shared/PageError';
+
 import { AdminStatsGrid } from '@/components/admin/AdminStatsGrid';
 import { ClinicListHeader } from '@/components/admin/ClinicListHeader';
 import { ClinicTable } from '@/components/admin/ClinicTable';
 import { CreateClinicDialog } from '@/components/admin/CreateClinicDialog';
 import { EditClinicDialog } from '@/components/admin/EditClinicDialog';
 import { DeleteClinicAlert } from '@/components/admin/DeleteClinicAlert';
-import { StatsGridSkeleton, ClinicTableSkeleton, PaymentRequestsSkeleton } from '@/components/skeletons/DashboardSkeletons';
+import { StatsGridSkeleton, PaymentRequestsSkeleton } from '@/components/skeletons/DashboardSkeletons';
 import { FileUpload } from '@/components/ui/file-upload';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { adminService } from '@/services/admin';
@@ -33,8 +33,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const router = useRouter();
 
   // Page-level state
-  const [pageIsLoading, setPageIsLoading] = useState(false);
-  const [pageError, setPageError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
 
   // Data state
@@ -49,7 +47,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     lastMonthRevenue: 0
   });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
-  const [isLoadingClinics, setIsLoadingClinics] = useState(false);
   const [isLoadingPayments, setIsLoadingPayments] = useState(false);
 
   // UPI Settings State
@@ -58,7 +55,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const [settingsLoading, setSettingsLoading] = useState(false);
 
   // Payment Requests State
-  const [paymentRequests, setPaymentRequests] = useState<any[]>([]);
+  const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
 
   // Fetch Payment Requests
   useEffect(() => {
@@ -84,7 +81,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       }
 
       fetchStats(); // Refresh stats to update revenue immediately
-    } catch (err) {
+    } catch {
       toast.error('Failed to process request');
     }
   };
@@ -122,8 +119,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setUpiSettings(prev => ({ ...prev, qr_code_url: url }));
       setQrFile(null);
       toast.success('Settings saved');
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setSettingsLoading(false);
     }
@@ -167,7 +164,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   // Initial Fetch
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   useEffect(() => {
     if (activeTab === 'payment-requests') {
@@ -230,7 +227,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       if (newClinicLogo) {
         const fileExt = newClinicLogo.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('clinic-logos')
           .upload(fileName, newClinicLogo);
 
@@ -249,7 +246,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         slug: newClinicSlug,
         logoUrl: logoUrl,
         compounderEmail: newClinicEmail,
-        compounderPassword: newClinicPassword
+        compounderPassword: newClinicPassword,
+        initialBalance: 0
       });
       setClinics(prev => {
         if (prev.some(c => c.id === newClinic.id)) return prev;
@@ -263,10 +261,11 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setNewClinicLogo(null);
       setNewClinicEmail('');
       setNewClinicPassword('');
+      setNewClinicPassword('');
       toast.success('Clinic created successfully');
 
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setFormIsLoading(false);
     }
@@ -310,15 +309,16 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       const updatedClinic = await adminService.updateClinic(selectedClinic.id, {
         name: newClinicName,
         slug: newClinicSlug,
-        logo_url: logoUrl,
+        logoUrl: logoUrl,
         password: newClinicPassword || undefined
       });
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       setIsEditModalOpen(false);
+      setIsEditModalOpen(false);
       toast.success('Clinic updated successfully');
 
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setFormIsLoading(false);
     }
@@ -340,9 +340,10 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
       setClinics(clinics.filter(c => c.id !== selectedClinic.id));
       setIsDeleteAlertOpen(false);
+      setIsDeleteAlertOpen(false);
       toast.success('Clinic deleted successfully');
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -350,9 +351,10 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     try {
       const updatedClinic = await adminService.toggleStatus(id, !currentStatus);
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
+      setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       toast.success(`Clinic ${!currentStatus ? 'activated' : 'deactivated'}`);
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -380,8 +382,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       const statsRes = await fetch('/api/admin/stats');
       if (statsRes.ok) setStats(await statsRes.json());
 
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
@@ -402,8 +404,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         const updatedClinic = await adminService.toggleTrial(id, null, null);
         setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
         toast.success('Trial mode disabled');
-      } catch (err: any) {
-        toast.error(err.message);
+      } catch (err: unknown) {
+        toast.error(err instanceof Error ? err.message : 'An error occurred');
       }
     } else {
       // Turn on trial
@@ -428,8 +430,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         const updatedClinic = await adminService.toggleTrial(id, start, end);
         setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
         toast.success('Trial mode enabled');
-      } catch (err: any) {
-        toast.error(err.message);
+      } catch (err: unknown) {
+        toast.error(err instanceof Error ? err.message : 'An error occurred');
       }
     }
   };
@@ -440,8 +442,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     (c.slug || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (pageIsLoading) return <PageLoading message="Loading Admin Dashboard..." />;
-  if (pageError) return <PageError message={pageError} />;
+
 
 
   return (
@@ -458,7 +459,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         <div className="space-y-8 animate-fade-in-up">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
-            <p className="text-gray-500 mt-1">Welcome back, Admin. Here's what's happening today.</p>
+            <p className="text-gray-500 mt-1">Welcome back, Admin. Here&apos;s what&apos;s happening today.</p>
           </div>
           <ErrorBoundary name="Admin Stats">
             {isLoadingStats ? (
@@ -483,22 +484,18 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
             onNewClinicClick={() => setIsCreateModalOpen(true)}
           />
           <ErrorBoundary name="Clinic Table">
-            {isLoadingClinics ? (
-              <ClinicTableSkeleton />
-            ) : (
-              <ClinicTable
-                clinics={filteredClinics}
-                onEdit={handleEditClick}
-                onDelete={handleDeleteClick}
-                onToggleStatus={handleToggleStatus}
-                onTopup={handleTopup}
-                topupAmounts={topupAmounts}
-                setTopupAmounts={setTopupAmounts}
-                onToggleTrial={handleToggleTrial}
-                trialDates={trialDates}
-                onTrialDateChange={handleTrialDateChange}
-              />
-            )}
+            <ClinicTable
+              clinics={filteredClinics}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteClick}
+              onToggleStatus={handleToggleStatus}
+              onTopup={handleTopup}
+              topupAmounts={topupAmounts}
+              setTopupAmounts={setTopupAmounts}
+              onToggleTrial={handleToggleTrial}
+              trialDates={trialDates}
+              onTrialDateChange={handleTrialDateChange}
+            />
           </ErrorBoundary>
         </div>
       )}
@@ -531,8 +528,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <a href={req.screenshot_url} target="_blank" rel="noopener noreferrer" className="block w-24 h-24 border rounded overflow-hidden bg-gray-100 hover:opacity-80 transition">
-                        <img src={req.screenshot_url} alt="Proof" className="w-full h-full object-cover" />
+                      <a href={req.screenshot_url} target="_blank" rel="noopener noreferrer" className="block w-24 h-24 border rounded overflow-hidden bg-gray-100 hover:opacity-80 transition relative">
+                        <Image src={req.screenshot_url} alt="Proof" fill className="object-cover" />
                       </a>
                       <div className="flex flex-col gap-2">
                         <button
@@ -574,8 +571,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">QR Code Image</label>
               {upiSettings.qr_code_url && (
-                <div className="mb-2">
-                  <img src={upiSettings.qr_code_url} alt="QR Code" className="w-48 h-48 object-contain border rounded" />
+                <div className="mb-2 relative w-48 h-48 border rounded">
+                  <Image src={upiSettings.qr_code_url} alt="QR Code" fill className="object-contain" />
                 </div>
               )}
               <FileUpload
@@ -625,7 +622,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         slug={newClinicSlug}
         setSlug={setNewClinicSlug}
         logoUrl={editClinicLogoUrl}
-        setLogoUrl={setEditClinicLogoUrl}
         logoFile={newClinicLogo}
         setLogoFile={setNewClinicLogo}
         password={newClinicPassword}

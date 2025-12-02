@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     const supabase = await createServerSupabaseClient();
 
     // Auth Check
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     if (error) return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
 
     // Convert array to object
-    const settingsMap = settings.reduce((acc: any, curr) => {
+    const settingsMap = settings.reduce((acc: Record<string, string>, curr) => {
         acc[curr.key] = curr.value;
         return acc;
     }, {});

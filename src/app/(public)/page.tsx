@@ -91,17 +91,17 @@ export default function HomePage() {
             <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transform hover:scale-105 transition-transform duration-300 hover-lift animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               <div className="text-5xl text-blue-500 mb-6 font-bold">1</div>
               <h3 className="text-2xl font-semibold mb-4 text-gray-800">Scan & Join.</h3>
-              <p className="text-gray-600 leading-relaxed">Patients scan your clinic's QR code, enter their phone number, and instantly get a live token on their own phone. No app needed.</p>
+              <p className="text-gray-600 leading-relaxed">Patients scan your clinic&apos;s QR code, enter their phone number, and instantly get a live token on their own phone. No app needed.</p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transform hover:scale-105 transition-transform duration-300 hover-lift animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               <div className="text-5xl text-blue-500 mb-6 font-bold">2</div>
               <h3 className="text-2xl font-semibold mb-4 text-gray-800">Call Next.</h3>
-              <p className="text-gray-600 leading-relaxed">Your compounder sees the digital queue, taps "Call Next," and the system moves the line forward with a single click.</p>
+              <p className="text-gray-600 leading-relaxed">Your compounder sees the digital queue, taps &quot;Call Next,&quot; and the system moves the line forward with a single click.</p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transform hover:scale-105 transition-transform duration-300 hover-lift animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
               <div className="text-5xl text-blue-500 mb-6 font-bold">3</div>
               <h3 className="text-2xl font-semibold mb-4 text-gray-800">Get Alerted.</h3>
-              <p className="text-gray-600 leading-relaxed">Patients receive a clear in-page alert and web notification (if allowed) on their phone when it’s their turn. They return from anywhere.</p>
+              <p className="text-gray-600 leading-relaxed">Patients receive a clear in-page alert and web notification (if allowed) on their phone when it&apos;s their turn. They return from anywhere.</p>
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function HomePage() {
             {[
               "Live Token on Your Phone: Always know your turn and the current token number.",
               "Wait Anywhere, Comfortably: No need to stay confined to a crowded waiting room.",
-              "Get Notified: Receive an alert when it’s almost your turn.",
+              "Get Notified: Receive an alert when it&apos;s almost your turn.",
               "Trust & Clarity: See the doctor's name on your screen, reducing confusion."
             ].map((benefit, index) => (
               <div key={index} className="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex items-start space-x-4 transform hover:scale-105 transition-transform duration-300">

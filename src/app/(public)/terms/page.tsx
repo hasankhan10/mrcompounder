@@ -31,7 +31,7 @@ export default function TermsPage() {
           <p>You are responsible for safeguarding the password that You use to access the Service and for any activities or actions under Your password. You agree not to disclose Your password to any third party. You must notify Us immediately upon becoming aware of any breach of security or unauthorized use of Your account.</p>
 
           <h2>Billing and Payment</h2>
-          <p>Our Service operates on a prepaid, metered basis. Each clinic account maintains a prepaid balance. For each patient token marked as "served," a fee of ₹1 (one Indian Rupee) will be deducted from Your prepaid balance.</p>
+          <p>Our Service operates on a prepaid, metered basis. Each clinic account maintains a prepaid balance. For each patient token marked as &quot;served,&quot; a fee of ₹1 (one Indian Rupee) will be deducted from Your prepaid balance.</p>
           <p>You are responsible for maintaining a positive balance. If Your balance is zero or negative, We reserve the right to suspend or limit access to the Service, including preventing the creation of new patient tokens, until the balance is topped up.</p>
           <p>All payments for top-ups are non-refundable.</p>
 
@@ -41,8 +41,8 @@ export default function TermsPage() {
           <h2>Limitation of Liability</h2>
           <p>To the maximum extent permitted by applicable law, in no event shall {APP_NAME} or its suppliers be liable for any special, incidental, indirect, or consequential damages whatsoever (including, but not limited to, damages for loss of profits, loss of data or other information, for business interruption, for personal injury, loss of privacy arising out of or in any way related to the use of or inability to use the Service).</p>
 
-          <h2>"As Is" and "As Available" Disclaimer</h2>
-          <p>The Service is provided to You "AS IS" and "AS AVAILABLE" and with all faults and defects without warranty of any kind. To the maximum extent permitted under applicable law, {APP_NAME}, on its own behalf and on behalf of its affiliates and its and their respective licensors and service providers, expressly disclaims all warranties, whether express, implied, statutory or otherwise, with respect to the Service.</p>
+          <h2>&quot;As Is&quot; and &quot;As Available&quot; Disclaimer</h2>
+          <p>The Service is provided to You &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; and with all faults and defects without warranty of any kind. To the maximum extent permitted under applicable law, {APP_NAME}, on its own behalf and on behalf of its affiliates and its and their respective licensors and service providers, expressly disclaims all warranties, whether express, implied, statutory or otherwise, with respect to the Service.</p>
 
           <h2>Governing Law</h2>
           <p>The laws of India, excluding its conflicts of law rules, shall govern this Terms and Your use of the Service. Your use of the Application may also be subject to other local, state, national, or international laws.</p>

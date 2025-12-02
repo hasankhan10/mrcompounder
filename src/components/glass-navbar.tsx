@@ -9,19 +9,24 @@ import { NavbarAuth } from '@/components/navbar-auth';
 import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { useState } from 'react';
+import { User } from '@supabase/supabase-js';
+import Image from 'next/image';
 
 interface GlassNavbarProps {
-    initialUser?: any;
+    initialUser?: User | null;
     initialRole?: string | null;
 }
 
-export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
-    const pathname = usePathname();
-    const [isOpen, setIsOpen] = useState(false);
+interface NavLinksProps {
+    mobile?: boolean;
+    pathname: string;
+    setIsOpen: (open: boolean) => void;
+}
 
+function NavLinks({ mobile = false, pathname, setIsOpen }: NavLinksProps) {
     const isActive = (path: string) => pathname === path;
 
-    const NavLinks = ({ mobile = false }: { mobile?: boolean }) => (
+    return (
         <>
             <Link
                 href="/"
@@ -53,13 +58,20 @@ export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
             </Link>
         </>
     );
+}
+
+export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
+    const pathname = usePathname();
+    const [isOpen, setIsOpen] = useState(false);
+
+
 
     return (
         <nav className="sticky top-0 z-50 bg-white/30 backdrop-blur-lg border-b border-gray-200/20 shadow-sm flex items-center justify-center">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
                     <Link href="/" className="flex items-center gap-2 group">
-                        <img src="/favicon.ico" alt={APP_NAME} className="h-10 w-auto rounded-xl" />
+                        <Image src="/favicon.ico" alt={APP_NAME} width={40} height={40} className="h-10 w-auto rounded-xl" />
                         <span className="text-2xl font-bold text-gray-900 drop-shadow-sm">
                             {APP_NAME}
                         </span>
@@ -67,7 +79,7 @@ export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8">
-                        <NavLinks />
+                        <NavLinks pathname={pathname} setIsOpen={setIsOpen} />
                     </div>
 
                     {/* Desktop Auth */}
@@ -86,7 +98,7 @@ export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
                             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                                 <SheetTitle className="text-left text-xl font-bold mb-6">{APP_NAME}</SheetTitle>
                                 <div className="flex flex-col space-y-4 mt-4">
-                                    <NavLinks mobile />
+                                    <NavLinks mobile pathname={pathname} setIsOpen={setIsOpen} />
                                     <div className="h-px bg-gray-100 my-4" />
                                     <div className="flex flex-col space-y-3 items-start">
                                         <NavbarAuth initialUser={initialUser} initialRole={initialRole} />

@@ -1,6 +1,8 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { redirect } from 'next/navigation';
 import { DashboardClient } from './DashboardClient';
+import { getCurrentTimeIST } from '@/lib/date-utils';
+import { Token } from '@/lib/types';
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
@@ -30,10 +32,10 @@ export default async function DashboardPage() {
 
   if (!clinic) redirect('/');
 
-  let allTokens: any[] = [];
+  let allTokens: Token[] = [];
 
   if (activeQueues && activeQueues.length > 0) {
-    const queueIds = activeQueues.map((q: any) => q.id);
+    const queueIds = activeQueues.map((q) => q.id);
     const { data: tokensData } = await supabase.from('tokens').select('*').in('queue_id', queueIds).order('token_number', { ascending: true });
     if (tokensData) {
       allTokens = tokensData;
@@ -45,7 +47,7 @@ export default async function DashboardPage() {
       initialClinic={clinic}
       initialActiveQueues={activeQueues || []}
       initialTokens={allTokens}
-      serverTime={new Date().toISOString()}
+      serverTime={getCurrentTimeIST()}
     />
   );
 }

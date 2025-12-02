@@ -1,4 +1,4 @@
-import { Clinic, Queue, Token } from '@/lib/types';
+import { Queue, Token } from '@/lib/types';
 
 export const dashboardService = {
     async fetchHistory() {
@@ -10,7 +10,7 @@ export const dashboardService = {
     async fetchRecentDoctors() {
         const res = await fetch('/api/dashboard/doctors/recent');
         if (!res.ok) throw new Error('Failed to fetch recent doctors');
-        return res.json() as Promise<any[]>;
+        return res.json() as Promise<{ doctor_name: string; doctor_image_url: string }[]>;
     },
 
     async startSession(data: { doctorName: string; doctorImageUrl: string; doctorArrivalTime: string }) {

@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Clinic } from '@/lib/types';
+import { Clinic, AdminStats, PaymentRequest } from '@/lib/types';
 import { adminService } from '@/services/admin';
 
 interface UseAdminRealtimeProps {
     supabase: SupabaseClient;
     setClinics: (updater: (prev: Clinic[]) => Clinic[]) => void;
-    setStats: (updater: (prev: any) => any) => void;
-    setPaymentRequests: (updater: (prev: any[]) => any[]) => void;
+    setStats: (updater: (prev: AdminStats) => AdminStats) => void;
+    setPaymentRequests: (updater: (prev: PaymentRequest[]) => PaymentRequest[]) => void;
     activeTab: string;
     fetchStats: (showLoading?: boolean) => Promise<void>;
     fetchClinicStats: () => Promise<void>;
@@ -62,7 +62,7 @@ export function useAdminRealtime({
                     table: 'tokens',
                     filter: 'status=eq.served'
                 },
-                (payload) => {
+                () => {
                     setStats(prev => ({
                         ...prev,
                         totalPatientsToday: prev.totalPatientsToday + 1

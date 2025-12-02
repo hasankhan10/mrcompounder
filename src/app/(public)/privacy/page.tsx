@@ -15,11 +15,11 @@ export default function PrivacyPage() {
 
           <p className="lead">Last updated: November 27, 2025</p>
 
-          <p>Clinic Line ("We", "Our", "Us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.</p>
+          <p>Clinic Line (&quot;We&quot;, &quot;Our&quot;, &quot;Us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.</p>
 
           <h2>Information We Collect</h2>
           <p>We may collect information about you in a variety of ways. The information we may collect on the Service includes:</p>
-          
+
           <h3>Clinic and Compounder Information</h3>
           <ul>
             <li>Personally identifiable information, such as your name, email address, and clinic details (name, slug, logo), that you voluntarily give to us when you are registered by our admin team.</li>
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
             <li><strong>Phone Numbers:</strong> When a patient joins a queue, we collect their phone number to assign a token for a single session. This number is used solely for the purpose of managing the queue for that specific session.</li>
             <li>We do not require patient names, and we do not create permanent patient accounts. Phone numbers are tied only to a temporary session token.</li>
           </ul>
-          
+
           <h2>How We Use Your Information</h2>
           <p>Having accurate information permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Service to:</p>
           <ul>
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
           <p>We will retain your information only for as long as is necessary for the purposes set out in this Privacy Policy.</p>
           <ul>
             <li><strong>Clinic & Compounder Data:</strong> We will retain your account information as long as your account is active.</li>
-            <li><strong>Patient Phone Numbers:</strong> A patient's phone number is associated with a token and a queue session. We may retain this data for a limited period for billing and auditing purposes, after which it may be anonymized or deleted. It is not used for any purpose outside of queue management for the session they joined.</li>
+            <li><strong>Patient Phone Numbers:</strong> A patient&apos;s phone number is associated with a token and a queue session. We may retain this data for a limited period for billing and auditing purposes, after which it may be anonymized or deleted. It is not used for any purpose outside of queue management for the session they joined.</li>
           </ul>
 
           <h2>Third-Party Services</h2>

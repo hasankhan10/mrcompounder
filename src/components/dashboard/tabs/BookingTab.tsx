@@ -1,5 +1,5 @@
 import { FormEvent } from 'react';
-import { Queue, Token } from '@/lib/types';
+import { Queue, Token, RecentDoctor } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft } from 'lucide-react';
@@ -34,7 +34,7 @@ interface BookingTabProps {
     setSelectedExistingImage: (url: string | null) => void;
     newDoctorArrivalTime: string;
     setNewDoctorArrivalTime: (val: string) => void;
-    recentDoctors: any[];
+    recentDoctors: RecentDoctor[];
 
     newPatientName: string;
     setNewPatientName: (val: string) => void;
@@ -112,10 +112,10 @@ export function BookingTab({
                         onSubmit={onStartSession}
                         recentDoctors={recentDoctors}
                         onSelectRecent={(doc) => {
-                            setNewDoctorName(doc.name);
-                            setSelectedExistingImage(doc.imageUrl);
+                            setNewDoctorName(doc.doctor_name);
+                            setSelectedExistingImage(doc.doctor_image_url);
                             setNewDoctorImage(null);
-                            toast.info(`Selected ${doc.name}`);
+                            toast.info(`Selected ${doc.doctor_name}`);
                         }}
                     />
                 </div>

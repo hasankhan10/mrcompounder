@@ -136,7 +136,7 @@ export function PatientLiveQueue({
                             {myToken.status === 'called' && (
                                 <div className="mt-4">
                                     <p className="text-green-700 font-bold text-lg animate-bounce">
-                                        It's your turn! Please go inside.
+                                        It&apos;s your turn! Please go inside.
                                     </p>
                                 </div>
                             )}

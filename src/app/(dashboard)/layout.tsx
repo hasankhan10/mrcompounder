@@ -2,7 +2,6 @@
 
 import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase-server'; // Import the helper
-import { Profile } from '@/lib/types'; // Assuming Profile type is defined
 
 export default async function DashboardLayout({
   children,

@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { BookingData } from '@/lib/types';
 
 interface PatientBookingSelectionProps {
-    bookings: any[];
-    onSelect: (booking: any) => void;
+    bookings: BookingData[];
+    onSelect: (booking: BookingData) => void;
     onBack: () => void;
 }
 
@@ -24,7 +25,7 @@ export function PatientBookingSelection({ bookings, onSelect, onBack }: PatientB
                             className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all cursor-pointer flex items-center gap-4"
                         >
                             {b.queue.doctor_image_url ? (
-                                <Image src={b.queue.doctor_image_url} alt={b.queue.doctor_name} width={64} height={64} className="w-16 h-16 rounded-full object-cover border border-gray-100" />
+                                <Image src={b.queue.doctor_image_url} alt={b.queue.doctor_name || 'Doctor'} width={64} height={64} className="w-16 h-16 rounded-full object-cover border border-gray-100" />
                             ) : (
                                 <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xl">
                                     {b.queue.doctor_name?.charAt(0)}

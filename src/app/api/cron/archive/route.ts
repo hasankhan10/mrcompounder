@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic'; // Ensure this doesn't get cached
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         // Optional: Add a secret check here if you use Vercel Cron
         // const authHeader = request.headers.get('authorization');
@@ -27,7 +27,8 @@ export async function GET(request: NextRequest) {
             message: data
         });
 
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

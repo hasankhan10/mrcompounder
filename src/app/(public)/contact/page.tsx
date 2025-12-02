@@ -2,7 +2,6 @@
 'use client'; // This page will have client-side interactivity for the form
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea'; // Assuming shadcn Textarea is available
@@ -51,7 +50,7 @@ export default function ContactUsPage() {
             Get in Touch With Us
           </h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-            We'd love to hear from you! Whether you have questions, feedback, or need a free setup, our team is here to help.
+            We&apos;d love to hear from you! Whether you have questions, feedback, or need a free setup, our team is here to help.
           </p>
         </div>
 
@@ -104,7 +103,7 @@ export default function ContactUsPage() {
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </Button>
               {submissionStatus === 'success' && (
-                <p className="text-green-600 text-center mt-4">Message sent successfully! We'll get back to you soon.</p>
+                <p className="text-green-600 text-center mt-4">Message sent successfully! We&apos;ll get back to you soon.</p>
               )}
               {submissionStatus === 'error' && (
                 <p className="text-red-600 text-center mt-4">Failed to send message. Please try again later.</p>

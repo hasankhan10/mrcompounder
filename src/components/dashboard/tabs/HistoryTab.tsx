@@ -40,7 +40,6 @@ export function HistoryTab({ pastSessions, isLoading }: HistoryTabProps) {
                                         Ended
                                     </span>
                                     <span className="text-xs text-gray-500 font-medium">
-                                        {/* @ts-ignore */}
                                         {session.served_count || 0} Patients Served
                                     </span>
                                 </div>

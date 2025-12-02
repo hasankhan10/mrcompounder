@@ -8,6 +8,16 @@ export type QueueStatus = 'active' | 'paused' | 'ended' | 'waiting';
 export type TokenStatus = 'waiting' | 'called' | 'served' | 'no_show';
 export type TransactionType = 'topup' | 'usage';
 
+export interface ClinicSettings {
+  upi_id?: string;
+  qr_code_url?: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
+export interface TransactionMetadata {
+  [key: string]: string | number | boolean | undefined;
+}
+
 export interface Clinic {
   id: string; // uuid
   created_at: string; // timestamp
@@ -18,7 +28,7 @@ export interface Clinic {
   is_active: boolean;
   trial_start_date?: string; // timestamp
   trial_end_date?: string; // timestamp
-  settings?: any; // jsonb
+  settings?: ClinicSettings; // jsonb
   served_today_count?: number;
 }
 
@@ -39,6 +49,7 @@ export interface Queue {
   session_date: string; // date
   status: QueueStatus;
   ended_at?: string; // timestamp
+  served_count?: number; // Added field for history
 }
 
 export interface Token {
@@ -66,7 +77,7 @@ export interface Transaction {
   amount: number;
   balance_before: number;
   balance_after: number;
-  metadata?: any; // jsonb
+  metadata?: TransactionMetadata; // jsonb
 }
 
 export interface NotificationSubscription {
@@ -75,6 +86,19 @@ export interface NotificationSubscription {
   clinic_id: string; // uuid
   token_id: string; // uuid
   fcm_token: string;
+}
+
+export interface PaymentRequest {
+  id: string;
+  created_at: string;
+  clinic_id: string;
+  amount: number;
+  status: 'pending' | 'approved' | 'rejected';
+  screenshot_url: string;
+  transaction_id?: string;
+  clinics?: {
+    name: string;
+  };
 }
 
 
@@ -181,4 +205,24 @@ export interface RegisterFcmTokenRequest {
 }
 export interface RegisterFcmTokenResponse {
   success: boolean;
+}
+
+export interface AdminStats {
+  totalClinics: number;
+  totalPatientsToday: number;
+  totalRevenue: number;
+  lastMonthRevenue: number;
+}
+
+export interface RecentDoctor {
+  doctor_name: string;
+  doctor_image_url: string;
+}
+
+export interface BookingData {
+  token: Token;
+  queue: Queue;
+  currentToken: Token | null;
+  lastServedTokenNumber: number;
+  lastServedTokens: Token[];
 }

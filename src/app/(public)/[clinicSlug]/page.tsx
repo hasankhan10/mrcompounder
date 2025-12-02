@@ -1,7 +1,7 @@
 // src/app/(public)/[clinicSlug]/page.tsx
 
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { Clinic, Queue, Token } from '@/lib/types';
+import { Clinic, Queue } from '@/lib/types';
 import { PatientQueueClient } from './PatientQueueClient';
 
 // Define the shape of our initial data

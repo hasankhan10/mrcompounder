@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { RegisterTokenRequest, RegisterTokenResponse } from '@/lib/types';
+import { RegisterTokenRequest } from '@/lib/types';
 
 // TODO: Implement authentication and authorization check for compounder
 // TODO: Get clinic_id from user's session
