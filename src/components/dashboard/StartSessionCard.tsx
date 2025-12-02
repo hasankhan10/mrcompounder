@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/ui/file-upload';
+import { Loader2 } from 'lucide-react';
 
 interface RecentDoctor {
     name: string;
@@ -88,7 +89,14 @@ export function StartSessionCard({ doctorName, setDoctorName, doctorImage, setDo
                             />
                         </div>
                         <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6 shadow-md hover:shadow-lg transition-all" disabled={isLoading}>
-                            {isLoading ? 'Creating...' : 'Open Booking'}
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                'Open Booking'
+                            )}
                         </Button>
                     </form>
                 </CardContent>

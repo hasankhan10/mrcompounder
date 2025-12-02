@@ -80,7 +80,10 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
             });
           } else if (newToken.status === 'served') {
             setLastServedTokenNumber(newToken.token_number);
-            setCurrentToken((prev) => (prev && prev.id === newToken.id ? null : prev));
+            // Delay clearing currentToken to allow "Call Next" to arrive and prevent "--" flicker
+            setTimeout(() => {
+              setCurrentToken((prev) => (prev && prev.id === newToken.id ? null : prev));
+            }, 1000);
           }
         }
       )

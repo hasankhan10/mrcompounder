@@ -3,6 +3,7 @@ import { Clinic } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
+import { Loader2 } from 'lucide-react';
 
 interface PatientLoginProps {
     clinic: Clinic;
@@ -51,7 +52,14 @@ export function PatientLogin({
                     </div>
                     {error && <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">{error}</p>}
                     <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
-                        {isLoading ? 'Checking...' : 'Check Status'}
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Checking...
+                            </>
+                        ) : (
+                            'Check Status'
+                        )}
                     </Button>
                 </form>
             </div>

@@ -325,8 +325,15 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const [formIsLoading, setFormIsLoading] = useState(false);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/login');
+    toast.info('Logging out...');
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      router.push('/login');
+      router.refresh();
+    }
   };
 
   // --- Handlers ---

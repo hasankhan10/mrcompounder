@@ -87,14 +87,15 @@ export function PatientLiveQueue({
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="text-8xl font-black text-gray-900 tracking-tighter overflow-hidden h-32 flex items-center justify-center">
-                                            <AnimatePresence mode="wait">
+                                        <div className="text-8xl font-black text-gray-900 tracking-tighter overflow-hidden h-32 flex items-center justify-center relative">
+                                            <AnimatePresence mode="popLayout">
                                                 <motion.div
                                                     key={currentToken ? currentToken.token_number : 'none'}
-                                                    initial={{ y: 50, opacity: 0 }}
-                                                    animate={{ y: 0, opacity: 1 }}
-                                                    exit={{ y: -50, opacity: 0 }}
-                                                    transition={{ duration: 0.3, ease: "easeOut" }}
+                                                    initial={{ y: 50, opacity: 0, filter: 'blur(10px)' }}
+                                                    animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+                                                    exit={{ y: -50, opacity: 0, filter: 'blur(10px)' }}
+                                                    transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
+                                                    className="absolute"
                                                 >
                                                     {currentToken ? currentToken.token_number : '--'}
                                                 </motion.div>

@@ -1,4 +1,3 @@
-// clinicline/src/app/(public)/login/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -8,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Profile } from '@/lib/types';
 import Link from 'next/link';
 
@@ -141,7 +140,14 @@ export default function LoginPage() {
               className="w-full text-lg py-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:opacity-90 transition-opacity"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </Button>
           </form>
         </CardContent>

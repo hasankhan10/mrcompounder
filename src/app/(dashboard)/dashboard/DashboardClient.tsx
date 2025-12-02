@@ -66,7 +66,7 @@ export function DashboardClient({
   // Derived Data
   const activeQueue = activeQueues.find(q => q.id === selectedQueueId) || null;
   const waitingTokens = tokens.filter(t => t.queue_id === selectedQueueId && (t.status === 'waiting' || t.status === 'called')).sort((a, b) => a.token_number - b.token_number);
-  const servedTokens = tokens.filter(t => t.queue_id === selectedQueueId && (t.status === 'served' || t.status === 'no_show')).sort((a, b) => b.served_at!.localeCompare(a.served_at!));
+  const servedTokens = tokens.filter(t => t.queue_id === selectedQueueId && (t.status === 'served' || t.status === 'no_show')).sort((a, b) => (b.served_at || '').localeCompare(a.served_at || ''));
   // Low balance warning removed for postpaid model
 
   // Form state

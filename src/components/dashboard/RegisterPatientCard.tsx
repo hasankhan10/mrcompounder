@@ -2,6 +2,7 @@ import React, { FormEvent } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 interface RegisterPatientCardProps {
     doctorName?: string;
@@ -89,7 +90,14 @@ export function RegisterPatientCard({
                             className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6 shadow-md hover:shadow-lg transition-all"
                             disabled={isLoading || !isSessionActive}
                         >
-                            {isLoading ? 'Saving...' : 'Save Patient'}
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Saving...
+                                </>
+                            ) : (
+                                'Save Patient'
+                            )}
                         </Button>
                         {!isSessionActive && <p className="text-xs text-center text-yellow-600">Resume session to register patients.</p>}
                     </form>
