@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     ],
   },
   verification: {
-    google: 'google-site-verification=rUa5vkdxLeHoXy5bVbe0pRkZ1NsmDne-nwcaRvnUVBI', // Replace this after getting code from Search Console
+    google: 'rUa5vkdxLeHoXy5bVbe0pRkZ1NsmDne-nwcaRvnUVBI',
   },
 };
 
