@@ -462,17 +462,26 @@ export function DashboardClient({
     }
   };
 
-  const handleCallNext = async () => {
-    if (!activeQueue) return;
+  const handleCallNext = async (queueId?: string) => {
+    const targetQueueId = queueId || activeQueue?.id;
+    if (!targetQueueId) return;
+
+    const targetQueue = activeQueues.find(q => q.id === targetQueueId);
+    if (!targetQueue) return;
 
     // Snapshot for rollback
     const prevTokens = [...tokens];
     const prevClinic = clinic ? { ...clinic } : null;
 
     // Logic to determine next state
-    const currentCalled = waitingTokens.find(t => t.status === 'called');
+    const queueTokens = tokens.filter(t => t.queue_id === targetQueueId);
+    const queueWaitingTokens = queueTokens
+      .filter(t => t.status === 'waiting' || t.status === 'called')
+      .sort((a, b) => a.token_number - b.token_number);
+
+    const currentCalled = queueWaitingTokens.find(t => t.status === 'called');
     // Find next waiting token (ensure sorted by token_number)
-    const nextInLine = waitingTokens
+    const nextInLine = queueWaitingTokens
       .filter(t => t.status === 'waiting')
       .sort((a, b) => a.token_number - b.token_number)[0];
 
@@ -511,7 +520,7 @@ export function DashboardClient({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          queueId: activeQueue.id,
+          queueId: targetQueueId,
           currentCalledTokenId: currentCalled?.id
         }),
       });

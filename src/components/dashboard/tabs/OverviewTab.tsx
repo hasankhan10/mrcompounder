@@ -19,7 +19,7 @@ interface OverviewTabProps {
     servedTokens: Token[];
     onToggleBreak: () => void;
     onEndSession: () => void;
-    onCallNext: () => void;
+    onCallNext: (queueId?: string) => void;
     onDeleteToken: (id: string) => void;
 }
 
@@ -69,7 +69,7 @@ export function OverviewTab({
                         </Button>
                     </div>
                 ) : (
-                    <SessionGrid queues={liveSessions} tokens={tokens} onSelect={setSelectedQueueId} />
+                    <SessionGrid queues={liveSessions} tokens={tokens} onSelect={setSelectedQueueId} onCallNext={onCallNext} />
                 )}
             </div>
         );
