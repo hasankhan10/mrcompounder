@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Hind_Siliguri } from "next/font/google";
 import { Toaster } from 'sonner';
 import { APP_NAME, APP_DESCRIPTION } from '@/lib/config';
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const inter = Inter({
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${hindSiliguri.variable} font-sans antialiased`} suppressHydrationWarning>
         {children}
         <Toaster richColors position="bottom-right" />
+        <Analytics />
       </body>
     </html>
   );
