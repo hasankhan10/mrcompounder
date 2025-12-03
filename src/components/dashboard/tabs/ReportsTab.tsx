@@ -1,0 +1,189 @@
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { dashboardService } from '@/services/dashboard';
+import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
+import { FileDown, Loader2, Calendar } from 'lucide-react';
+
+interface ReportsTabProps {
+    isLoading: boolean;
+}
+
+export function ReportsTab({ isLoading }: ReportsTabProps) {
+    const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7)); // YYYY-MM
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [reportData, setReportData] = useState<any[] | null>(null);
+
+    const handleGenerateReport = async () => {
+        setIsGenerating(true);
+        try {
+            const data = await dashboardService.fetchMonthlyReport(selectedMonth);
+            setReportData(data);
+            toast.success('Report data fetched successfully');
+        } catch (error) {
+            console.error(error);
+            toast.error('Failed to fetch report data');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleDownloadExcel = () => {
+        if (!reportData || reportData.length === 0) {
+            toast.error('No data to download');
+            return;
+        }
+
+        // 1. Prepare Summary Data (Doctor-wise)
+        const doctorStats: Record<string, { booked: number; present: number; absent: number }> = {};
+
+        reportData.forEach((token: any) => {
+            const doctorName = token.queues?.doctor_name || 'Unknown';
+            if (!doctorStats[doctorName]) {
+                doctorStats[doctorName] = { booked: 0, present: 0, absent: 0 };
+            }
+
+            doctorStats[doctorName].booked++;
+
+            if (token.status === 'served') {
+                doctorStats[doctorName].present++;
+            } else if (token.status === 'no_show') {
+                doctorStats[doctorName].absent++;
+            }
+        });
+
+        const summarySheetData = Object.entries(doctorStats).map(([docName, stats]) => ({
+            'Doctor Name': docName,
+            'Total Booked': stats.booked,
+            'Present (Served)': stats.present,
+            'Absent (No Show)': stats.absent,
+            'Attendance Rate': stats.booked > 0 ? `${((stats.present / stats.booked) * 100).toFixed(1)}%` : '0%'
+        }));
+
+        // 2. Prepare Detailed Log Data
+        const logSheetData = reportData.map((token: any) => ({
+            'Date': new Date(token.created_at).toLocaleDateString(),
+            'Time': new Date(token.created_at).toLocaleTimeString(),
+            'Doctor Name': token.queues?.doctor_name || 'Unknown',
+            'Patient Name': token.patient_name || 'N/A',
+            'Phone': token.phone,
+            'Token Number': token.token_number,
+            'Status': token.status.toUpperCase()
+        }));
+
+        // 3. Create Workbook
+        const wb = XLSX.utils.book_new();
+
+        const summaryWs = XLSX.utils.json_to_sheet(summarySheetData);
+        XLSX.utils.book_append_sheet(wb, summaryWs, "Doctor Performance");
+
+        const logWs = XLSX.utils.json_to_sheet(logSheetData);
+        XLSX.utils.book_append_sheet(wb, logWs, "Detailed Logs");
+
+        // 4. Download
+        XLSX.writeFile(wb, `Clinic_Report_${selectedMonth}.xlsx`);
+        toast.success('Excel file downloaded');
+    };
+
+    return (
+        <div className="space-y-8 animate-fade-in-up">
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900">Monthly Reports</h1>
+                <p className="text-gray-500 mt-1">Generate and download detailed performance reports.</p>
+            </div>
+
+            <Card className="border-none shadow-md">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-blue-600" />
+                        Select Month
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="flex flex-col md:flex-row gap-4 items-end">
+                        <div className="w-full md:w-64">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                            <input
+                                type="month"
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={selectedMonth}
+                                onChange={(e) => setSelectedMonth(e.target.value)}
+                            />
+                        </div>
+                        <Button
+                            onClick={handleGenerateReport}
+                            disabled={isGenerating}
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                            {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                            {isGenerating ? 'Fetching Data...' : 'Get Report'}
+                        </Button>
+                    </div>
+
+                    {reportData && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                            {/* Preview Table */}
+                            <div className="border rounded-lg overflow-hidden overflow-x-auto">
+                                <table className="w-full text-sm text-left min-w-[600px]">
+                                    <thead className="bg-gray-50 text-gray-700 font-medium border-b">
+                                        <tr>
+                                            <th className="px-4 py-3 whitespace-nowrap">Doctor Name</th>
+                                            <th className="px-4 py-3 text-center whitespace-nowrap">Total Booked</th>
+                                            <th className="px-4 py-3 text-center whitespace-nowrap">Present</th>
+                                            <th className="px-4 py-3 text-center whitespace-nowrap">Absent</th>
+                                            <th className="px-4 py-3 text-right whitespace-nowrap">Attendance Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100 bg-white">
+                                        {(() => {
+                                            const doctorStats: Record<string, { booked: number; present: number; absent: number }> = {};
+                                            reportData.forEach((token: any) => {
+                                                const doctorName = token.queues?.doctor_name || 'Unknown';
+                                                if (!doctorStats[doctorName]) {
+                                                    doctorStats[doctorName] = { booked: 0, present: 0, absent: 0 };
+                                                }
+                                                doctorStats[doctorName].booked++;
+                                                if (token.status === 'served') doctorStats[doctorName].present++;
+                                                else if (token.status === 'no_show') doctorStats[doctorName].absent++;
+                                            });
+
+                                            return Object.entries(doctorStats).map(([docName, stats]) => (
+                                                <tr key={docName} className="hover:bg-gray-50">
+                                                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{docName}</td>
+                                                    <td className="px-4 py-3 text-center">{stats.booked}</td>
+                                                    <td className="px-4 py-3 text-center text-green-600">{stats.present}</td>
+                                                    <td className="px-4 py-3 text-center text-red-600">{stats.absent}</td>
+                                                    <td className="px-4 py-3 text-right font-bold">
+                                                        {stats.booked > 0 ? `${((stats.present / stats.booked) * 100).toFixed(1)}%` : '0%'}
+                                                    </td>
+                                                </tr>
+                                            ));
+                                        })()}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                                <div>
+                                    <h3 className="text-lg font-bold text-green-900">Report Ready!</h3>
+                                    <p className="text-green-700">
+                                        Found <span className="font-bold">{reportData.length}</span> records for {selectedMonth}.
+                                    </p>
+                                </div>
+                                <Button
+                                    onClick={handleDownloadExcel}
+                                    size="lg"
+                                    className="bg-green-600 hover:bg-green-700 text-white font-bold shadow-lg"
+                                >
+                                    <FileDown className="w-5 h-5 mr-2" />
+                                    Download Excel
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
+    );
+}

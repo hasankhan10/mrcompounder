@@ -15,6 +15,7 @@ import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
 import { OverviewTab } from '@/components/dashboard/tabs/OverviewTab';
 import { BookingTab } from '@/components/dashboard/tabs/BookingTab';
 import { HistoryTab } from '@/components/dashboard/tabs/HistoryTab';
+import { ReportsTab } from '@/components/dashboard/tabs/ReportsTab';
 import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { dashboardService } from '@/services/dashboard';
 
@@ -430,6 +431,7 @@ export function DashboardClient({
     { label: 'Overview', value: 'overview', icon: PieChart },
     { label: 'Patient Booking', value: 'patient-booking', icon: Users },
     { label: 'Session History', value: 'history', icon: History },
+    { label: 'Reports', value: 'reports', icon: PieChart },
     { label: 'Settings', value: 'settings', icon: Settings },
   ];
 
@@ -556,6 +558,10 @@ export function DashboardClient({
           pastSessions={pastSessions}
           isLoading={false}
         />
+      )}
+
+      {activeTab === 'reports' && (
+        <ReportsTab isLoading={false} />
       )}
 
       {

@@ -115,5 +115,11 @@ export const dashboardService = {
             throw new Error(err.error || 'Failed to mark absent');
         }
         return response.json();
+    },
+
+    async fetchMonthlyReport(month: string) {
+        const res = await fetch(`/api/dashboard/reports?month=${month}`);
+        if (!res.ok) throw new Error('Failed to fetch report');
+        return res.json();
     }
 };
