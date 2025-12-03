@@ -86,8 +86,7 @@ export function DashboardClient({
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      router.push('/login');
-      router.refresh();
+      window.location.href = '/login';
     } catch (error) {
       console.error('Logout failed:', error);
       window.location.href = '/login';

@@ -61,17 +61,8 @@ export async function POST(request: NextRequest) {
             .update({ current_due: newDue })
             .eq('id', served.clinic_id);
 
-          // 3. Record transaction
-          await supabase
-            .from('transactions')
-            .insert({
-              clinic_id: served.clinic_id,
-              amount: 1,
-              type: 'usage',
-              balance_before: currentDue,
-              balance_after: newDue,
-              metadata: { description: `Token #${served.token_number} served` }
-            });
+          // Transaction log removed for performance. 
+          // Audit via 'tokens' table if needed.
         }
       }
     }
