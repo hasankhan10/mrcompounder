@@ -11,6 +11,7 @@ interface PatientLiveQueueProps {
     bookingsLength: number;
     onBack: () => void;
     getWaitMessage: () => string;
+    isCalled: boolean;
 }
 
 export function PatientLiveQueue({
@@ -20,10 +21,12 @@ export function PatientLiveQueue({
     currentToken,
     bookingsLength,
     onBack,
-    getWaitMessage
+    getWaitMessage,
+    isCalled
 }: PatientLiveQueueProps) {
     return (
-        <main className="min-h-screen bg-slate-50 flex flex-col items-center p-4 md:pt-10">
+        <main className={`min-h-screen flex flex-col items-center p-4 md:pt-10 transition-colors duration-500 ${isCalled ? 'bg-green-500 animate-pulse' : 'bg-slate-50'
+            }`}>
             <div className="w-full max-w-md space-y-6">
 
                 {/* Header Card */}

@@ -1,5 +1,14 @@
 // clinicline/src/app/(public)/privacy/page.tsx
 import React from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy - Your Data is Safe',
+  description: 'Read our Privacy Policy to understand how Mr Compounder collects, uses, and protects your data.',
+  alternates: {
+    canonical: '/privacy',
+  },
+};
 
 export default function PrivacyPage() {
   return (

@@ -1,6 +1,15 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Pricing - Simple, Transparent & Honest',
+    description: 'No subscriptions, no hidden fees. Pay only ₹1 per patient served. 14-day free trial included.',
+    alternates: {
+        canonical: '/pricing',
+    },
+};
 
 export default function PricingPage() {
     return (

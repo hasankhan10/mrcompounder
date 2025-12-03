@@ -4,6 +4,15 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About Us - Our Mission & Story',
+  description: 'Learn about Mr Compounder, our mission to bring calm to clinics, and the team dedicated to improving healthcare experiences in India.',
+  alternates: {
+    canonical: '/about',
+  },
+};
 
 export default function AboutUsPage() {
   return (

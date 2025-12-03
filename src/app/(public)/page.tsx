@@ -15,6 +15,16 @@ function FloatingPlusIcon({ className, style }: { className?: string; style?: Re
 }
 
 
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Home - Smart Queue Management',
+  description: 'Replace shouting names with a simple, digital token system. Patients wait stress-free, staff manage effortlessly.',
+  alternates: {
+    canonical: '/',
+  },
+};
+
 // The Navbar and Footer are now in the layout.tsx file,
 // so this page only needs to render its specific content.
 export default function HomePage() {

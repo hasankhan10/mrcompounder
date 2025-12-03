@@ -20,26 +20,58 @@ const hindSiliguri = Hind_Siliguri({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.mrcompounder.com'),
   title: {
-    default: `${APP_NAME} - Smart Queue Management`,
+    default: `${APP_NAME} - Smart Queue Management for Clinics`,
     template: `%s | ${APP_NAME}`,
   },
   description: APP_DESCRIPTION,
+  keywords: ['clinic management', 'queue management', 'token system', 'smart clinic', 'doctor appointment', 'patient queue', 'digital token', 'mr compounder'],
+  authors: [{ name: 'Stova Media', url: 'https://stovamedia.in' }],
+  creator: 'Stova Media',
+  publisher: 'Stova Media',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://www.mrcompounder.com',
     siteName: APP_NAME,
+    title: `${APP_NAME} - Smart Queue Management`,
+    description: APP_DESCRIPTION,
     images: [
       {
-        url: '/og-image.png', // You should add an og-image.png to your public folder
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: APP_NAME,
       },
     ],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${APP_NAME} - Smart Queue Management`,
+    description: APP_DESCRIPTION,
+    images: ['/og-image.png'],
+    creator: '@stovamedia',
+  },
   verification: {
     google: 'rUa5vkdxLeHoXy5bVbe0pRkZ1NsmDne-nwcaRvnUVBI',
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
 };
 

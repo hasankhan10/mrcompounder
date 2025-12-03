@@ -65,8 +65,26 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
           setMyToken((prev) => {
             if (prev && prev.id === newToken.id) {
               if (newToken.status === 'called' && prev.status !== 'called') {
-                audioRef.current?.play().catch(e => console.log('Audio error', e));
+                // Trigger Flash and Sound
+                setIsFlashing(true);
+
+                // Play sound
+                if (audioRef.current) {
+                  audioRef.current.loop = true; // Loop for 10 seconds
+                  audioRef.current.play().catch(e => console.log('Audio error', e));
+                }
+
                 toast.success("It's your turn! Please proceed to the doctor.");
+
+                // Stop after 10 seconds
+                setTimeout(() => {
+                  setIsFlashing(false);
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                    audioRef.current.loop = false;
+                  }
+                }, 10000);
               }
               return newToken;
             }
@@ -200,6 +218,15 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
 
   const handleCheckBooking = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Unlock Audio Context (User Interaction)
+    if (audioRef.current) {
+      audioRef.current.play().then(() => {
+        audioRef.current?.pause();
+        audioRef.current!.currentTime = 0;
+      }).catch(err => console.warn('Audio unlock failed:', err));
+    }
+
     if (!phone || !/^\d{10}$/.test(phone)) {
       setError('Please enter a valid 10-digit mobile number.');
       return;
@@ -240,6 +267,9 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
     return `~${estTime} mins wait (${peopleAhead} people ahead)`;
   };
 
+  // Flash State
+  const [isFlashing, setIsFlashing] = useState(false);
+
   // --- Render ---
 
   if (!clinic) return <div className="p-10 text-center">Clinic not found</div>;
@@ -268,6 +298,14 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
       <PatientBookingSelection
         bookings={bookings}
         onSelect={(b) => {
+          // Unlock Audio Context
+          if (audioRef.current) {
+            audioRef.current.play().then(() => {
+              audioRef.current?.pause();
+              audioRef.current!.currentTime = 0;
+            }).catch(err => console.warn('Audio unlock failed:', err));
+          }
+
           setMyToken(b.token);
           setQueue(b.queue);
           setCurrentToken(b.currentToken);
@@ -301,6 +339,7 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
         }
       }}
       getWaitMessage={getWaitMessage}
+      isCalled={isFlashing}
     />
   );
 }

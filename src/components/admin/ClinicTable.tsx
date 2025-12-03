@@ -14,6 +14,9 @@ interface ClinicTableProps {
     onToggleTrial: (id: string, isActive: boolean) => void;
     trialDates: { [key: string]: { start: string, end: string } };
     onTrialDateChange: (id: string, type: 'start' | 'end', value: string) => void;
+    onTopup: (id: string) => void;
+    topupAmounts: { [key: string]: string };
+    setTopupAmounts: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
 }
 
 export function ClinicTable({
@@ -23,7 +26,10 @@ export function ClinicTable({
     onToggleStatus,
     onToggleTrial,
     trialDates,
-    onTrialDateChange
+    onTrialDateChange,
+    onTopup,
+    topupAmounts,
+    setTopupAmounts
 }: ClinicTableProps) {
     return (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">

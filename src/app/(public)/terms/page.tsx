@@ -1,6 +1,15 @@
 // clinicline/src/app/(public)/terms/page.tsx
 import { APP_NAME } from '@/lib/config';
 import React from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms & Conditions - Usage Guidelines',
+  description: 'Review the Terms and Conditions for using Mr Compounder. Understand your rights and obligations.',
+  alternates: {
+    canonical: '/terms',
+  },
+};
 
 export default function TermsPage() {
   return (
