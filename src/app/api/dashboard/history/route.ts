@@ -21,12 +21,13 @@ export async function GET() {
         return new NextResponse(JSON.stringify({ error: 'Clinic not found' }), { status: 404 });
     }
 
-    // 3. Fetch History (Ended sessions)
+    // 3. Fetch History (Ended sessions) with served token count
     const { data: history, error } = await supabase
         .from('queues')
-        .select('*')
+        .select('*, tokens(count)')
         .eq('clinic_id', profile.clinic_id)
         .eq('status', 'ended')
+        .eq('tokens.status', 'served') // Only count served tokens
         .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
         .order('created_at', { ascending: false });
 
@@ -34,5 +35,11 @@ export async function GET() {
         return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
     }
 
-    return NextResponse.json(history);
+    // Map the result to flatten the count structure
+    const historyWithCount = history.map((session: any) => ({
+        ...session,
+        served_count: session.tokens?.[0]?.count || 0
+    }));
+
+    return NextResponse.json(historyWithCount);
 }

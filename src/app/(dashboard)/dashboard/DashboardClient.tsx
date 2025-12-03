@@ -85,6 +85,7 @@ export function DashboardClient({
 
   const handleLogout = async () => {
     try {
+      toast.success('Logging out...');
       await supabase.auth.signOut();
       window.location.href = '/login';
     } catch (error) {

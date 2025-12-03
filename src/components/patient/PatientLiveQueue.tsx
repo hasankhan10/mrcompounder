@@ -12,6 +12,8 @@ interface PatientLiveQueueProps {
     onBack: () => void;
     getWaitMessage: () => string;
     isCalled: boolean;
+    audioEnabled: boolean;
+    onEnableAudio: () => void;
 }
 
 export function PatientLiveQueue({
@@ -22,7 +24,9 @@ export function PatientLiveQueue({
     bookingsLength,
     onBack,
     getWaitMessage,
-    isCalled
+    isCalled,
+    audioEnabled,
+    onEnableAudio
 }: PatientLiveQueueProps) {
     return (
         <main className={`min-h-screen flex flex-col items-center p-4 md:pt-10 transition-colors duration-500 ${isCalled ? 'bg-green-500 animate-pulse' : 'bg-slate-50'
@@ -30,17 +34,24 @@ export function PatientLiveQueue({
             <div className="w-full max-w-md space-y-6">
 
                 {/* Header Card */}
-                <div className="bg-white rounded-2xl shadow-sm p-6 flex items-center gap-4">
-                    {clinic.logo_url ? (
-                        <Image src={clinic.logo_url} alt="Logo" width={64} height={64} className="w-16 h-16 rounded-lg object-cover" />
+                <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col items-center text-center gap-4">
+                    {queue?.doctor_image_url ? (
+                        <div className="relative w-32 h-32">
+                            <Image
+                                src={queue.doctor_image_url}
+                                alt="Doctor"
+                                fill
+                                className="rounded-full object-cover border-4 border-white shadow-lg"
+                            />
+                        </div>
                     ) : (
-                        <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-xl">
-                            {clinic.name.charAt(0)}
+                        <div className="w-32 h-32 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-4xl border-4 border-white shadow-lg">
+                            {queue?.doctor_name?.charAt(0) || 'D'}
                         </div>
                     )}
                     <div>
-                        <h1 className="font-bold text-gray-900 text-lg leading-tight">{clinic.name}</h1>
-                        <p className="text-sm text-gray-500">Dr. {queue?.doctor_name || 'Doctor'}</p>
+                        <h1 className="font-bold text-gray-900 text-2xl md:text-3xl leading-tight mb-1">Dr. {queue?.doctor_name || 'Doctor'}</h1>
+                        <p className="text-base text-gray-500 font-medium">{clinic.name}</p>
                     </div>
                 </div>
 
@@ -144,6 +155,21 @@ export function PatientLiveQueue({
                                 </div>
                             )}
                         </div>
+
+                        {/* Audio Toggle */}
+                        {!audioEnabled && myToken.status === 'waiting' && (
+                            <Button
+                                onClick={onEnableAudio}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg animate-pulse"
+                            >
+                                🔔 Enable Audio Alerts
+                            </Button>
+                        )}
+                        {audioEnabled && myToken.status === 'waiting' && (
+                            <div className="text-center text-green-600 font-medium text-sm bg-green-50 py-2 rounded-lg">
+                                🔊 Audio Alerts Enabled
+                            </div>
+                        )}
                     </>
                 )}
 
@@ -158,6 +184,6 @@ export function PatientLiveQueue({
                 )}
 
             </div>
-        </main>
+        </main >
     );
 }
