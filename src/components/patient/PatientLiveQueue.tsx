@@ -123,6 +123,21 @@ export function PatientLiveQueue({
                             </div>
                         </div>
 
+                        {/* Audio Toggle */}
+                        {!audioEnabled && myToken.status === 'waiting' && (
+                            <Button
+                                onClick={onEnableAudio}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg animate-pulse"
+                            >
+                                🔔 Enable Audio Alerts
+                            </Button>
+                        )}
+                        {audioEnabled && myToken.status === 'waiting' && (
+                            <div className="text-center text-green-600 font-medium text-sm bg-green-50 py-2 rounded-lg">
+                                🔊 Audio Alerts Enabled
+                            </div>
+                        )}
+
                         {/* My Token Card */}
                         <div className={`rounded-2xl shadow-md p-6 border-2 ${myToken.status === 'called' ? 'bg-green-50 border-green-500' : 'bg-white border-transparent'}`}>
                             <div className="flex justify-between items-center mb-4">
@@ -156,20 +171,6 @@ export function PatientLiveQueue({
                             )}
                         </div>
 
-                        {/* Audio Toggle */}
-                        {!audioEnabled && myToken.status === 'waiting' && (
-                            <Button
-                                onClick={onEnableAudio}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg animate-pulse"
-                            >
-                                🔔 Enable Audio Alerts
-                            </Button>
-                        )}
-                        {audioEnabled && myToken.status === 'waiting' && (
-                            <div className="text-center text-green-600 font-medium text-sm bg-green-50 py-2 rounded-lg">
-                                🔊 Audio Alerts Enabled
-                            </div>
-                        )}
                     </>
                 )}
 

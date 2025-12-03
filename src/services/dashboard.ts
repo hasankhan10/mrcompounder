@@ -97,6 +97,12 @@ export const dashboardService = {
         });
 
         if (!response.ok) throw new Error('Failed to delete token');
+
+        // 204 No Content means success but no body
+        if (response.status === 204) {
+            return null;
+        }
+
         return response.json();
     },
 
