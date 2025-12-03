@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { APP_NAME } from '@/lib/config';
+import { Reveal } from '@/components/shared/Reveal';
 
 // New Component for the floating medical plus icon
 function FloatingPlusIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
@@ -48,20 +49,26 @@ export default function HomePage() {
         </div>
 
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 drop-shadow-lg">
-            End the Chaos. Bring Calm. <br /> {APP_NAME} for a Smarter Clinic.
-          </h1>
-          <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto opacity-90">
-            Replace shouting names with a simple, digital token system. Patients wait stress-free, staff manage effortlessly.
-          </p>
-          <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
-            <Button asChild size="lg" className="bg-white text-blue-700 hover:bg-gray-100 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
-              <Link href="/contact">Try Demo</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-700 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
-              <Link href="/contact">Book Free Setup</Link>
-            </Button>
-          </div>
+          <Reveal width="100%" direction="up">
+            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 drop-shadow-lg">
+              End the Chaos. Bring Calm. <br /> {APP_NAME} for a Smarter Clinic.
+            </h1>
+          </Reveal>
+          <Reveal width="100%" direction="up" delay={0.4}>
+            <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto opacity-90">
+              Replace shouting names with a simple, digital token system. Patients wait stress-free, staff manage effortlessly.
+            </p>
+          </Reveal>
+          <Reveal width="100%" direction="up" delay={0.6}>
+            <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
+              <Button asChild size="lg" className="bg-white text-blue-700 hover:bg-gray-100 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
+                <Link href="/contact">Try Demo</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-700 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
+                <Link href="/contact">Book Free Setup</Link>
+              </Button>
+            </div>
+          </Reveal>
 
           {/* Simple Mockup Description */}
           <div className="mt-20 flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-12">
@@ -98,21 +105,27 @@ export default function HomePage() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-blue-800 mb-12 animate-fade-in-up">How It Works (3 Simple Steps)</h2>
           <div className="grid md:grid-cols-3 gap-10">
-            <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transform hover:scale-105 transition-transform duration-300 hover-lift animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              <div className="text-5xl text-blue-500 mb-6 font-bold">1</div>
-              <h3 className="text-2xl font-semibold mb-4 text-gray-800">Scan & Join.</h3>
-              <p className="text-gray-600 leading-relaxed">Patients scan your clinic&apos;s QR code, enter their phone number, and instantly get a live token on their own phone. No app needed.</p>
-            </div>
-            <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transform hover:scale-105 transition-transform duration-300 hover-lift animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <div className="text-5xl text-blue-500 mb-6 font-bold">2</div>
-              <h3 className="text-2xl font-semibold mb-4 text-gray-800">Call Next.</h3>
-              <p className="text-gray-600 leading-relaxed">Your compounder sees the digital queue, taps &quot;Call Next,&quot; and the system moves the line forward with a single click.</p>
-            </div>
-            <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transform hover:scale-105 transition-transform duration-300 hover-lift animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-              <div className="text-5xl text-blue-500 mb-6 font-bold">3</div>
-              <h3 className="text-2xl font-semibold mb-4 text-gray-800">Get Alerted.</h3>
-              <p className="text-gray-600 leading-relaxed">Patients receive a clear in-page alert and web notification (if allowed) on their phone when it&apos;s their turn. They return from anywhere.</p>
-            </div>
+            <Reveal delay={0.2} width="100%">
+              <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transform hover:scale-105 transition-transform duration-300 hover-lift h-full">
+                <div className="text-5xl text-blue-500 mb-6 font-bold">1</div>
+                <h3 className="text-2xl font-semibold mb-4 text-gray-800">Scan & Join.</h3>
+                <p className="text-gray-600 leading-relaxed">Patients scan your clinic&apos;s QR code, enter their phone number, and instantly get a live token on their own phone. No app needed.</p>
+              </div>
+            </Reveal>
+            <Reveal delay={0.4} width="100%">
+              <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transform hover:scale-105 transition-transform duration-300 hover-lift h-full">
+                <div className="text-5xl text-blue-500 mb-6 font-bold">2</div>
+                <h3 className="text-2xl font-semibold mb-4 text-gray-800">Call Next.</h3>
+                <p className="text-gray-600 leading-relaxed">Your compounder sees the digital queue, taps &quot;Call Next,&quot; and the system moves the line forward with a single click.</p>
+              </div>
+            </Reveal>
+            <Reveal delay={0.6} width="100%">
+              <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transform hover:scale-105 transition-transform duration-300 hover-lift h-full">
+                <div className="text-5xl text-blue-500 mb-6 font-bold">3</div>
+                <h3 className="text-2xl font-semibold mb-4 text-gray-800">Get Alerted.</h3>
+                <p className="text-gray-600 leading-relaxed">Patients receive a clear in-page alert and web notification (if allowed) on their phone when it&apos;s their turn. They return from anywhere.</p>
+              </div>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -130,12 +143,14 @@ export default function HomePage() {
               "Get Notified: Receive an alert when it&apos;s almost your turn.",
               "Trust & Clarity: See the doctor's name on your screen, reducing confusion."
             ].map((benefit, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex items-start space-x-4 transform hover:scale-105 transition-transform duration-300">
-                <svg className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
-                </svg>
-                <p className="text-lg text-gray-700">{benefit}</p>
-              </div>
+              <Reveal key={index} delay={index * 0.1} width="100%">
+                <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex items-start space-x-4 transform hover:scale-105 transition-transform duration-300 h-full">
+                  <svg className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
+                  </svg>
+                  <p className="text-lg text-gray-700">{benefit}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -152,13 +167,15 @@ export default function HomePage() {
               { title: "Real-time Analytics", desc: "Track daily footfall, peak hours, and doctor performance to optimize scheduling.", icon: "📊" },
               { title: "Premium Brand Image", desc: "Stand out as a modern, patient-centric facility in your neighborhood.", icon: "🏥" }
             ].map((item, index) => (
-              <div key={index} className="flex items-start p-8 rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 transform hover:-translate-y-1">
-                <div className="text-4xl mr-6 bg-blue-50 w-20 h-20 flex items-center justify-center rounded-2xl flex-shrink-0 shadow-inner">{item.icon}</div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                  <p className="text-gray-600 leading-relaxed text-lg">{item.desc}</p>
+              <Reveal key={index} delay={index * 0.1} width="100%">
+                <div className="flex items-start p-8 rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 transform hover:-translate-y-1 h-full">
+                  <div className="text-4xl mr-6 bg-blue-50 w-20 h-20 flex items-center justify-center rounded-2xl flex-shrink-0 shadow-inner">{item.icon}</div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                    <p className="text-gray-600 leading-relaxed text-lg">{item.desc}</p>
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -187,23 +204,25 @@ export default function HomePage() {
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-blue-800 mb-12">Simple, Transparent Pricing</h2>
-          <div className="bg-white p-10 rounded-xl shadow-lg border border-gray-200 max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
-            <div className="filter select-none mb-6 opacity-50">
-              <p className="text-5xl blur-sm font-extrabold text-green-600 mb-4">₹1</p>
-              <p className="text-2xl text-gray-800 font-semibold">per patient served</p>
+          <Reveal width="100%" delay={0.2}>
+            <div className="bg-white p-10 rounded-xl shadow-lg border border-gray-200 max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
+              <div className="filter select-none mb-6 opacity-50">
+                <p className="text-5xl blur-sm font-extrabold text-green-600 mb-4">₹1</p>
+                <p className="text-2xl text-gray-800 font-semibold">per patient served</p>
+              </div>
+              <p className="text-lg text-gray-600 leading-relaxed mb-4">
+                Our simple postpaid billing system means you use now and pay later. No hidden fees, no complex subscriptions.
+              </p>
+              <div className="mb-8">
+                <span className="inline-block bg-green-100 text-green-800 text-sm font-bold px-4 py-2 rounded-full animate-pulse">
+                  🎉 14 Days Free Trial Included
+                </span>
+              </div>
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold py-3 px-8 rounded-full">
+                <Link href="/pricing">View Pricing Model</Link>
+              </Button>
             </div>
-            <p className="text-lg text-gray-600 leading-relaxed mb-4">
-              Our simple postpaid billing system means you use now and pay later. No hidden fees, no complex subscriptions.
-            </p>
-            <div className="mb-8">
-              <span className="inline-block bg-green-100 text-green-800 text-sm font-bold px-4 py-2 rounded-full animate-pulse">
-                🎉 14 Days Free Trial Included
-              </span>
-            </div>
-            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold py-3 px-8 rounded-full">
-              <Link href="/pricing">View Pricing Model</Link>
-            </Button>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -231,20 +250,22 @@ export default function HomePage() {
       {/* Premium CTA Section */}
       <section className="bg-white py-20">
         <div className="container mx-auto px-4">
-          <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl overflow-hidden text-white p-12 md:p-16">
-            <div className="relative z-10 text-center">
-              <h2 className="text-3xl md:text-5xl font-extrabold mb-4">Ready to Modernize Your Clinic?</h2>
-              <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 mb-8">
-                Transform your waiting room today. Join dozens of clinics who have brought calm and efficiency to their practice with {APP_NAME}.
-              </p>
-              <Button asChild size="lg" className="bg-white text-blue-700 hover:bg-gray-100 text-lg md:text-xl font-bold py-4 px-10 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
-                <Link href="/contact">Book a Free Setup</Link>
-              </Button>
+          <Reveal width="100%">
+            <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl overflow-hidden text-white p-12 md:p-16">
+              <div className="relative z-10 text-center">
+                <h2 className="text-3xl md:text-5xl font-extrabold mb-4">Ready to Modernize Your Clinic?</h2>
+                <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 mb-8">
+                  Transform your waiting room today. Join dozens of clinics who have brought calm and efficiency to their practice with {APP_NAME}.
+                </p>
+                <Button asChild size="lg" className="bg-white text-blue-700 hover:bg-gray-100 text-lg md:text-xl font-bold py-4 px-10 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                  <Link href="/contact">Book a Free Setup</Link>
+                </Button>
+              </div>
+              {/* Decorative background elements */}
+              <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full transform -translate-x-1/4 -translate-y-1/4"></div>
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
             </div>
-            {/* Decorative background elements */}
-            <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full transform -translate-x-1/4 -translate-y-1/4"></div>
-            <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
-          </div>
+          </Reveal>
         </div>
       </section>
     </>

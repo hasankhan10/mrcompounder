@@ -2,6 +2,7 @@ import { APP_NAME } from '@/lib/config';
 import Link from 'next/link';
 import { GlassNavbar } from '@/components/glass-navbar';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
+import { SmoothScroll } from '@/components/shared/SmoothScroll';
 
 // The Footer is moved here
 function SiteFooter() {
@@ -40,12 +41,14 @@ export default async function PublicLayout({
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans flex flex-col">
-      <GlassNavbar initialUser={user} initialRole={role} />
-      <main className="flex-grow">
-        {children}
-      </main>
-      <SiteFooter />
-    </div>
+    <SmoothScroll>
+      <div className="min-h-screen bg-white text-gray-900 font-sans flex flex-col">
+        <GlassNavbar initialUser={user} initialRole={role} />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <SiteFooter />
+      </div>
+    </SmoothScroll>
   );
 }
