@@ -132,8 +132,8 @@ export type ListClinicsResponse = ClinicSummary[];
 export interface UpdateClinicRequest {
   topupAmount?: number;
   isActive?: boolean;
-  trialStartDate?: string;
-  trialEndDate?: string;
+  trialStartDate?: string | null;
+  trialEndDate?: string | null;
   name?: string;
   slug?: string;
   logoUrl?: string;

@@ -13,10 +13,11 @@ interface QueueDisplayProps {
     onCallNext: () => void;
     isSessionActive: boolean;
     onDeleteToken?: (tokenId: string) => void;
+    onMarkAbsent?: () => void;
     showControls?: boolean;
 }
 
-export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, servedTokens, onCallNext, isSessionActive, onDeleteToken, showControls = true }: QueueDisplayProps) {
+export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, servedTokens, onCallNext, onMarkAbsent, isSessionActive, onDeleteToken, showControls = true }: QueueDisplayProps) {
     const currentToken = waitingTokens.find(t => t.status === 'called');
     const pendingTokens = waitingTokens.filter(t => t.status === 'waiting');
     const isLastPatient = currentToken && pendingTokens.length === 0;
@@ -67,6 +68,17 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                             </div>
                         )}
                         <div className="flex justify-center gap-4">
+                            {onMarkAbsent && !isLastPatient && (
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    className="font-bold text-lg px-6 py-6 border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                                    onClick={() => onMarkAbsent()}
+                                    disabled={!currentToken || !isSessionActive}
+                                >
+                                    Mark Absent
+                                </Button>
+                            )}
                             <Button
                                 size="lg"
                                 className={`font-bold text-lg px-8 py-6 shadow-xl ${isLastPatient

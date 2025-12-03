@@ -360,6 +360,56 @@ export function DashboardClient({
     }
   };
 
+  const handleMarkAbsent = async () => {
+    const targetQueueId = activeQueue?.id;
+    if (!targetQueueId) return;
+
+    // Snapshot for rollback
+    const prevTokens = [...tokens];
+
+    // Logic to determine next state
+    const queueTokens = tokens.filter(t => t.queue_id === targetQueueId);
+    const queueWaitingTokens = queueTokens
+      .filter(t => t.status === 'waiting' || t.status === 'called')
+      .sort((a, b) => a.token_number - b.token_number);
+
+    const currentCalled = queueWaitingTokens.find(t => t.status === 'called');
+
+    if (!currentCalled) return; // Can only mark absent if someone is called
+
+    // Find next waiting token
+    const nextInLine = queueWaitingTokens
+      .filter(t => t.status === 'waiting')
+      .sort((a, b) => a.token_number - b.token_number)[0];
+
+    // Optimistic Updates
+    let newTokens = [...tokens];
+
+    // 1. Mark Current as Absent (No Show)
+    newTokens = newTokens.map(t => t.id === currentCalled.id ? { ...t, status: 'no_show' } : t);
+
+    // NOTE: We do NOT update clinic balance here (Billing skipped)
+
+    // 2. Call Next (if any)
+    if (nextInLine) {
+      const calledToken = { ...nextInLine, status: 'called' as const };
+      newTokens = newTokens.map(t => t.id === nextInLine.id ? calledToken : t);
+      toast.info(`Marked Absent. Calling Token #${calledToken.token_number}`);
+    } else {
+      toast.info('Patient marked absent. Queue is empty.');
+    }
+
+    setTokens(newTokens);
+
+    try {
+      await dashboardService.markAbsent(targetQueueId, currentCalled.id);
+    } catch (err: unknown) {
+      // Rollback
+      setTokens(prevTokens);
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+
   const handleDeleteToken = async (tokenId: string) => {
     if (!confirm('Are you sure you want to remove this patient from the queue?')) return;
 
@@ -453,6 +503,7 @@ export function DashboardClient({
             onToggleBreak={handleToggleBreak}
             onEndSession={handleEndSession}
             onCallNext={handleCallNext}
+            onMarkAbsent={handleMarkAbsent}
             onDeleteToken={handleDeleteToken}
           />
         </div>
@@ -480,6 +531,7 @@ export function DashboardClient({
             onEndSession={handleEndSession}
             onRegisterPatient={handleRegisterPatient}
             onCallNext={handleCallNext}
+            onMarkAbsent={handleMarkAbsent}
             onDeleteToken={handleDeleteToken}
             newDoctorName={newDoctorName}
             setNewDoctorName={setNewDoctorName}

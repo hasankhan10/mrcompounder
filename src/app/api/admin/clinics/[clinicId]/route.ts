@@ -89,10 +89,11 @@ export async function PATCH(
     }
 
     // 4. Handle Trial Period Update (Admin Context)
-    if (body.trialStartDate !== undefined || body.trialEndDate !== undefined) {
+    // We check if keys exist in body, even if value is null
+    if ('trialStartDate' in body || 'trialEndDate' in body) {
       const updateData: Record<string, string | null> = {};
-      if (body.trialStartDate !== undefined) updateData.trial_start_date = body.trialStartDate;
-      if (body.trialEndDate !== undefined) updateData.trial_end_date = body.trialEndDate;
+      if ('trialStartDate' in body) updateData.trial_start_date = body.trialStartDate || null;
+      if ('trialEndDate' in body) updateData.trial_end_date = body.trialEndDate || null;
 
       const { data: updatedClinic, error } = await supabaseAdmin
         .from('clinics')

@@ -98,5 +98,22 @@ export const dashboardService = {
 
         if (!response.ok) throw new Error('Failed to delete token');
         return response.json();
+    },
+
+    async markAbsent(queueId: string, currentCalledTokenId: string) {
+        const response = await fetch('/api/dashboard/token/absent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                queueId,
+                currentCalledTokenId
+            }),
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Failed to mark absent');
+        }
+        return response.json();
     }
 };

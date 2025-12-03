@@ -88,6 +88,11 @@ export const adminService = {
     },
 
     async toggleTrial(id: string, startDate: string | null, endDate: string | null) {
-        return this.updateClinic(id, { trialStartDate: startDate || undefined, trialEndDate: endDate || undefined });
+        // Explicitly pass null if the value is null, otherwise pass the string
+        // We cast to any because the type definition might be strict about undefined vs null
+        return this.updateClinic(id, {
+            trialStartDate: startDate === null ? null : startDate,
+            trialEndDate: endDate === null ? null : endDate
+        } as any);
     }
 };

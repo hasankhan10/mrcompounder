@@ -25,6 +25,7 @@ interface BookingTabProps {
     onRegisterPatient: (e: FormEvent) => void;
     onCallNext: () => void;
     onDeleteToken: (id: string) => void;
+    onMarkAbsent: () => void;
 
     // Form State
     newDoctorName: string;
@@ -60,6 +61,7 @@ export function BookingTab({
     onRegisterPatient,
     onCallNext,
     onDeleteToken,
+    onMarkAbsent,
     newDoctorName,
     setNewDoctorName,
     newDoctorImage,
@@ -179,6 +181,7 @@ export function BookingTab({
                     waitingTokens={waitingTokens}
                     servedTokens={servedTokens}
                     onCallNext={onCallNext}
+                    onMarkAbsent={onMarkAbsent}
                     isSessionActive={activeQueue!.status === 'active'}
                     onDeleteToken={onDeleteToken}
                     showControls={false}

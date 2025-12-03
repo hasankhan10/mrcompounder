@@ -21,6 +21,7 @@ interface OverviewTabProps {
     onEndSession: () => void;
     onCallNext: (queueId?: string) => void;
     onDeleteToken: (id: string) => void;
+    onMarkAbsent: () => void;
 }
 
 export function OverviewTab({
@@ -36,7 +37,8 @@ export function OverviewTab({
     onToggleBreak,
     onEndSession,
     onCallNext,
-    onDeleteToken
+    onDeleteToken,
+    onMarkAbsent
 }: OverviewTabProps) {
 
     if (isLoading) {
@@ -98,6 +100,7 @@ export function OverviewTab({
                     waitingTokens={waitingTokens}
                     servedTokens={servedTokens}
                     onCallNext={onCallNext}
+                    onMarkAbsent={onMarkAbsent}
                     isSessionActive={activeQueue!.status === 'active'}
                     onDeleteToken={onDeleteToken}
                 />
