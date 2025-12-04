@@ -7,9 +7,10 @@ interface SessionStatusCardProps {
     doctorName: string;
     onToggleBreak: () => void;
     onEndSession: () => void;
+    loadingAction: string | null;
 }
 
-export function SessionStatusCard({ status, doctorName, onToggleBreak, onEndSession }: SessionStatusCardProps) {
+export function SessionStatusCard({ status, doctorName, onToggleBreak, onEndSession, loadingAction }: SessionStatusCardProps) {
     return (
         <Card className="border-none shadow-md bg-white overflow-hidden">
             <div className={`h-2 ${status === 'active' ? 'bg-green-500' : 'bg-yellow-500'}`} />
@@ -27,11 +28,17 @@ export function SessionStatusCard({ status, doctorName, onToggleBreak, onEndSess
                     variant="outline"
                     className={`w-full ${status === 'active' ? 'border-yellow-200 text-yellow-700 hover:bg-yellow-50' : 'border-green-200 text-green-700 hover:bg-green-50'}`}
                     onClick={onToggleBreak}
+                    disabled={!!loadingAction}
                 >
-                    {status === 'active' ? 'Take a Break (Pause)' : 'Resume Session'}
+                    {loadingAction === 'toggle-break' ? 'Processing...' : (status === 'active' ? 'Take a Break (Pause)' : 'Resume Session')}
                 </Button>
-                <Button variant="destructive" className="w-full" onClick={onEndSession}>
-                    End Session
+                <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={onEndSession}
+                    disabled={!!loadingAction}
+                >
+                    {loadingAction === 'end-session' ? 'Ending...' : 'End Session'}
                 </Button>
             </CardContent>
         </Card>

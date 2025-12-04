@@ -22,6 +22,7 @@ interface OverviewTabProps {
     onCallNext: (queueId?: string) => void;
     onDeleteToken: (id: string) => void;
     onMarkAbsent: () => void;
+    loadingAction: string | null;
 }
 
 export function OverviewTab({
@@ -38,7 +39,8 @@ export function OverviewTab({
     onEndSession,
     onCallNext,
     onDeleteToken,
-    onMarkAbsent
+    onMarkAbsent,
+    loadingAction
 }: OverviewTabProps) {
 
     if (isLoading) {
@@ -90,6 +92,7 @@ export function OverviewTab({
                         doctorName={activeQueue!.doctor_name || 'Unknown Doctor'}
                         onToggleBreak={onToggleBreak}
                         onEndSession={onEndSession}
+                        loadingAction={loadingAction}
                     />
                 </div>
 
@@ -103,6 +106,7 @@ export function OverviewTab({
                     onMarkAbsent={onMarkAbsent}
                     isSessionActive={activeQueue!.status === 'active'}
                     onDeleteToken={onDeleteToken}
+                    loadingAction={loadingAction}
                 />
             </div>
         </div>

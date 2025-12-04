@@ -147,8 +147,12 @@ export function DashboardClient({
   });
 
   // Handlers
+  const [loadingAction, setLoadingAction] = useState<string | null>(null);
+
   const handleStartSession = async (e: FormEvent) => {
     e.preventDefault();
+    if (loadingAction) return;
+    setLoadingAction('start-session');
     setFormIsLoading(true);
 
     // Feedback for image upload
@@ -192,12 +196,14 @@ export function DashboardClient({
       toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setFormIsLoading(false);
+      setLoadingAction(null);
     }
   };
 
   const handleToggleBreak = async () => {
-    if (!activeQueue) return;
+    if (!activeQueue || loadingAction) return;
     const newStatus = activeQueue.status === 'active' ? 'paused' : 'active';
+    setLoadingAction('toggle-break');
 
     try {
       const updatedQueue = await dashboardService.toggleBreak(activeQueue.id, newStatus);
@@ -205,12 +211,15 @@ export function DashboardClient({
       toast.success(newStatus === 'paused' ? 'Session paused' : 'Session resumed');
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoadingAction(null);
     }
   };
 
   const handleEndSession = async () => {
-    if (!activeQueue) return;
+    if (!activeQueue || loadingAction) return;
     if (!confirm('Are you sure you want to end the session? This will clear the current queue.')) return;
+    setLoadingAction('end-session');
 
     try {
       await dashboardService.endSession(activeQueue.id);
@@ -222,11 +231,14 @@ export function DashboardClient({
       setActiveTab('history');
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoadingAction(null);
     }
   };
 
   const handleActivateSession = async () => {
-    if (!activeQueue) return;
+    if (!activeQueue || loadingAction) return;
+    setLoadingAction('activate-session');
     setFormIsLoading(true);
     try {
       const updatedQueue = await dashboardService.activateSession(activeQueue.id);
@@ -237,12 +249,13 @@ export function DashboardClient({
       toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setFormIsLoading(false);
+      setLoadingAction(null);
     }
   };
 
   const handleRegisterPatient = async (e: FormEvent) => {
     e.preventDefault();
-    if (!activeQueue) return;
+    if (!activeQueue || loadingAction) return;
 
     const name = newPatientName;
     const phone = newPatientPhone;
@@ -251,6 +264,8 @@ export function DashboardClient({
     // Clear inputs immediately for speed
     setNewPatientName('');
     setNewPatientPhone('');
+
+    setLoadingAction('register-patient');
 
     // Calculate estimated token number
     const lastTokenNum = Math.max(
@@ -297,15 +312,20 @@ export function DashboardClient({
       setNewPatientPhone(phone);
       setNewPatientPurpose(purpose);
       toast.error(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoadingAction(null);
     }
   };
 
   const handleCallNext = async (queueId?: string) => {
+    if (loadingAction) return;
     const targetQueueId = queueId || activeQueue?.id;
     if (!targetQueueId) return;
 
     const targetQueue = activeQueues.find(q => q.id === targetQueueId);
     if (!targetQueue) return;
+
+    setLoadingAction('call-next');
 
     // Snapshot for rollback
     const prevTokens = [...tokens];
@@ -325,6 +345,7 @@ export function DashboardClient({
 
     if (!currentCalled && !nextInLine) {
       toast.info('Queue is empty');
+      setLoadingAction(null);
       return;
     }
 
@@ -363,12 +384,17 @@ export function DashboardClient({
       setTokens(prevTokens);
       if (prevClinic) setClinic(prevClinic);
       toast.error(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoadingAction(null);
     }
   };
 
   const handleMarkAbsent = async () => {
+    if (loadingAction) return;
     const targetQueueId = activeQueue?.id;
     if (!targetQueueId) return;
+
+    setLoadingAction('mark-absent');
 
     // Snapshot for rollback
     const prevTokens = [...tokens];
@@ -381,7 +407,10 @@ export function DashboardClient({
 
     const currentCalled = queueWaitingTokens.find(t => t.status === 'called');
 
-    if (!currentCalled) return; // Can only mark absent if someone is called
+    if (!currentCalled) {
+      setLoadingAction(null);
+      return; // Can only mark absent if someone is called
+    }
 
     // Find next waiting token
     const nextInLine = queueWaitingTokens
@@ -413,11 +442,16 @@ export function DashboardClient({
       // Rollback
       setTokens(prevTokens);
       toast.error(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoadingAction(null);
     }
   };
 
   const handleDeleteToken = async (tokenId: string) => {
+    if (loadingAction) return;
     if (!confirm('Are you sure you want to remove this patient from the queue?')) return;
+
+    setLoadingAction(`delete-token-${tokenId}`);
 
     try {
       await dashboardService.deleteToken(tokenId);
@@ -426,6 +460,8 @@ export function DashboardClient({
       toast.success('Patient removed from queue');
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoadingAction(null);
     }
   };
 
@@ -512,6 +548,7 @@ export function DashboardClient({
             onCallNext={handleCallNext}
             onMarkAbsent={handleMarkAbsent}
             onDeleteToken={handleDeleteToken}
+            loadingAction={loadingAction}
           />
         </div>
       )}
@@ -554,6 +591,7 @@ export function DashboardClient({
             setNewPatientPhone={setNewPatientPhone}
             newPatientPurpose={newPatientPurpose}
             setNewPatientPurpose={setNewPatientPurpose}
+            loadingAction={loadingAction}
           />
         </div>
       )}

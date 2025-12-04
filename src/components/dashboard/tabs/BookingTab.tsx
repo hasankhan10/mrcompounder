@@ -43,6 +43,7 @@ interface BookingTabProps {
     setNewPatientPhone: (val: string) => void;
     newPatientPurpose: string;
     setNewPatientPurpose: (val: string) => void;
+    loadingAction: string | null;
 }
 
 export function BookingTab({
@@ -75,7 +76,8 @@ export function BookingTab({
     newPatientPhone,
     setNewPatientPhone,
     newPatientPurpose,
-    setNewPatientPurpose
+    setNewPatientPurpose,
+    loadingAction
 }: BookingTabProps) {
 
     if (isLoading) {
@@ -110,7 +112,7 @@ export function BookingTab({
                         }}
                         doctorArrivalTime={newDoctorArrivalTime}
                         setDoctorArrivalTime={setNewDoctorArrivalTime}
-                        isLoading={formIsLoading}
+                        isLoading={formIsLoading || loadingAction === 'start-session'}
                         onSubmit={onStartSession}
                         recentDoctors={recentDoctors}
                         onSelectRecent={(doc) => {
@@ -141,20 +143,20 @@ export function BookingTab({
                         <Button
                             size="lg"
                             onClick={onActivateSession}
-                            disabled={formIsLoading}
+                            disabled={formIsLoading || !!loadingAction}
                             className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-12 py-6 shadow-lg transform transition cursor-pointer hover:scale-105"
                         >
-                            {formIsLoading ? 'Starting...' : 'Start Session'}
+                            {loadingAction === 'activate-session' ? 'Starting...' : 'Start Session'}
                         </Button>
 
                         <Button
                             size="lg"
                             variant="outline"
                             onClick={onEndSession}
-                            disabled={formIsLoading}
+                            disabled={formIsLoading || !!loadingAction}
                             className="bg-white hover:bg-red-50 text-red-600 border-red-200 font-bold text-lg px-8 py-6 shadow-sm transform transition cursor-pointer hover:scale-105"
                         >
-                            Cancel Session
+                            {loadingAction === 'end-session' ? 'Cancelling...' : 'Cancel Session'}
                         </Button>
                     </div>
                 </div>
@@ -169,7 +171,7 @@ export function BookingTab({
                 setPatientPhone={setNewPatientPhone}
                 patientPurpose={newPatientPurpose}
                 setPatientPurpose={setNewPatientPurpose}
-                isLoading={formIsLoading}
+                isLoading={formIsLoading || loadingAction === 'register-patient'}
                 isSessionActive={['active', 'waiting'].includes(activeQueue!.status)}
                 onSubmit={onRegisterPatient}
             />
@@ -185,6 +187,7 @@ export function BookingTab({
                     isSessionActive={activeQueue!.status === 'active'}
                     onDeleteToken={onDeleteToken}
                     showControls={false}
+                    loadingAction={loadingAction}
                 />
             </div>
         </>

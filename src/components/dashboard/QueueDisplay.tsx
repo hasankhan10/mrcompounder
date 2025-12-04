@@ -15,9 +15,10 @@ interface QueueDisplayProps {
     onDeleteToken?: (tokenId: string) => void;
     onMarkAbsent?: () => void;
     showControls?: boolean;
+    loadingAction: string | null;
 }
 
-export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, servedTokens, onCallNext, onMarkAbsent, isSessionActive, onDeleteToken, showControls = true }: QueueDisplayProps) {
+export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, servedTokens, onCallNext, onMarkAbsent, isSessionActive, onDeleteToken, showControls = true, loadingAction }: QueueDisplayProps) {
     const currentToken = waitingTokens.find(t => t.status === 'called');
     const pendingTokens = waitingTokens.filter(t => t.status === 'waiting');
     const isLastPatient = currentToken && pendingTokens.length === 0;
@@ -74,9 +75,9 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                                     variant="outline"
                                     className="font-bold text-lg px-6 py-6 border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
                                     onClick={() => onMarkAbsent()}
-                                    disabled={!currentToken || !isSessionActive}
+                                    disabled={!currentToken || !isSessionActive || !!loadingAction}
                                 >
-                                    Mark Absent
+                                    {loadingAction === 'mark-absent' ? 'Marking...' : 'Mark Absent'}
                                 </Button>
                             )}
                             <Button
@@ -86,9 +87,9 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                                     : 'bg-white text-blue-600 hover:bg-blue-50'
                                     }`}
                                 onClick={() => onCallNext()}
-                                disabled={(!isLastPatient && pendingTokens.length === 0) || !isSessionActive}
+                                disabled={(!isLastPatient && pendingTokens.length === 0) || !isSessionActive || !!loadingAction}
                             >
-                                {isLastPatient ? 'Serve & Finish' : 'Call Next Token'}
+                                {loadingAction === 'call-next' ? 'Calling...' : (isLastPatient ? 'Serve & Finish' : 'Call Next Token')}
                             </Button>
                         </div>
                         <p className={`mt-4 text-sm ${isLastPatient ? 'text-green-200' : 'text-blue-200'}`}>
@@ -135,6 +136,7 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                                                     onClick={() => onDeleteToken(token.id)}
                                                     className="text-red-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
                                                     title="Remove Patient"
+                                                    disabled={!!loadingAction}
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg>
                                                 </button>
