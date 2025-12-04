@@ -94,13 +94,18 @@ export function DashboardClient({
     }
   };
 
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+
   // Fetch history
   const fetchHistory = async () => {
+    setIsHistoryLoading(true);
     try {
       const data = await dashboardService.fetchHistory();
       setPastSessions(data);
     } catch (error) {
       console.error('Failed to fetch history', error);
+    } finally {
+      setIsHistoryLoading(false);
     }
   };
 
@@ -556,7 +561,7 @@ export function DashboardClient({
       {activeTab === 'history' && (
         <HistoryTab
           pastSessions={pastSessions}
-          isLoading={false}
+          isLoading={isHistoryLoading}
         />
       )}
 
