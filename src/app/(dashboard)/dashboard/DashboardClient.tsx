@@ -522,7 +522,7 @@ export function DashboardClient({
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-8 text-xs gap-1 bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100"
+                      className="h-8 text-xs gap-1 bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100 hover:text-teal-800"
                       onClick={() => setIsRechargeModalOpen(true)}
                     >
                       <IndianRupee className="w-3 h-3" /> Pay Bill

@@ -26,7 +26,7 @@ export function SessionStatusCard({ status, doctorName, onToggleBreak, onEndSess
             <CardContent className="space-y-3">
                 <Button
                     variant="outline"
-                    className={`w-full ${status === 'active' ? 'border-yellow-200 text-yellow-700 hover:bg-yellow-50' : 'border-green-200 text-green-700 hover:bg-green-50'}`}
+                    className={`w-full ${status === 'active' ? 'border-yellow-200 text-yellow-700 hover:bg-yellow-50 hover:text-yellow-800' : 'border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800'}`}
                     onClick={onToggleBreak}
                     disabled={!!loadingAction}
                 >

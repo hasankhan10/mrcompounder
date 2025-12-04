@@ -81,7 +81,7 @@ export function OverviewTab({
 
     return (
         <div className="space-y-4">
-            <Button variant="outline" onClick={() => setSelectedQueueId(null)} className="gap-2 border-slate-300 text-slate-700 hover:bg-slate-50">
+            <Button variant="outline" onClick={() => setSelectedQueueId(null)} className="gap-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900">
                 <ArrowLeft className="w-4 h-4" /> Back to All Sessions
             </Button>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
