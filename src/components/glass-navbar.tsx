@@ -43,6 +43,13 @@ function NavLinks({ mobile = false, pathname, setIsOpen }: NavLinksProps) {
                 About Us
             </Link>
             <Link
+                href="/reviews"
+                onClick={() => mobile && setIsOpen(false)}
+                className={`font-medium transition-colors ${isActive('/reviews') ? 'text-teal-600 font-bold' : 'text-slate-700 hover:text-teal-600'} ${mobile ? 'text-lg py-2' : ''}`}
+            >
+                Reviews
+            </Link>
+            <Link
                 href="/contact"
                 onClick={() => mobile && setIsOpen(false)}
                 className={`font-medium transition-colors ${isActive('/contact') ? 'text-teal-600 font-bold' : 'text-slate-700 hover:text-teal-600'} ${mobile ? 'text-lg py-2' : ''}`}

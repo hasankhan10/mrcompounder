@@ -13,64 +13,73 @@ import { APP_NAME } from '@/lib/config';
 const CLINIC_REVIEWS = [
     {
         id: 1,
-        name: "Heart Care Center",
-        location: "Mumbai, MH",
+        name: "Suroksha Diagnostics",
+        location: "Barasat, Kolkata",
         logo: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&h=400&fit=crop",
         rating: 5,
-        comment: "MrCompounder has completely transformed our waiting room. We used to have chaos every morning, now it's silent and organized. The patients love tracking their turn from home.",
+        comment: "We used to have 40-50 patients crowding the reception every evening. It was chaotic. With Mr Compounder, the waiting room is quiet, and patients just walk in when their number is up. It's a game changer for our administration.",
         date: "2 days ago"
     },
     {
         id: 2,
-        name: "Little Smiles Clinic",
-        location: "Bangalore, KA",
+        name: "Dr. Sharma's Child Care",
+        location: "Indiranagar, Bangalore",
         logo: "https://images.unsplash.com/photo-1536064479547-7ee40b74b807?w=400&h=400&fit=crop",
         rating: 5,
-        comment: "The best investment for my clinic. My staff is less stressed, and parents are happier because they don't have to wait in a crowded room with sick kids.",
+        comment: "Parents love that they don't have to expose their healthy kids to sick ones in the waiting area. They scan the QR, go wait in their car or a nearby cafe, and come back exactly on time. Best decision for my practice.",
         date: "1 week ago"
     },
     {
         id: 3,
-        name: "City Health Clinic",
-        location: "Delhi, DL",
+        name: "City Polyclinic",
+        location: "Vasant Kunj, Delhi",
         logo: "https://images.unsplash.com/photo-1601839777132-b3f4e455c369?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGNsaW5pYyUyMHBpY3R1cmV8ZW58MHx8MHx8fDA%3D",
         rating: 4,
-        comment: "Simple, effective, and affordable. The QR code system is genius. Setup took less than 10 minutes.",
+        comment: "Setup was surprisingly easy. We didn't need to buy any new computers; the compounder just uses his Android phone. The 'Call Next' feature is very responsive.",
         date: "2 weeks ago"
+    },
+    {
+        id: 4,
+        name: "LifeLine Ortho Centre",
+        location: "Pune, MH",
+        logo: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=400&h=400&fit=crop",
+        rating: 5,
+        comment: "My receptionist used to spend half her time answering 'How much longer?' Now the patients see it on their own phones. Efficiency has gone up by at least 40%.",
+        date: "3 weeks ago"
     }
 ];
 
 const PATIENT_REVIEWS = [
     {
         id: 1,
-        name: "Priya M.",
-        location: "Mumbai",
+        name: "Ananya Roy",
+        location: "Kolkata",
         rating: 5,
-        comment: "I love this system! I scanned the QR code, went to a nearby cafe, and came back exactly when it was my turn. No more waiting in line!",
+        comment: "Finally, a doctor's clinic that respects my time! I scanned the code, saw I was 10th in line, and went to finish my grocery shopping. Got a notification when it was my turn. Amazing.",
         date: "Yesterday"
     },
     {
         id: 2,
-        name: "Rahul S.",
-        location: "Bangalore",
+        name: "Rahul Verma",
+        location: "Mumbai",
         rating: 5,
-        comment: "Very convenient. I could see exactly how many people were ahead of me on my phone. Every clinic should have this.",
+        comment: "No more fighting at the reception counter about who came first. The digital token number is clear and fair. Every clinic in Mumbai needs this.",
         date: "3 days ago"
     },
     {
         id: 3,
-        name: "Anjali K.",
-        location: "Delhi",
+        name: "Sneha K.",
+        location: "Bangalore",
         rating: 4,
-        comment: "Smooth experience. The live updates are accurate. Much better than the old token system.",
+        comment: "Very convenient. I didn't have to download any app, which is great. The live status page updates instantly.",
         date: "1 week ago"
     },
     {
         id: 4,
-        name: "Vikram R.",
-        location: "Chennai",
+        name: "Vikram Singh",
+        location: "Jaipur",
         rating: 5,
-        comment: "Finally, a clinic that respects my time. Great technology.",
+        comment: "I took my elderly mother to the clinic. It was so helpful that she didn't have to sit in the uncomfortable waiting chairs for 2 hours. We waited at home and left only when the token reached 5.",
         date: "2 weeks ago"
     }
 ];
