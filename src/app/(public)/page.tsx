@@ -106,21 +106,21 @@ export default function HomePage() {
           <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12 animate-fade-in-up">How It Works (3 Simple Steps)</h2>
           <div className="grid md:grid-cols-3 gap-10">
             <Reveal delay={0.2} width="100%">
-              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transform hover:scale-105 transition-transform duration-300 hover-lift h-full">
+              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 hover-lift h-full">
                 <div className="text-5xl text-teal-500 mb-6 font-bold">1</div>
                 <h3 className="text-2xl font-semibold mb-4 text-slate-800">Scan & Join.</h3>
                 <p className="text-slate-600 leading-relaxed">Patients scan your clinic&apos;s QR code, enter their phone number, and instantly get a live token on their own phone. No app needed.</p>
               </div>
             </Reveal>
             <Reveal delay={0.4} width="100%">
-              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transform hover:scale-105 transition-transform duration-300 hover-lift h-full">
+              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 hover-lift h-full">
                 <div className="text-5xl text-teal-500 mb-6 font-bold">2</div>
                 <h3 className="text-2xl font-semibold mb-4 text-slate-800">Call Next.</h3>
                 <p className="text-slate-600 leading-relaxed">Your compounder sees the digital queue, taps &quot;Call Next,&quot; and the system moves the line forward with a single click.</p>
               </div>
             </Reveal>
             <Reveal delay={0.6} width="100%">
-              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transform hover:scale-105 transition-transform duration-300 hover-lift h-full">
+              <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 hover-lift h-full">
                 <div className="text-5xl text-teal-500 mb-6 font-bold">3</div>
                 <h3 className="text-2xl font-semibold mb-4 text-slate-800">Get Alerted.</h3>
                 <p className="text-slate-600 leading-relaxed">Patients receive a clear in-page alert and web notification (if allowed) on their phone when it&apos;s their turn. They return from anywhere.</p>
@@ -144,7 +144,7 @@ export default function HomePage() {
               "Trust & Clarity: See the doctor's name on your screen, reducing confusion."
             ].map((benefit, index) => (
               <Reveal key={index} delay={index * 0.1} width="100%">
-                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex items-start space-x-4 transform hover:scale-105 transition-transform duration-300 h-full">
+                <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex items-start space-x-4 transition-all duration-300 h-full hover:shadow-lg">
                   <svg className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
                   </svg>
@@ -168,7 +168,7 @@ export default function HomePage() {
               { title: "Premium Brand Image", desc: "Stand out as a modern, patient-centric facility in your neighborhood.", icon: "🏥" }
             ].map((item, index) => (
               <Reveal key={index} delay={index * 0.1} width="100%">
-                <div className="flex items-start p-8 rounded-2xl border border-slate-100 shadow-lg hover:shadow-xl transition-all duration-300 bg-white transform hover:-translate-y-1 h-full">
+                <div className="flex items-start p-8 rounded-2xl border border-slate-100 shadow-lg hover:shadow-xl transition-all duration-300 bg-white h-full hover:border-slate-200">
                   <div className="text-4xl mr-6 bg-teal-50 w-20 h-20 flex items-center justify-center rounded-2xl flex-shrink-0 shadow-inner">{item.icon}</div>
                   <div>
                     <h3 className="text-2xl font-bold text-slate-900 mb-3">{item.title}</h3>
