@@ -236,6 +236,30 @@ export function DashboardClient({
     }
   };
 
+  const handleCancelSession = async () => {
+    if (!activeQueue || loadingAction) return;
+    if (!confirm('Are you sure you want to CANCEL this session? This indicates the doctor did not arrive.')) return;
+    setLoadingAction('cancel-session');
+
+    try {
+      await dashboardService.cancelSession(activeQueue.id);
+
+      const cancelledQueue = { ...activeQueue, status: 'cancelled' as const, ended_at: new Date().toISOString() };
+
+      setActiveQueues(prev => prev.filter(q => q.id !== activeQueue.id));
+      setPastSessions(prev => [cancelledQueue, ...prev]);
+
+      setSelectedQueueId(null);
+      setNewDoctorName('');
+      toast.success('Session cancelled');
+      setActiveTab('history');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
   const handleActivateSession = async () => {
     if (!activeQueue || loadingAction) return;
     setLoadingAction('activate-session');
@@ -573,6 +597,7 @@ export function DashboardClient({
             onStartSession={handleStartSession}
             onActivateSession={handleActivateSession}
             onEndSession={handleEndSession}
+            onCancelSession={handleCancelSession}
             onRegisterPatient={handleRegisterPatient}
             onCallNext={handleCallNext}
             onMarkAbsent={handleMarkAbsent}

@@ -36,9 +36,15 @@ export function HistoryTab({ pastSessions, isLoading }: HistoryTabProps) {
                                 <h3 className="font-bold text-slate-900 text-lg">{session.doctor_name}</h3>
                                 <p className="text-sm text-slate-500 mb-1">{new Date(session.created_at).toLocaleDateString()}</p>
                                 <div className="flex items-center gap-2">
-                                    <span className="inline-block px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-full font-medium">
-                                        Ended
-                                    </span>
+                                    {session.status === 'cancelled' ? (
+                                        <span className="inline-block px-2 py-1 bg-red-100 text-red-600 text-xs rounded-full font-medium">
+                                            Cancelled
+                                        </span>
+                                    ) : (
+                                        <span className="inline-block px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-full font-medium">
+                                            Ended
+                                        </span>
+                                    )}
                                     <span className="text-xs text-slate-500 font-medium">
                                         {session.served_count || 0} Patients Served
                                     </span>

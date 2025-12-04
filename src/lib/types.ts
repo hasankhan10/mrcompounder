@@ -4,7 +4,7 @@
 // ================================================================= //
 
 export type UserRole = 'super_admin' | 'compounder';
-export type QueueStatus = 'active' | 'paused' | 'ended' | 'waiting';
+export type QueueStatus = 'active' | 'paused' | 'ended' | 'waiting' | 'cancelled';
 export type TokenStatus = 'waiting' | 'called' | 'served' | 'no_show';
 export type TransactionType = 'topup' | 'usage';
 
@@ -164,6 +164,14 @@ export interface ToggleBreakRequest {
   newStatus: 'paused' | 'active';
 }
 export type ToggleBreakResponse = Queue;
+
+export interface CancelSessionRequest {
+  sessionId: string;
+}
+export interface CancelSessionResponse {
+  message: 'Session cancelled successfully';
+  cancelledAt: string;
+}
 
 export interface RegisterTokenRequest {
   queueId: string;

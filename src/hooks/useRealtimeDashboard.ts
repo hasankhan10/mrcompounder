@@ -82,7 +82,7 @@ export function useRealtimeDashboard({
                     } else if (payload.eventType === 'UPDATE') {
                         const updatedQueue = payload.new as Queue;
 
-                        if (updatedQueue.status === 'ended') {
+                        if (updatedQueue.status === 'ended' || updatedQueue.status === 'cancelled') {
                             // Move from active to history
                             setActiveQueues(prev => prev.filter(q => q.id !== updatedQueue.id));
                             setPastSessions(prev => {
@@ -93,7 +93,7 @@ export function useRealtimeDashboard({
 
                             if (selectedQueueId === updatedQueue.id) {
                                 setSelectedQueueId(null);
-                                toast.info('Session ended.');
+                                toast.info(updatedQueue.status === 'cancelled' ? 'Session cancelled.' : 'Session ended.');
                             }
                         } else {
                             // Update active queue

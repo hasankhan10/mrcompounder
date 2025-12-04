@@ -22,6 +22,7 @@ interface BookingTabProps {
     onStartSession: (e: FormEvent) => void;
     onActivateSession: () => void;
     onEndSession: () => void;
+    onCancelSession: () => void;
     onRegisterPatient: (e: FormEvent) => void;
     onCallNext: () => void;
     onDeleteToken: (id: string) => void;
@@ -59,6 +60,7 @@ export function BookingTab({
     onStartSession,
     onActivateSession,
     onEndSession,
+    onCancelSession,
     onRegisterPatient,
     onCallNext,
     onDeleteToken,
@@ -130,7 +132,7 @@ export function BookingTab({
     return (
         <>
             <div className="mb-4">
-                <Button variant="outline" onClick={() => setSelectedQueueId(null)} className="gap-2 border-slate-300 text-slate-700 hover:bg-slate-50">
+                <Button variant="outline" onClick={() => setSelectedQueueId(null)} className="gap-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900">
                     <ArrowLeft className="w-4 h-4" /> Back to Selection
                 </Button>
             </div>
@@ -152,11 +154,11 @@ export function BookingTab({
                         <Button
                             size="lg"
                             variant="outline"
-                            onClick={onEndSession}
+                            onClick={onCancelSession}
                             disabled={formIsLoading || !!loadingAction}
-                            className="bg-white hover:bg-red-50 text-red-600 border-red-200 font-bold text-lg px-8 py-6 shadow-sm transform transition cursor-pointer hover:scale-105"
+                            className="bg-white border-red-200 font-bold text-lg px-8 py-6 shadow-sm transform transition cursor-pointer hover:scale-105"
                         >
-                            {loadingAction === 'end-session' ? 'Cancelling...' : 'Cancel Session'}
+                            {loadingAction === 'cancel-session' ? 'Cancelling...' : 'Cancel Session'}
                         </Button>
                     </div>
                 </div>

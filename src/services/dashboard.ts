@@ -49,6 +49,17 @@ export const dashboardService = {
         return response.json();
     },
 
+    async cancelSession(sessionId: string) {
+        const response = await fetch('/api/dashboard/session/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId }),
+        });
+
+        if (!response.ok) throw new Error('Failed to cancel session');
+        return response.json();
+    },
+
     async activateSession(sessionId: string) {
         const response = await fetch('/api/dashboard/session/activate', {
             method: 'POST',
