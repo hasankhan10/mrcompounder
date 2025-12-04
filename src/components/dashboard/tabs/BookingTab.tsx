@@ -96,10 +96,10 @@ export function BookingTab({
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 <div>
                     <h2 className="text-xl font-bold text-slate-900 mb-4">Select Session to Book</h2>
-                    {activeQueues.length === 0 ? (
+                    {activeQueues.filter(q => q.status !== 'cancelled').length === 0 ? (
                         <p className="text-slate-500 italic">No active sessions. Start one on the right.</p>
                     ) : (
-                        <SessionGrid queues={activeQueues} tokens={tokens} onSelect={setSelectedQueueId} />
+                        <SessionGrid queues={activeQueues.filter(q => q.status !== 'cancelled')} tokens={tokens} onSelect={setSelectedQueueId} />
                     )}
                 </div>
                 <div>

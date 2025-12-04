@@ -11,9 +11,10 @@ import { Loader2 } from 'lucide-react';
 interface NavbarAuthProps {
     initialUser?: User | null;
     initialRole?: string | null;
+    onLinkClick?: () => void;
 }
 
-export function NavbarAuth({ initialUser, initialRole }: NavbarAuthProps) {
+export function NavbarAuth({ initialUser, initialRole, onLinkClick }: NavbarAuthProps) {
     const [user, setUser] = useState<User | null>(initialUser || null);
     const [role, setRole] = useState<string | null>(initialRole || null);
     const [loading, setLoading] = useState(false);
@@ -52,6 +53,7 @@ export function NavbarAuth({ initialUser, initialRole }: NavbarAuthProps) {
 
     const handleDashboardClick = () => {
         setIsNavigating(true);
+        onLinkClick?.();
         if (role === 'super_admin') {
             router.push('/admin');
         } else if (role === 'compounder') {
@@ -78,10 +80,10 @@ export function NavbarAuth({ initialUser, initialRole }: NavbarAuthProps) {
 
     return (
         <>
-            <Button asChild variant="ghost" className="text-gray-800 hover:bg-gray-200/50 font-semibold">
+            <Button asChild variant="ghost" className="text-gray-800 hover:bg-gray-200/50 font-semibold" onClick={onLinkClick}>
                 <Link href="/login">Login</Link>
             </Button>
-            <Button asChild variant="outline" className="bg-white/50 border-gray-300 hover:bg-white text-gray-800 font-semibold">
+            <Button asChild variant="outline" className="bg-white/50 border-gray-300 hover:bg-white text-gray-800 font-semibold" onClick={onLinkClick}>
                 <Link href="/contact">Book Free Setup</Link>
             </Button>
         </>

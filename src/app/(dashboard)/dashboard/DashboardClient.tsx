@@ -104,6 +104,9 @@ export function DashboardClient({
       setPastSessions(data);
     } catch (error) {
       console.error('Failed to fetch history', error);
+      toast.error('Failed to load history', {
+        description: 'Could not fetch past sessions. Please try again later.'
+      });
     } finally {
       setIsHistoryLoading(false);
     }
@@ -116,6 +119,9 @@ export function DashboardClient({
       setRecentDoctors(data);
     } catch (error) {
       console.error('Failed to fetch recent doctors', error);
+      toast.error('Failed to load doctors', {
+        description: 'Could not fetch recent doctors list.'
+      });
     }
   };
 
@@ -193,7 +199,9 @@ export function DashboardClient({
       setSelectedExistingImage(null);
       toast.success('Session started successfully');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to start session', {
+        description: err instanceof Error ? err.message : 'An unexpected error occurred.'
+      });
     } finally {
       setFormIsLoading(false);
       setLoadingAction(null);
@@ -210,7 +218,9 @@ export function DashboardClient({
       setActiveQueues(prev => prev.map(q => q.id === updatedQueue.id ? updatedQueue : q));
       toast.success(newStatus === 'paused' ? 'Session paused' : 'Session resumed');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to update session status', {
+        description: err instanceof Error ? err.message : 'Could not toggle break mode.'
+      });
     } finally {
       setLoadingAction(null);
     }
@@ -230,7 +240,9 @@ export function DashboardClient({
       toast.success('Session ended');
       setActiveTab('history');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to end session', {
+        description: err instanceof Error ? err.message : 'Could not complete the request.'
+      });
     } finally {
       setLoadingAction(null);
     }
@@ -247,14 +259,19 @@ export function DashboardClient({
       const cancelledQueue = { ...activeQueue, status: 'cancelled' as const, ended_at: new Date().toISOString() };
 
       setActiveQueues(prev => prev.filter(q => q.id !== activeQueue.id));
-      setPastSessions(prev => [cancelledQueue, ...prev]);
+      setPastSessions(prev => {
+        if (prev.some(q => q.id === cancelledQueue.id)) return prev;
+        return [cancelledQueue, ...prev];
+      });
 
       setSelectedQueueId(null);
       setNewDoctorName('');
       toast.success('Session cancelled');
       setActiveTab('history');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to cancel session', {
+        description: err instanceof Error ? err.message : 'Could not cancel the session.'
+      });
     } finally {
       setLoadingAction(null);
     }
@@ -270,7 +287,9 @@ export function DashboardClient({
       toast.success('Session started! You can now call patients.');
       setActiveTab('overview');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to activate session', {
+        description: err instanceof Error ? err.message : 'Could not activate the session.'
+      });
     } finally {
       setFormIsLoading(false);
       setLoadingAction(null);
@@ -335,7 +354,9 @@ export function DashboardClient({
       setNewPatientName(name);
       setNewPatientPhone(phone);
       setNewPatientPurpose(purpose);
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to register patient', {
+        description: err instanceof Error ? err.message : 'Could not add patient to queue.'
+      });
     } finally {
       setLoadingAction(null);
     }
@@ -407,7 +428,9 @@ export function DashboardClient({
       // Rollback
       setTokens(prevTokens);
       if (prevClinic) setClinic(prevClinic);
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to call next patient', {
+        description: err instanceof Error ? err.message : 'Could not update queue status.'
+      });
     } finally {
       setLoadingAction(null);
     }
@@ -465,7 +488,9 @@ export function DashboardClient({
     } catch (err: unknown) {
       // Rollback
       setTokens(prevTokens);
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to mark absent', {
+        description: err instanceof Error ? err.message : 'Could not update status.'
+      });
     } finally {
       setLoadingAction(null);
     }
@@ -483,7 +508,9 @@ export function DashboardClient({
       setTokens(prev => prev.filter(t => t.id !== tokenId));
       toast.success('Patient removed from queue');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to remove patient', {
+        description: err instanceof Error ? err.message : 'Could not delete token.'
+      });
     } finally {
       setLoadingAction(null);
     }

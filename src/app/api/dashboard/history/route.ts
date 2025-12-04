@@ -26,7 +26,7 @@ export async function GET() {
         .from('queues')
         .select('*, tokens(count)')
         .eq('clinic_id', profile.clinic_id)
-        .eq('status', 'ended')
+        .in('status', ['ended', 'cancelled'])
         .eq('tokens.status', 'served') // Only count served tokens
         .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
         .order('created_at', { ascending: false });

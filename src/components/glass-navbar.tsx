@@ -101,7 +101,7 @@ export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
                                     <NavLinks mobile pathname={pathname} setIsOpen={setIsOpen} />
                                     <div className="h-px bg-slate-100 my-4" />
                                     <div className="flex flex-col space-y-3 items-start">
-                                        <NavbarAuth initialUser={initialUser} initialRole={initialRole} />
+                                        <NavbarAuth initialUser={initialUser} initialRole={initialRole} onLinkClick={() => setIsOpen(false)} />
                                     </div>
                                 </div>
                             </SheetContent>

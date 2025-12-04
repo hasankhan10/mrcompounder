@@ -81,8 +81,10 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       }
 
       fetchStats(); // Refresh stats to update revenue immediately
-    } catch {
-      toast.error('Failed to process request');
+    } catch (err: unknown) {
+      toast.error('Failed to process request', {
+        description: err instanceof Error ? err.message : 'Could not approve/reject payment.'
+      });
     }
   };
 
@@ -94,7 +96,12 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
           upi_id: data.upi_id || '',
           qr_code_url: data.qr_code_url || ''
         }))
-        .catch(err => console.error(err));
+        .catch(err => {
+          console.error(err);
+          toast.error('Failed to load settings', {
+            description: 'Could not fetch UPI settings.'
+          });
+        });
     }
   }, [activeTab]);
 
@@ -120,7 +127,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setQrFile(null);
       toast.success('Settings saved');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to save settings', {
+        description: err instanceof Error ? err.message : 'Could not update UPI settings.'
+      });
     } finally {
       setSettingsLoading(false);
     }
@@ -143,6 +152,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setStats(data);
     } catch (error) {
       console.error('Failed to fetch stats', error);
+      toast.error('Failed to load stats', {
+        description: 'Could not fetch dashboard statistics.'
+      });
     } finally {
       if (showLoading) setIsLoadingStats(false);
     }
@@ -158,6 +170,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       })));
     } catch (error) {
       console.error('Failed to fetch clinic stats', error);
+      toast.error('Failed to load clinic data', {
+        description: 'Could not fetch served patient counts.'
+      });
     }
   }, []);
 
@@ -172,7 +187,12 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       fetch('/api/admin/recharge/requests')
         .then(res => res.json())
         .then(data => setPaymentRequests(data))
-        .catch(err => console.error(err))
+        .catch(err => {
+          console.error(err);
+          toast.error('Failed to load payments', {
+            description: 'Could not fetch pending payment requests.'
+          });
+        })
         .finally(() => setIsLoadingPayments(false));
     }
   }, [activeTab]);
@@ -265,7 +285,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       toast.success('Clinic created successfully');
 
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to create clinic', {
+        description: err instanceof Error ? err.message : 'An unexpected error occurred.'
+      });
     } finally {
       setFormIsLoading(false);
     }
@@ -318,7 +340,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       toast.success('Clinic updated successfully');
 
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to update clinic', {
+        description: err instanceof Error ? err.message : 'Could not save changes.'
+      });
     } finally {
       setFormIsLoading(false);
     }
@@ -343,7 +367,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setIsDeleteAlertOpen(false);
       toast.success('Clinic deleted successfully');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to delete clinic', {
+        description: err instanceof Error ? err.message : 'Could not remove clinic.'
+      });
     }
   };
 
@@ -354,7 +380,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       toast.success(`Clinic ${!currentStatus ? 'activated' : 'deactivated'}`);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to update status', {
+        description: err instanceof Error ? err.message : 'Could not toggle clinic status.'
+      });
     }
   };
 
@@ -383,7 +411,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       if (statsRes.ok) setStats(await statsRes.json());
 
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      toast.error('Failed to record payment', {
+        description: err instanceof Error ? err.message : 'Could not topup balance.'
+      });
     }
   };
 
@@ -405,7 +435,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
         toast.success('Trial mode disabled');
       } catch (err: unknown) {
-        toast.error(err instanceof Error ? err.message : 'An error occurred');
+        toast.error('Failed to disable trial', {
+          description: err instanceof Error ? err.message : 'Could not update trial status.'
+        });
       }
     } else {
       // Turn on trial
@@ -431,7 +463,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
         toast.success('Trial mode enabled');
       } catch (err: unknown) {
-        toast.error(err instanceof Error ? err.message : 'An error occurred');
+        toast.error('Failed to enable trial', {
+          description: err instanceof Error ? err.message : 'Could not update trial status.'
+        });
       }
     }
   };

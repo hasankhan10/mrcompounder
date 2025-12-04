@@ -58,7 +58,7 @@ export function OverviewTab({
     }
 
     if (!selectedQueueId) {
-        const liveSessions = activeQueues.filter(q => q.status !== 'waiting');
+        const liveSessions = activeQueues.filter(q => q.status !== 'waiting' && q.status !== 'cancelled');
         return (
             <div>
                 {liveSessions.length === 0 ? (
