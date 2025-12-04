@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 interface NavbarAuthProps {
     initialUser?: User | null;
@@ -47,7 +48,10 @@ export function NavbarAuth({ initialUser, initialRole }: NavbarAuthProps) {
         };
     }, [supabase, router]);
 
+    const [isNavigating, setIsNavigating] = useState(false);
+
     const handleDashboardClick = () => {
+        setIsNavigating(true);
         if (role === 'super_admin') {
             router.push('/admin');
         } else if (role === 'compounder') {
@@ -65,7 +69,8 @@ export function NavbarAuth({ initialUser, initialRole }: NavbarAuthProps) {
 
     if (user && role) {
         return (
-            <Button onClick={handleDashboardClick} variant="ghost" className="text-black cursor-pointer hover:bg-teal-50 hover:text-teal-700 font-bold border border-teal-100">
+            <Button onClick={handleDashboardClick} variant="ghost" className="text-black cursor-pointer hover:bg-teal-50 hover:text-teal-700 font-bold border border-teal-100" disabled={isNavigating}>
+                {isNavigating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 Dashboard
             </Button>
         );
