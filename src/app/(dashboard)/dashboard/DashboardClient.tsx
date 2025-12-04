@@ -503,11 +503,11 @@ export function DashboardClient({
           {/* Overview Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Overview</h1>
-              <p className="text-gray-500 mt-1">Monitor queue status and call patients.</p>
+              <h1 className="text-3xl font-bold text-slate-900">Overview</h1>
+              <p className="text-slate-500 mt-1">Monitor queue status and call patients.</p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-lg font-medium bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm flex items-center gap-3">
+              <div className="text-lg font-medium bg-white px-4 py-2 rounded-lg border border-slate-100 shadow-sm flex items-center gap-3">
                 {trialActive ? (
                   <span className="text-green-600 font-bold flex items-center">
                     <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
@@ -516,13 +516,13 @@ export function DashboardClient({
                 ) : (
                   <>
                     <span className="font-bold flex items-center gap-1">
-                      <span className="text-gray-900">Current Bill:</span>
+                      <span className="text-slate-900">Current Bill:</span>
                       <span className={getBalanceColor()}>₹{clinic.current_due}</span>
                     </span>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-8 text-xs gap-1 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                      className="h-8 text-xs gap-1 bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100"
                       onClick={() => setIsRechargeModalOpen(true)}
                     >
                       <IndianRupee className="w-3 h-3" /> Pay Bill
@@ -556,8 +556,8 @@ export function DashboardClient({
       {activeTab === 'patient-booking' && (
         <div className="space-y-8 animate-fade-in-up">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Patient Booking</h1>
-            <p className="text-gray-500 mt-1">Start sessions and register new patients.</p>
+            <h1 className="text-3xl font-bold text-slate-900">Patient Booking</h1>
+            <p className="text-slate-500 mt-1">Start sessions and register new patients.</p>
           </div>
 
           <BookingTab

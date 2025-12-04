@@ -47,12 +47,12 @@ export function RegisterPatientCard({
                         />
                     </div>
                 ) : (
-                    <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mb-3 shadow-inner">
-                        <span className="text-2xl font-bold text-blue-600">{doctorName?.charAt(0)}</span>
+                    <div className="w-24 h-24 rounded-full bg-teal-100 flex items-center justify-center mb-3 shadow-inner">
+                        <span className="text-2xl font-bold text-teal-600">{doctorName?.charAt(0)}</span>
                     </div>
                 )}
-                <h2 className="text-xl font-bold text-gray-900">Booking for {doctorName}</h2>
-                <p className="text-sm text-gray-500">Session Active</p>
+                <h2 className="text-xl font-bold text-slate-900">Booking for {doctorName}</h2>
+                <p className="text-sm text-slate-500">Session Active</p>
             </div>
 
             <Card className="border-none shadow-xl bg-white">
@@ -62,37 +62,37 @@ export function RegisterPatientCard({
                 <CardContent>
                     <form onSubmit={onSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Patient Name</label>
+                            <label className="text-sm font-medium text-slate-700">Patient Name</label>
                             <Input
                                 placeholder="Enter patient name"
                                 value={patientName}
                                 onChange={(e) => setPatientName(e.target.value)}
-                                className="text-lg bg-gray-50"
+                                className="text-lg bg-slate-50"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Phone Number</label>
+                            <label className="text-sm font-medium text-slate-700">Phone Number</label>
                             <Input
                                 type="tel"
                                 placeholder="Enter phone number"
                                 value={patientPhone}
                                 onChange={(e) => setPatientPhone(e.target.value)}
                                 required
-                                className="text-lg bg-gray-50"
+                                className="text-lg bg-slate-50"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Purpose</label>
+                            <label className="text-sm font-medium text-slate-700">Purpose</label>
                             <Input
                                 placeholder="e.g. Fever, Checkup"
                                 value={patientPurpose}
                                 onChange={(e) => setPatientPurpose(e.target.value)}
-                                className="text-lg bg-gray-50"
+                                className="text-lg bg-slate-50"
                             />
                         </div>
                         <Button
                             type="submit"
-                            className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6 shadow-md hover:shadow-lg transition-all"
+                            className="w-full bg-teal-600 hover:bg-teal-700 text-white text-lg py-6 shadow-md hover:shadow-lg transition-all"
                             disabled={isLoading || !isSessionActive}
                         >
                             {isLoading ? (

@@ -11,13 +11,13 @@ export const metadata: Metadata = {
 
 export default function ContactUsPage() {
   return (
-    <div className="bg-white text-gray-800 py-16 md:py-24">
+    <div className="bg-white text-slate-800 py-16 md:py-24">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-800 mb-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">
             Get in Touch With Us
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto">
             We&apos;d love to hear from you! Whether you have questions, feedback, or need a free setup, our team is here to help.
           </p>
         </div>
@@ -25,15 +25,15 @@ export default function ContactUsPage() {
         <div className="grid md:grid-cols-2 gap-12">
           {/* Contact Info */}
           <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Contact Details</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Our Contact Details</h2>
             <div className="flex items-center space-x-4">
-              <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-8 h-8 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
               </svg>
               <div>
                 <p className="text-lg font-semibold">Email Us</p>
-                <p className="text-gray-600">Update Soon...</p>
+                <p className="text-slate-600">Update Soon...</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -42,8 +42,8 @@ export default function ContactUsPage() {
               </svg>
               <div>
                 <p className="text-lg font-semibold">WhatsApp Us</p>
-                <p className="text-gray-600">
-                  <a href="https://wa.me/917001717263" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                <p className="text-slate-600">
+                  <a href="https://wa.me/917001717263" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">
                     (Click to Chat)
                   </a>
                 </p>

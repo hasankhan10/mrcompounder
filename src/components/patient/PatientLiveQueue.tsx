@@ -45,13 +45,13 @@ export function PatientLiveQueue({
                             />
                         </div>
                     ) : (
-                        <div className="w-32 h-32 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-4xl border-4 border-white shadow-lg">
+                        <div className="w-32 h-32 bg-teal-100 rounded-full flex items-center justify-center text-teal-600 font-bold text-4xl border-4 border-white shadow-lg">
                             {queue?.doctor_name?.charAt(0) || 'D'}
                         </div>
                     )}
                     <div>
-                        <h1 className="font-bold text-gray-900 text-2xl md:text-3xl leading-tight mb-1">Dr. {queue?.doctor_name || 'Doctor'}</h1>
-                        <p className="text-base text-gray-500 font-medium">{clinic.name}</p>
+                        <h1 className="font-bold text-slate-900 text-2xl md:text-3xl leading-tight mb-1">Dr. {queue?.doctor_name || 'Doctor'}</h1>
+                        <p className="text-base text-slate-500 font-medium">{clinic.name}</p>
                     </div>
                 </div>
 
@@ -60,9 +60,9 @@ export function PatientLiveQueue({
                         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <span className="text-4xl">✅</span>
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-3">Visit Completed</h2>
-                        <p className="text-gray-600 text-lg mb-6">Thank you for visiting <strong>{clinic.name}</strong>.</p>
-                        <p className="text-sm text-gray-400">We hope you have a speedy recovery!</p>
+                        <h2 className="text-3xl font-bold text-slate-900 mb-3">Visit Completed</h2>
+                        <p className="text-slate-600 text-lg mb-6">Thank you for visiting <strong>{clinic.name}</strong>.</p>
+                        <p className="text-sm text-slate-400">We hope you have a speedy recovery!</p>
 
                         <Button
                             variant="outline"
@@ -76,7 +76,7 @@ export function PatientLiveQueue({
                     <>
                         {/* Live Status Card */}
                         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                            <div className={`p-4 text-center ${queue?.status === 'paused' ? 'bg-orange-500' : 'bg-blue-600'}`}>
+                            <div className={`p-4 text-center ${queue?.status === 'paused' ? 'bg-orange-500' : 'bg-teal-600'}`}>
                                 <p className="text-white font-medium uppercase tracking-wide text-sm">
                                     {queue?.status === 'paused' ? 'Session Paused' : 'Now Serving Token'}
                                 </p>
@@ -85,23 +85,23 @@ export function PatientLiveQueue({
                                 {queue?.status === 'waiting' ? (
                                     <div className="flex flex-col items-center justify-center h-full">
                                         <p className="text-6xl mb-4">👨‍⚕️</p>
-                                        <p className="text-xl font-bold text-gray-700">Doctor has not arrived yet</p>
+                                        <p className="text-xl font-bold text-slate-700">Doctor has not arrived yet</p>
                                         {queue.doctor_arrival_time && (
-                                            <p className="text-lg font-semibold text-blue-600 mt-1">
+                                            <p className="text-lg font-semibold text-teal-600 mt-1">
                                                 Arriving at: {queue.doctor_arrival_time}
                                             </p>
                                         )}
-                                        <p className="text-sm text-gray-500 mt-2">Please wait for the session to start.</p>
+                                        <p className="text-sm text-slate-500 mt-2">Please wait for the session to start.</p>
                                     </div>
                                 ) : queue?.status === 'paused' ? (
                                     <div className="flex flex-col items-center justify-center h-full animate-pulse">
                                         <p className="text-6xl mb-4">☕</p>
                                         <p className="text-xl font-bold text-orange-700">Doctor is on a Break</p>
-                                        <p className="text-sm text-gray-500 mt-2">We will resume shortly.</p>
+                                        <p className="text-sm text-slate-500 mt-2">We will resume shortly.</p>
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="text-8xl font-black text-gray-900 tracking-tighter overflow-hidden h-32 flex items-center justify-center relative">
+                                        <div className="text-8xl font-black text-slate-900 tracking-tighter overflow-hidden h-32 flex items-center justify-center relative">
                                             <AnimatePresence mode="popLayout">
                                                 <motion.div
                                                     key={currentToken ? currentToken.token_number : 'none'}
@@ -115,7 +115,7 @@ export function PatientLiveQueue({
                                                 </motion.div>
                                             </AnimatePresence>
                                         </div>
-                                        <p className="text-gray-400 mt-2 text-sm">
+                                        <p className="text-slate-400 mt-2 text-sm">
                                             {currentToken ? 'Currently in consultation' : 'Waiting for next patient...'}
                                         </p>
                                     </>
@@ -127,7 +127,7 @@ export function PatientLiveQueue({
                         {!audioEnabled && myToken.status === 'waiting' && (
                             <Button
                                 onClick={onEnableAudio}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg animate-pulse"
+                                className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-xl shadow-lg animate-pulse"
                             >
                                 🔔 Enable Audio Alerts
                             </Button>
@@ -141,22 +141,22 @@ export function PatientLiveQueue({
                         {/* My Token Card */}
                         <div className={`rounded-2xl shadow-md p-6 border-2 ${myToken.status === 'called' ? 'bg-green-50 border-green-500' : 'bg-white border-transparent'}`}>
                             <div className="flex justify-between items-center mb-4">
-                                <span className="text-gray-500 font-medium">Your Token</span>
+                                <span className="text-slate-500 font-medium">Your Token</span>
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${myToken.status === 'waiting' ? 'bg-yellow-100 text-yellow-700' :
                                     myToken.status === 'called' ? 'bg-green-100 text-green-700' :
-                                        'bg-gray-100 text-gray-700'
+                                        'bg-slate-100 text-slate-700'
                                     }`}>
                                     {myToken.status.replace('_', ' ')}
                                 </span>
                             </div>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-5xl font-bold text-gray-900">#{myToken.token_number}</span>
+                                <span className="text-5xl font-bold text-slate-900">#{myToken.token_number}</span>
                             </div>
 
                             {myToken.status === 'waiting' && (
-                                <div className="mt-4 pt-4 border-t border-gray-100">
-                                    <p className="text-gray-600 font-medium flex items-center gap-2">
-                                        <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                                <div className="mt-4 pt-4 border-t border-slate-100">
+                                    <p className="text-slate-600 font-medium flex items-center gap-2">
+                                        <span className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></span>
                                         {getWaitMessage()}
                                     </p>
                                 </div>
@@ -177,7 +177,7 @@ export function PatientLiveQueue({
                 {myToken.status !== 'served' && (
                     <Button
                         variant="ghost"
-                        className="w-full text-gray-400 hover:text-gray-600"
+                        className="w-full text-slate-400 hover:text-slate-600"
                         onClick={onBack}
                     >
                         {bookingsLength > 0 ? 'Back to My Bookings' : 'Check another number'}

@@ -39,8 +39,8 @@ export function ContactForm() {
     };
 
     return (
-        <div className="bg-gray-50 p-8 rounded-xl shadow-lg border border-gray-200">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
+        <div className="bg-slate-50 p-8 rounded-xl shadow-lg border border-slate-200">
+            <h2 className="text-3xl font-bold text-slate-900 mb-6">Send Us a Message</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <Label htmlFor="name">Your Name</Label>
@@ -54,7 +54,7 @@ export function ContactForm() {
                     <Label htmlFor="message">Your Message</Label>
                     <Textarea id="message" name="message" value={formData.message} onChange={handleChange} rows={5} required className="mt-1 bg-white" />
                 </div>
-                <Button type="submit" className="w-full bg-blue-700 text-lg py-3 text-white hover:scale-105 transition-all" disabled={isSubmitting}>
+                <Button type="submit" className="w-full bg-teal-700 text-lg py-3 text-white hover:scale-105 transition-all" disabled={isSubmitting}>
                     {isSubmitting ? 'Sending...' : 'Send Message'}
                 </Button>
                 {submissionStatus === 'success' && (

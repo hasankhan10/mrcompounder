@@ -62,13 +62,13 @@ export function OverviewTab({
         return (
             <div>
                 {liveSessions.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-96 bg-white rounded-xl border border-dashed border-gray-300">
-                        <div className="bg-blue-50 p-4 rounded-full mb-4">
-                            <LayoutDashboard className="w-8 h-8 text-blue-600" />
+                    <div className="flex flex-col items-center justify-center h-96 bg-white rounded-xl border border-dashed border-slate-300">
+                        <div className="bg-teal-50 p-4 rounded-full mb-4">
+                            <LayoutDashboard className="w-8 h-8 text-teal-600" />
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900">No Live Sessions</h3>
-                        <p className="text-gray-500 mt-2 mb-6">Sessions waiting for doctors are in Patient Booking.</p>
-                        <Button onClick={() => setActiveTab('patient-booking')} className="bg-blue-600 hover:bg-blue-700">
+                        <h3 className="text-xl font-semibold text-slate-900">No Live Sessions</h3>
+                        <p className="text-slate-500 mt-2 mb-6">Sessions waiting for doctors are in Patient Booking.</p>
+                        <Button onClick={() => setActiveTab('patient-booking')} className="bg-teal-600 hover:bg-teal-700">
                             Go to Patient Booking
                         </Button>
                     </div>
@@ -81,7 +81,7 @@ export function OverviewTab({
 
     return (
         <div className="space-y-4">
-            <Button variant="outline" onClick={() => setSelectedQueueId(null)} className="gap-2 border-gray-300 text-gray-700 hover:bg-gray-50">
+            <Button variant="outline" onClick={() => setSelectedQueueId(null)} className="gap-2 border-slate-300 text-slate-700 hover:bg-slate-50">
                 <ArrowLeft className="w-4 h-4" /> Back to All Sessions
             </Button>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

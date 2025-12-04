@@ -89,21 +89,21 @@ export function ReportsTab({ isLoading }: ReportsTabProps) {
     return (
         <div className="space-y-8 animate-fade-in-up">
             <div>
-                <h1 className="text-3xl font-bold text-gray-900">Monthly Reports</h1>
-                <p className="text-gray-500 mt-1">Generate and download detailed performance reports.</p>
+                <h1 className="text-3xl font-bold text-slate-900">Monthly Reports</h1>
+                <p className="text-slate-500 mt-1">Generate and download detailed performance reports.</p>
             </div>
 
             <Card className="border-none shadow-md">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-blue-600" />
+                        <Calendar className="w-5 h-5 text-teal-600" />
                         Select Month
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="flex flex-col md:flex-row gap-4 items-end">
                         <div className="w-full md:w-64">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Month</label>
                             <input
                                 type="month"
                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -114,7 +114,7 @@ export function ReportsTab({ isLoading }: ReportsTabProps) {
                         <Button
                             onClick={handleGenerateReport}
                             disabled={isGenerating}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            className="bg-teal-600 hover:bg-teal-700 text-white"
                         >
                             {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                             {isGenerating ? 'Fetching Data...' : 'Get Report'}
@@ -126,7 +126,7 @@ export function ReportsTab({ isLoading }: ReportsTabProps) {
                             {/* Preview Table */}
                             <div className="border rounded-lg overflow-hidden overflow-x-auto">
                                 <table className="w-full text-sm text-left min-w-[600px]">
-                                    <thead className="bg-gray-50 text-gray-700 font-medium border-b">
+                                    <thead className="bg-slate-50 text-slate-700 font-medium border-b">
                                         <tr>
                                             <th className="px-4 py-3 whitespace-nowrap">Doctor Name</th>
                                             <th className="px-4 py-3 text-center whitespace-nowrap">Total Booked</th>
@@ -135,7 +135,7 @@ export function ReportsTab({ isLoading }: ReportsTabProps) {
                                             <th className="px-4 py-3 text-right whitespace-nowrap">Attendance Rate</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100 bg-white">
+                                    <tbody className="divide-y divide-slate-100 bg-white">
                                         {(() => {
                                             const doctorStats: Record<string, { booked: number; present: number; absent: number }> = {};
                                             reportData.forEach((token: any) => {
@@ -149,8 +149,8 @@ export function ReportsTab({ isLoading }: ReportsTabProps) {
                                             });
 
                                             return Object.entries(doctorStats).map(([docName, stats]) => (
-                                                <tr key={docName} className="hover:bg-gray-50">
-                                                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{docName}</td>
+                                                <tr key={docName} className="hover:bg-slate-50">
+                                                    <td className="px-4 py-3 font-medium text-slate-900 whitespace-nowrap">{docName}</td>
                                                     <td className="px-4 py-3 text-center">{stats.booked}</td>
                                                     <td className="px-4 py-3 text-center text-green-600">{stats.present}</td>
                                                     <td className="px-4 py-3 text-center text-red-600">{stats.absent}</td>

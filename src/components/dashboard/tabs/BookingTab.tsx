@@ -93,15 +93,15 @@ export function BookingTab({
         return (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">Select Session to Book</h2>
+                    <h2 className="text-xl font-bold text-slate-900 mb-4">Select Session to Book</h2>
                     {activeQueues.length === 0 ? (
-                        <p className="text-gray-500 italic">No active sessions. Start one on the right.</p>
+                        <p className="text-slate-500 italic">No active sessions. Start one on the right.</p>
                     ) : (
                         <SessionGrid queues={activeQueues} tokens={tokens} onSelect={setSelectedQueueId} />
                     )}
                 </div>
                 <div>
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">Start New Session</h2>
+                    <h2 className="text-xl font-bold text-slate-900 mb-4">Start New Session</h2>
                     <StartSessionCard
                         doctorName={newDoctorName}
                         setDoctorName={setNewDoctorName}
@@ -130,21 +130,21 @@ export function BookingTab({
     return (
         <>
             <div className="mb-4">
-                <Button variant="outline" onClick={() => setSelectedQueueId(null)} className="gap-2 border-gray-300 text-gray-700 hover:bg-gray-50">
+                <Button variant="outline" onClick={() => setSelectedQueueId(null)} className="gap-2 border-slate-300 text-slate-700 hover:bg-slate-50">
                     <ArrowLeft className="w-4 h-4" /> Back to Selection
                 </Button>
             </div>
 
             {activeQueue!.status === 'waiting' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center mb-8 animate-pulse">
-                    <h3 className="text-xl font-bold text-blue-900 mb-2">Doctor is Arriving?</h3>
-                    <p className="text-blue-700 mb-6">Booking is open. Click below when the doctor is ready to see patients.</p>
+                <div className="bg-teal-50 border border-teal-200 rounded-xl p-6 text-center mb-8 animate-pulse">
+                    <h3 className="text-xl font-bold text-teal-900 mb-2">Doctor is Arriving?</h3>
+                    <p className="text-teal-700 mb-6">Booking is open. Click below when the doctor is ready to see patients.</p>
                     <div className="flex flex-col md:flex-row justify-center gap-4">
                         <Button
                             size="lg"
                             onClick={onActivateSession}
                             disabled={formIsLoading || !!loadingAction}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-12 py-6 shadow-lg transform transition cursor-pointer hover:scale-105"
+                            className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-lg px-12 py-6 shadow-lg transform transition cursor-pointer hover:scale-105"
                         >
                             {loadingAction === 'activate-session' ? 'Starting...' : 'Start Session'}
                         </Button>

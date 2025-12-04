@@ -21,7 +21,7 @@ export function SessionStatusCard({ status, doctorName, onToggleBreak, onEndSess
                         {status}
                     </span>
                 </CardTitle>
-                <p className="text-sm text-gray-500">Doctor: <span className="font-medium text-gray-900">{doctorName}</span></p>
+                <p className="text-sm text-slate-500">Doctor: <span className="font-medium text-slate-900">{doctorName}</span></p>
             </CardHeader>
             <CardContent className="space-y-3">
                 <Button

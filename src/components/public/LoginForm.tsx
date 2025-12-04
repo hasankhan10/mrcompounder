@@ -90,9 +90,9 @@ export function LoginForm() {
     };
 
     return (
-        <Card className="w-full max-w-md shadow-2xl bg-white/80 backdrop-blur-sm border-gray-200">
+        <Card className="w-full max-w-md shadow-2xl bg-white/80 backdrop-blur-sm border-slate-200">
             <CardHeader className="text-center space-y-4">
-                <Link href="/" className="text-3xl font-bold text-blue-700 drop-shadow-sm">
+                <Link href="/" className="text-3xl font-bold text-teal-700 drop-shadow-sm">
                     Clinic Line
                 </Link>
                 <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
@@ -127,7 +127,7 @@ export function LoginForm() {
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 flex items-center justify-center h-full w-10 text-gray-500 hover:text-gray-700"
+                                className="absolute inset-y-0 right-0 flex items-center justify-center h-full w-10 text-slate-500 hover:text-slate-700"
                             >
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
@@ -136,7 +136,7 @@ export function LoginForm() {
                     {error && <p className="text-sm text-red-500 text-center">{error}</p>}
                     <Button
                         type="submit"
-                        className="w-full text-lg py-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:opacity-90 transition-opacity"
+                        className="w-full text-lg py-6 bg-teal-700 text-white hover:opacity-90 transition-opacity"
                         disabled={isLoading}
                     >
                         {isLoading ? (
