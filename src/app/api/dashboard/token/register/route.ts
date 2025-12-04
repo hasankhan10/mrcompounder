@@ -15,6 +15,8 @@ import { RegisterTokenRequest } from '@/lib/types';
  */
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 
+export const runtime = 'edge';
+
 export async function POST(request: NextRequest) {
   const supabase = await createServerSupabaseClient();
   const body: RegisterTokenRequest = await request.json();
