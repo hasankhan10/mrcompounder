@@ -39,7 +39,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   // Data state
   const [clinics, setClinics] = useState<Clinic[]>(initialClinics);
   const [searchQuery, setSearchQuery] = useState('');
-  const [topupAmounts, setTopupAmounts] = useState<{ [key: string]: string }>({});
+
   const [trialDates, setTrialDates] = useState<{ [key: string]: { start: string, end: string } }>({});
   const [stats, setStats] = useState({
     totalClinics: 0,
@@ -390,36 +390,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     }
   };
 
-  const handleTopup = async (id: string) => {
-    const amount = parseInt(topupAmounts[id] || '0');
-    if (amount <= 0) {
-      toast.error('Please enter a valid amount');
-      return;
-    }
 
-    try {
-      const updatedClinic = await adminService.topupClinic(id, amount);
-      setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
-      setTopupAmounts(prev => ({ ...prev, [id]: '' }));
-      toast.success(`Payment of ₹${amount} recorded`);
-
-      // Optimistic update
-      setStats(prev => ({
-        ...prev,
-        totalRevenue: prev.totalRevenue + amount,
-
-      }));
-
-      // Refresh stats
-      const statsRes = await fetch('/api/admin/stats');
-      if (statsRes.ok) setStats(await statsRes.json());
-
-    } catch (err: unknown) {
-      toast.error('Failed to record payment', {
-        description: err instanceof Error ? err.message : 'Could not topup balance.'
-      });
-    }
-  };
 
   const handleTrialDateChange = (id: string, type: 'start' | 'end', value: string) => {
     setTrialDates(prev => ({
@@ -520,9 +491,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
           onToggleStatus={handleToggleStatus}
-          onTopup={handleTopup}
-          topupAmounts={topupAmounts}
-          setTopupAmounts={setTopupAmounts}
           onToggleTrial={handleToggleTrial}
           trialDates={trialDates}
           onTrialDateChange={handleTrialDateChange}

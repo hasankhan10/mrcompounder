@@ -2,7 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { NextResponse } from 'next/server';
 
 export type AuthResult =
-    | { user: any; error: null }
+    | { user: { id: string; email?: string }; error: null }
     | { user: null; error: NextResponse };
 
 /**

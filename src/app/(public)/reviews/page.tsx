@@ -196,7 +196,7 @@ export default function ReviewsPage() {
     );
 }
 
-function ReviewCard({ review, type, index }: { review: any, type: 'clinic' | 'patient', index: number }) {
+function ReviewCard({ review, type, index }: { review: { rating: number; comment: string; logo?: string; name: string; location: string }; type: 'clinic' | 'patient'; index: number }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -224,7 +224,7 @@ function ReviewCard({ review, type, index }: { review: any, type: 'clinic' | 'pa
                 {type === 'clinic' ? (
                     <>
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 shadow-sm bg-white">
-                            <Image src={review.logo} alt={review.name} fill className="object-cover" />
+                            <Image src={review.logo || '/placeholder-logo.png'} alt={review.name} fill className="object-cover" />
                         </div>
                         <div>
                             <h4 className="font-bold text-slate-900 text-sm">{review.name}</h4>

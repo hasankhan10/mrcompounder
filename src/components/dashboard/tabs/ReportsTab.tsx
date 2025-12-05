@@ -6,14 +6,12 @@ import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 import { FileDown, Loader2, Calendar } from 'lucide-react';
 
-interface ReportsTabProps {
-    isLoading: boolean;
-}
 
-export function ReportsTab({ isLoading }: ReportsTabProps) {
+
+export function ReportsTab() {
     const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7)); // YYYY-MM
     const [isGenerating, setIsGenerating] = useState(false);
-    const [reportData, setReportData] = useState<any[] | null>(null);
+    const [reportData, setReportData] = useState<{ queues: { doctor_name: string }; status: string; created_at: string; patient_name: string; phone: string; token_number: number }[] | null>(null);
 
     const handleGenerateReport = async () => {
         setIsGenerating(true);
@@ -38,7 +36,7 @@ export function ReportsTab({ isLoading }: ReportsTabProps) {
         // 1. Prepare Summary Data (Doctor-wise)
         const doctorStats: Record<string, { booked: number; present: number; absent: number }> = {};
 
-        reportData.forEach((token: any) => {
+        reportData.forEach((token: { queues: { doctor_name: string }; status: string }) => {
             const doctorName = token.queues?.doctor_name || 'Unknown';
             if (!doctorStats[doctorName]) {
                 doctorStats[doctorName] = { booked: 0, present: 0, absent: 0 };
@@ -62,7 +60,7 @@ export function ReportsTab({ isLoading }: ReportsTabProps) {
         }));
 
         // 2. Prepare Detailed Log Data
-        const logSheetData = reportData.map((token: any) => ({
+        const logSheetData = reportData.map((token) => ({
             'Date': new Date(token.created_at).toLocaleDateString(),
             'Time': new Date(token.created_at).toLocaleTimeString(),
             'Doctor Name': token.queues?.doctor_name || 'Unknown',
@@ -138,7 +136,7 @@ export function ReportsTab({ isLoading }: ReportsTabProps) {
                                     <tbody className="divide-y divide-slate-100 bg-white">
                                         {(() => {
                                             const doctorStats: Record<string, { booked: number; present: number; absent: number }> = {};
-                                            reportData.forEach((token: any) => {
+                                            reportData.forEach((token) => {
                                                 const doctorName = token.queues?.doctor_name || 'Unknown';
                                                 if (!doctorStats[doctorName]) {
                                                     doctorStats[doctorName] = { booked: 0, present: 0, absent: 0 };

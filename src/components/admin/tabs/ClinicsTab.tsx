@@ -11,9 +11,6 @@ interface ClinicsTabProps {
     onEdit: (clinic: Clinic) => void;
     onDelete: (id: string) => void;
     onToggleStatus: (id: string, currentStatus: boolean) => void;
-    onTopup: (id: string) => void;
-    topupAmounts: { [key: string]: string };
-    setTopupAmounts: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
     onToggleTrial: (id: string, isActive: boolean) => void;
     trialDates: { [key: string]: { start: string; end: string } };
     onTrialDateChange: (id: string, type: 'start' | 'end', value: string) => void;
@@ -27,9 +24,6 @@ export function ClinicsTab({
     onEdit,
     onDelete,
     onToggleStatus,
-    onTopup,
-    topupAmounts,
-    setTopupAmounts,
     onToggleTrial,
     trialDates,
     onTrialDateChange,
@@ -47,9 +41,6 @@ export function ClinicsTab({
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onToggleStatus={onToggleStatus}
-                    onTopup={onTopup}
-                    topupAmounts={topupAmounts}
-                    setTopupAmounts={setTopupAmounts}
                     onToggleTrial={onToggleTrial}
                     trialDates={trialDates}
                     onTrialDateChange={onTrialDateChange}

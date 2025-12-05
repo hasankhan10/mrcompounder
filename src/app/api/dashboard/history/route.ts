@@ -36,7 +36,7 @@ export async function GET() {
     }
 
     // Map the result to flatten the count structure
-    const historyWithCount = history.map((session: any) => ({
+    const historyWithCount = history.map((session: { tokens: { count: number }[] }) => ({
         ...session,
         served_count: session.tokens?.[0]?.count || 0
     }));

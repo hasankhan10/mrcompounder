@@ -21,7 +21,7 @@ interface BookingTabProps {
     formIsLoading: boolean;
     onStartSession: (e: FormEvent) => void;
     onActivateSession: () => void;
-    onEndSession: () => void;
+
     onCancelSession: () => void;
     onRegisterPatient: (e: FormEvent) => void;
     onCallNext: () => void;
@@ -59,7 +59,7 @@ export function BookingTab({
     formIsLoading,
     onStartSession,
     onActivateSession,
-    onEndSession,
+
     onCancelSession,
     onRegisterPatient,
     onCallNext,

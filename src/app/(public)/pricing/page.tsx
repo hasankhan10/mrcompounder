@@ -28,6 +28,7 @@ export default function PricingPage() {
                     <div className="mb-8">
                         <h2 className="text-2xl font-bold text-slate-800 mb-2">Postpaid Billing</h2>
                         <div className="flex items-baseline justify-center gap-1 mt-6">
+                            <span className="text-4xl text-slate-500 font-extrabold mr-2">Only</span>
                             <span className="text-4xl font-extrabold text-green-600">₹</span>
                             <span className="text-7xl font-extrabold text-green-600">1</span>
                             <span className="text-xl text-slate-500 font-medium">/ patient</span>

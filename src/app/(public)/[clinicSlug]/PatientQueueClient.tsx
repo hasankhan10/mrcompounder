@@ -40,15 +40,14 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
   const [queue, setQueue] = useState<Queue | null>(activeQueue);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const oscillatorRef = useRef<OscillatorNode | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   const playAlarm = () => {
     try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContext) return;
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextClass) return;
 
-      const ctx = new AudioContext();
+      const ctx = new AudioContextClass();
       audioCtxRef.current = ctx;
 
       const oscillator = ctx.createOscillator();
@@ -90,7 +89,7 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
         osc.stop(ctx.currentTime + 1);
       }, 1000);
 
-      (window as any).alarmInterval = loopInterval;
+      (window as unknown as { alarmInterval: NodeJS.Timeout }).alarmInterval = loopInterval;
 
     } catch (e) {
       console.error('Alarm error', e);
@@ -98,8 +97,8 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
   };
 
   const stopAlarm = () => {
-    if ((window as any).alarmInterval) {
-      clearInterval((window as any).alarmInterval);
+    if ((window as unknown as { alarmInterval: NodeJS.Timeout }).alarmInterval) {
+      clearInterval((window as unknown as { alarmInterval: NodeJS.Timeout }).alarmInterval);
     }
     if (audioCtxRef.current) {
       audioCtxRef.current.close();
@@ -195,9 +194,9 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
 
       // Method 2: Web Audio API (The 100% Fix)
       // We create a silent oscillator to force the browser's audio engine to wake up.
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (AudioContext) {
-        const ctx = new AudioContext();
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioContextClass) {
+        const ctx = new AudioContextClass();
         const oscillator = ctx.createOscillator();
         const gainNode = ctx.createGain();
 

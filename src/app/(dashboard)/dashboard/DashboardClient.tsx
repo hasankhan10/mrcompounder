@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 
 // Components
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
+import { TrialCountdown } from '@/components/dashboard/TrialCountdown';
 
 import { OverviewTab } from '@/components/dashboard/tabs/OverviewTab';
 import { BookingTab } from '@/components/dashboard/tabs/BookingTab';
@@ -564,6 +565,9 @@ export function DashboardClient({
                   <span className="text-green-600 font-bold flex items-center">
                     <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
                     Trial Active
+                    <div className="ml-2 pl-2 border-l border-slate-200">
+                      <TrialCountdown endDate={clinic.trial_end_date!} />
+                    </div>
                   </span>
                 ) : (
                   <>
@@ -624,7 +628,7 @@ export function DashboardClient({
             formIsLoading={formIsLoading}
             onStartSession={handleStartSession}
             onActivateSession={handleActivateSession}
-            onEndSession={handleEndSession}
+
             onCancelSession={handleCancelSession}
             onRegisterPatient={handleRegisterPatient}
             onCallNext={handleCallNext}
@@ -657,7 +661,7 @@ export function DashboardClient({
       )}
 
       {activeTab === 'reports' && (
-        <ReportsTab isLoading={false} />
+        <ReportsTab />
       )}
 
       {
