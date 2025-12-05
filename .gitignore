@@ -42,3 +42,6 @@ next-env.d.ts
 
 # AI Agent
 .agent
+
+# Sentry Config File
+.env.sentry-build-plugin
