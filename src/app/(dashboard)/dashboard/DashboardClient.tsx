@@ -548,6 +548,7 @@ export function DashboardClient({
       onTabChange={setActiveTab}
       onLogout={handleLogout}
       userType="clinic"
+      trialEndDate={trialActive ? clinic.trial_end_date : undefined}
     >
       {activeTab === 'overview' && (
         <div className="space-y-8 animate-fade-in-up">

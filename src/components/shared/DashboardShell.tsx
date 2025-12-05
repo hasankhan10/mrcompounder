@@ -7,6 +7,7 @@ import { LayoutDashboard, Menu, LogOut, ChevronRight, Home } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { TrialCountdown } from '../dashboard/TrialCountdown';
 
 export interface NavItem {
     label: string;
@@ -24,6 +25,7 @@ interface DashboardShellProps {
     onLogout: () => void;
     children: ReactNode;
     userType: 'admin' | 'clinic';
+    trialEndDate?: string;
 }
 
 interface SidebarContentProps {
@@ -36,6 +38,7 @@ interface SidebarContentProps {
     setIsMobileOpen: (open: boolean) => void;
     router: AppRouterInstance;
     onLogout: () => void;
+    trialEndDate?: string;
 }
 
 function SidebarContent({
@@ -47,7 +50,8 @@ function SidebarContent({
     onTabChange,
     setIsMobileOpen,
     router,
-    onLogout
+    onLogout,
+    trialEndDate
 }: SidebarContentProps) {
     return (
         <div className="flex flex-col h-full bg-white border-r border-gray-200 w-64">
@@ -69,6 +73,11 @@ function SidebarContent({
                 </div>
             </div>
             <div className="flex-1 py-6 px-4 space-y-2">
+                {trialEndDate && (
+                    <div className="mb-6 px-2">
+                        <TrialCountdown endDate={trialEndDate} />
+                    </div>
+                )}
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2">Main Menu</div>
 
                 {navItems.map((item) => {
@@ -123,7 +132,8 @@ export function DashboardShell({
     activeTab,
     onTabChange,
     onLogout,
-    children
+    children,
+    trialEndDate
 }: DashboardShellProps) {
     const router = useRouter();
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
@@ -144,6 +154,7 @@ export function DashboardShell({
                     setIsMobileOpen={setIsMobileOpen}
                     router={router}
                     onLogout={onLogout}
+                    trialEndDate={trialEndDate}
                 />
             </aside>
 
@@ -167,6 +178,7 @@ export function DashboardShell({
                             setIsMobileOpen={setIsMobileOpen}
                             router={router}
                             onLogout={onLogout}
+                            trialEndDate={trialEndDate}
                         />
                     </SheetContent>
                 </Sheet>

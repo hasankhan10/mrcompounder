@@ -93,7 +93,7 @@ export function LoginForm() {
         <Card className="w-full max-w-md shadow-2xl bg-white/80 backdrop-blur-sm border-slate-200">
             <CardHeader className="text-center space-y-4">
                 <Link href="/" className="text-3xl font-bold text-teal-700 drop-shadow-sm">
-                    Clinic Line
+                    Mr. Compounder
                 </Link>
                 <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
                 <CardDescription>Enter your credentials to access your dashboard.</CardDescription>
