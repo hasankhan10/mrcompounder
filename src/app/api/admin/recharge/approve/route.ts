@@ -2,19 +2,15 @@ import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { requireSuperAdmin } from '@/lib/auth-utils';
 
 export async function POST(request: NextRequest) {
-    const supabase = await createServerSupabaseClient();
     const body = await request.json(); // { requestId, action: 'approve' | 'reject' }
 
     // Auth Check
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    const { user, error: authError } = await requireSuperAdmin();
+    if (authError) return authError;
 
-    const { data: profile } = await supabaseAdmin.from('profiles').select('role').eq('id', user.id).single();
-    if (!profile || profile.role !== 'super_admin') {
-        return new NextResponse(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
-    }
 
     const { requestId, action } = body;
 

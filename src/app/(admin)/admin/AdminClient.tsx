@@ -7,22 +7,23 @@ import { createClient } from '@/lib/supabase-client';
 import { Clinic, PaymentRequest } from '@/lib/types';
 import { toast } from 'sonner';
 import { LayoutDashboard, Building2, Settings, QrCode, IndianRupee } from 'lucide-react';
-import Image from 'next/image';
 
 // Components
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
-
 import { AdminStatsGrid } from '@/components/admin/AdminStatsGrid';
-import { ClinicListHeader } from '@/components/admin/ClinicListHeader';
-import { ClinicTable } from '@/components/admin/ClinicTable';
 import { CreateClinicDialog } from '@/components/admin/CreateClinicDialog';
 import { EditClinicDialog } from '@/components/admin/EditClinicDialog';
 import { DeleteClinicAlert } from '@/components/admin/DeleteClinicAlert';
-import { StatsGridSkeleton, PaymentRequestsSkeleton } from '@/components/skeletons/DashboardSkeletons';
-import { FileUpload } from '@/components/ui/file-upload';
+import { StatsGridSkeleton } from '@/components/skeletons/DashboardSkeletons';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { adminService } from '@/services/admin';
 import { useAdminRealtime } from '@/hooks/useAdminRealtime';
+
+// Tabs
+import { ClinicsTab } from '@/components/admin/tabs/ClinicsTab';
+import { PaymentsTab } from '@/components/admin/tabs/PaymentsTab';
+import { UpiSettingsTab } from '@/components/admin/tabs/UpiSettingsTab';
+import { SettingsTab } from '@/components/admin/tabs/SettingsTab';
 
 interface AdminClientProps {
   initialClinics: Clinic[];
@@ -105,8 +106,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     }
   }, [activeTab]);
 
-  // ... (Realtime blocks will be removed next)
-
   const handleSaveSettings = async (e: FormEvent) => {
     e.preventDefault();
     setSettingsLoading(true);
@@ -143,7 +142,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     { label: 'Settings', value: 'settings', icon: Settings },
   ];
 
-  // Fetch Stats Helper
   // Fetch Stats Helper
   const fetchStats = useCallback(async (showLoading = true) => {
     if (showLoading) setIsLoadingStats(true);
@@ -217,11 +215,11 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   // Form state (Create/Edit)
   const [newClinicName, setNewClinicName] = useState('');
   const [newClinicSlug, setNewClinicSlug] = useState('');
-  const [newClinicLocation, setNewClinicLocation] = useState(''); // Added location state
+  const [newClinicLocation, setNewClinicLocation] = useState('');
   const [newClinicLogo, setNewClinicLogo] = useState<File | null>(null);
   const [newClinicEmail, setNewClinicEmail] = useState('');
   const [newClinicPassword, setNewClinicPassword] = useState('');
-  const [editClinicLogoUrl, setEditClinicLogoUrl] = useState(''); // For preview in edit
+  const [editClinicLogoUrl, setEditClinicLogoUrl] = useState('');
   const [formIsLoading, setFormIsLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -265,7 +263,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       const { clinic: newClinic } = await adminService.createClinic({
         name: newClinicName,
         slug: newClinicSlug,
-        location: newClinicLocation, // Pass location
+        location: newClinicLocation,
         logoUrl: logoUrl,
         compounderEmail: newClinicEmail,
         compounderPassword: newClinicPassword,
@@ -280,7 +278,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       // Reset form
       setNewClinicName('');
       setNewClinicSlug('');
-      setNewClinicLocation(''); // Reset location
+      setNewClinicLocation('');
       setNewClinicLogo(null);
       setNewClinicEmail('');
       setNewClinicPassword('');
@@ -299,9 +297,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     setSelectedClinic(clinic);
     setNewClinicName(clinic.name);
     setNewClinicSlug(clinic.slug);
-    setNewClinicLocation(clinic.location || ''); // Set location
+    setNewClinicLocation(clinic.location || '');
     setEditClinicLogoUrl(clinic.logo_url || '');
-    setNewClinicPassword(''); // Don't show existing password
+    setNewClinicPassword('');
     setNewClinicLogo(null);
     setIsEditModalOpen(true);
   };
@@ -334,7 +332,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       const updatedClinic = await adminService.updateClinic(selectedClinic.id, {
         name: newClinicName,
         slug: newClinicSlug,
-        location: newClinicLocation, // Pass location
+        location: newClinicLocation,
         logoUrl: logoUrl,
         password: newClinicPassword || undefined
       });
@@ -477,9 +475,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     (c.slug || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-
-
-
   return (
     <DashboardShell
       title={`${APP_NAME} Admin`}
@@ -512,121 +507,42 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       )}
 
       {activeTab === 'clinics' && (
-        <div className="space-y-8 animate-fade-in-up">
-          <ClinicListHeader
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onNewClinicClick={() => setIsCreateModalOpen(true)}
-          />
-          <ErrorBoundary name="Clinic Table">
-            <ClinicTable
-              clinics={filteredClinics}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteClick}
-              onToggleStatus={handleToggleStatus}
-              onTopup={handleTopup}
-              topupAmounts={topupAmounts}
-              setTopupAmounts={setTopupAmounts}
-              onToggleTrial={handleToggleTrial}
-              trialDates={trialDates}
-              onTrialDateChange={handleTrialDateChange}
-            />
-          </ErrorBoundary>
-        </div>
+        <ClinicsTab
+          clinics={filteredClinics}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onNewClinicClick={() => setIsCreateModalOpen(true)}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+          onToggleStatus={handleToggleStatus}
+          onTopup={handleTopup}
+          topupAmounts={topupAmounts}
+          setTopupAmounts={setTopupAmounts}
+          onToggleTrial={handleToggleTrial}
+          trialDates={trialDates}
+          onTrialDateChange={handleTrialDateChange}
+        />
       )}
 
-      {activeTab === 'settings' && (
-        <div className="flex items-center justify-center h-full text-gray-500">
-          Global Settings coming soon...
-        </div>
-      )}
+      {activeTab === 'settings' && <SettingsTab />}
 
       {activeTab === 'payment-requests' && (
-        <div className="space-y-6 animate-fade-in-up">
-          <h2 className="text-2xl font-bold">Pending Bill Payments</h2>
-          {isLoadingPayments ? (
-            <PaymentRequestsSkeleton />
-          ) : paymentRequests.length === 0 ? (
-            <p className="text-gray-500">No pending requests.</p>
-          ) : (
-            <ErrorBoundary name="Bill Payments">
-              <div className="grid gap-4">
-                {paymentRequests.map(req => (
-                  <div key={req.id} className="bg-white p-6 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="font-bold text-lg">{req.clinics?.name}</h3>
-                      <p className="text-sm text-gray-500">Requested: {new Date(req.created_at).toLocaleString()}</p>
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="bg-teal-100 text-teal-800 px-2 py-1 rounded text-sm font-bold">₹{req.amount}</span>
-                        {req.transaction_id && <span className="text-sm text-slate-600 font-mono">Txn: {req.transaction_id}</span>}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <a href={req.screenshot_url} target="_blank" rel="noopener noreferrer" className="block w-24 h-24 border rounded overflow-hidden bg-slate-100 hover:opacity-80 transition relative">
-                        <Image src={req.screenshot_url} alt="Proof" fill className="object-cover" />
-                      </a>
-                      <div className="flex flex-col gap-2">
-                        <button
-                          onClick={() => handleRequestAction(req.id, 'approve', req.amount)}
-                          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-medium"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleRequestAction(req.id, 'reject')}
-                          className="bg-red-100 text-red-600 px-4 py-2 rounded hover:bg-red-200 font-medium"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ErrorBoundary>
-          )}
-        </div>
+        <PaymentsTab
+          paymentRequests={paymentRequests}
+          isLoading={isLoadingPayments}
+          onAction={handleRequestAction}
+        />
       )}
 
       {activeTab === 'upi-settings' && (
-        <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-sm animate-fade-in-up">
-          <h2 className="text-2xl font-bold mb-6 text-slate-900">UPI Payment Settings</h2>
-          <form onSubmit={handleSaveSettings} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">UPI ID</label>
-              <input
-                type="text"
-                value={upiSettings.upi_id}
-                onChange={e => setUpiSettings({ ...upiSettings, upi_id: e.target.value })}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                placeholder="e.g. admin@upi"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">QR Code Image</label>
-              {upiSettings.qr_code_url && (
-                <div className="mb-2 relative w-48 h-48 border rounded">
-                  <Image src={upiSettings.qr_code_url} alt="QR Code" fill className="object-contain" />
-                </div>
-              )}
-              <FileUpload
-                value={qrFile}
-                onChange={setQrFile}
-                accept="image/*"
-                label="Upload QR Code"
-              />
-              <p className="text-xs text-slate-500 mt-1">Upload a clear image of your QR code.</p>
-            </div>
-            <button
-              type="submit"
-              disabled={settingsLoading}
-              className="w-full bg-teal-600 text-white py-2 rounded-md hover:bg-teal-700 disabled:opacity-50 font-medium transition-colors"
-            >
-              {settingsLoading ? 'Saving...' : 'Save Settings'}
-            </button>
-          </form>
-        </div>
+        <UpiSettingsTab
+          upiSettings={upiSettings}
+          setUpiSettings={setUpiSettings}
+          qrFile={qrFile}
+          setQrFile={setQrFile}
+          onSave={handleSaveSettings}
+          isLoading={settingsLoading}
+        />
       )}
 
       {/* Dialogs */}
@@ -639,8 +555,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setName={setNewClinicName}
         slug={newClinicSlug}
         setSlug={setNewClinicSlug}
-        location={newClinicLocation} // Pass location
-        setLocation={setNewClinicLocation} // Pass setLocation
+        location={newClinicLocation}
+        setLocation={setNewClinicLocation}
         logoFile={newClinicLogo}
         setLogoFile={setNewClinicLogo}
         email={newClinicEmail}
@@ -658,8 +574,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setName={setNewClinicName}
         slug={newClinicSlug}
         setSlug={setNewClinicSlug}
-        location={newClinicLocation} // Pass location
-        setLocation={setNewClinicLocation} // Pass setLocation
+        location={newClinicLocation}
+        setLocation={setNewClinicLocation}
         logoUrl={editClinicLogoUrl}
         logoFile={newClinicLogo}
         setLogoFile={setNewClinicLogo}

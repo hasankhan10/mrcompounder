@@ -18,25 +18,27 @@ export default async function AdminPage() {
     redirect('/dashboard');
   }
 
-  // Fetch Clinics
-  const { data: clinics } = await supabaseAdmin
-    .from('clinics')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  // Calculate Served Today
   const todayStr = getTodayIST();
 
-  // 1. Get queues for today
-  const { data: queues } = await supabaseAdmin
-    .from('queues')
-    .select('id, clinic_id')
-    .eq('session_date', todayStr);
+  // Parallel Fetching
+  const [clinicsRes, queuesRes] = await Promise.all([
+    supabaseAdmin
+      .from('clinics')
+      .select('*')
+      .order('created_at', { ascending: false }),
+    supabaseAdmin
+      .from('queues')
+      .select('id, clinic_id')
+      .eq('session_date', todayStr)
+  ]);
 
-  // 2. Get served tokens for these queues
+  const clinics = clinicsRes.data || [];
+  const queues = queuesRes.data || [];
+
+  // Calculate Served Today
   const clinicCounts: Record<string, number> = {};
 
-  if (queues && queues.length > 0) {
+  if (queues.length > 0) {
     const queueIds = queues.map(q => q.id);
     const { data: tokens } = await supabaseAdmin
       .from('tokens')
@@ -52,12 +54,12 @@ export default async function AdminPage() {
     });
   }
 
-  const clinicsWithStats = clinics?.map((c) => ({
+  const clinicsWithStats = clinics.map((c) => ({
     ...c,
     served_today_count: clinicCounts[c.id] || 0,
   }));
 
   return (
-    <AdminClient initialClinics={clinicsWithStats || []} />
+    <AdminClient initialClinics={clinicsWithStats} />
   );
 }

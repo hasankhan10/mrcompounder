@@ -3,8 +3,7 @@ import type { NextRequest } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import type { CreateClinicRequest } from '@/lib/types';
-
-// TODO: Implement authentication and authorization check for super_admin
+import { requireSuperAdmin } from '@/lib/auth-utils';
 
 /**
  * GET /api/admin/clinics
@@ -13,21 +12,9 @@ import type { CreateClinicRequest } from '@/lib/types';
  * @return {ListClinicsResponse} 200 - Success response
  */
 export async function GET() {
-  const supabase = await createServerSupabaseClient();
-
   // Check Auth
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-
-  const { data: adminProfile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (!adminProfile || adminProfile.role !== 'super_admin') {
-    return new NextResponse(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
-  }
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return authError;
 
   // Fetch Clinics
   const { data: clinics, error } = await supabaseAdmin
@@ -51,23 +38,10 @@ export async function GET() {
  * @return {object} 400 - Bad request
  */
 export async function POST(request: NextRequest) {
-  const supabase = await createServerSupabaseClient();
-
   // 1. Check Authentication & Authorization
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-  }
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return authError;
 
-  const { data: adminProfile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (!adminProfile || adminProfile.role !== 'super_admin') {
-    return new NextResponse(JSON.stringify({ error: 'Forbidden: Only Super Admins can create clinics.' }), { status: 403 });
-  }
 
   try {
     const body: CreateClinicRequest = await request.json();
