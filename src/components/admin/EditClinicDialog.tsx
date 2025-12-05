@@ -98,7 +98,7 @@ export function EditClinicDialog({
                     </div>
 
                     <div className="flex justify-end pt-4">
-                        <Button type="submit" disabled={isLoading} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button type="submit" disabled={isLoading} className="bg-teal-600 hover:bg-teal-700 text-white">
                             {isLoading ? 'Updating...' : 'Save Changes'}
                         </Button>
                     </div>

@@ -32,10 +32,10 @@ export function ClinicTable({
     setTopupAmounts
 }: ClinicTableProps) {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <Table>
                 <TableHeader>
-                    <TableRow className="bg-gray-50/50">
+                    <TableRow className="bg-slate-50/50">
                         <TableHead className="w-[250px]">Clinic Details</TableHead>
                         <TableHead>Location</TableHead>
                         <TableHead>Status</TableHead>
@@ -48,32 +48,32 @@ export function ClinicTable({
                 <TableBody>
                     {clinics.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={7} className="h-24 text-center text-gray-500">
+                            <TableCell colSpan={7} className="h-24 text-center text-slate-500">
                                 No clinics found.
                             </TableCell>
                         </TableRow>
                     ) : (
                         clinics.map((clinic) => (
-                            <TableRow key={clinic.id} className="hover:bg-gray-50/50 transition-colors">
+                            <TableRow key={clinic.id} className="hover:bg-slate-50/50 transition-colors">
                                 <TableCell>
                                     <div className="flex items-center space-x-3">
                                         {clinic.logo_url ? (
-                                            <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-gray-100">
+                                            <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-slate-100">
                                                 <Image src={clinic.logo_url} alt={clinic.name || 'Clinic'} fill className="object-cover" unoptimized />
                                             </div>
                                         ) : (
-                                            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                            <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600 font-bold">
                                                 {(clinic.name || '?').charAt(0)}
                                             </div>
                                         )}
                                         <div>
-                                            <div className="font-medium text-gray-900">{clinic.name || 'Unnamed Clinic'}</div>
-                                            <div className="text-xs text-gray-500">/{clinic.slug}</div>
+                                            <div className="font-medium text-slate-900">{clinic.name || 'Unnamed Clinic'}</div>
+                                            <div className="text-xs text-slate-500">/{clinic.slug}</div>
                                         </div>
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <div className="text-sm text-gray-600">
+                                    <div className="text-sm text-slate-600">
                                         {clinic.location || '-'}
                                     </div>
                                 </TableCell>
@@ -84,18 +84,18 @@ export function ClinicTable({
                                             onCheckedChange={() => onToggleStatus(clinic.id, clinic.is_active)}
                                             className="data-[state=checked]:bg-green-500"
                                         />
-                                        <span className={`text-sm ${clinic.is_active ? 'text-green-600 font-medium' : 'text-gray-500'}`}>
+                                        <span className={`text-sm ${clinic.is_active ? 'text-green-600 font-medium' : 'text-slate-500'}`}>
                                             {clinic.is_active ? 'Active' : 'Inactive'}
                                         </span>
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <div className="font-medium text-gray-900 pl-4">
+                                    <div className="font-medium text-slate-900 pl-4">
                                         {clinic.served_today_count || 0}
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <div className="font-medium text-red-600">₹{clinic.current_due}</div>
+                                    <div className="font-medium text-rose-600">₹{clinic.current_due}</div>
                                 </TableCell>
                                 <TableCell>
                                     <div className="space-y-2">
@@ -105,19 +105,19 @@ export function ClinicTable({
                                                 onCheckedChange={(checked) => onToggleTrial(clinic.id, checked)}
                                                 className="data-[state=checked]:bg-purple-500"
                                             />
-                                            <span className="text-xs text-gray-500">Trial Mode</span>
+                                            <span className="text-xs text-slate-500">Trial Mode</span>
                                         </div>
                                         {!!(clinic.trial_start_date && clinic.trial_end_date) && (
                                             <div className="flex flex-col gap-1">
                                                 <input
                                                     type="date"
-                                                    className="text-xs border rounded px-1 py-0.5"
+                                                    className="text-xs border border-slate-200 rounded px-1 py-0.5 text-slate-700"
                                                     value={trialDates[clinic.id]?.start || clinic.trial_start_date?.split('T')[0] || ''}
                                                     onChange={(e) => onTrialDateChange(clinic.id, 'start', e.target.value)}
                                                 />
                                                 <input
                                                     type="date"
-                                                    className="text-xs border rounded px-1 py-0.5"
+                                                    className="text-xs border border-slate-200 rounded px-1 py-0.5 text-slate-700"
                                                     value={trialDates[clinic.id]?.end || clinic.trial_end_date?.split('T')[0] || ''}
                                                     onChange={(e) => onTrialDateChange(clinic.id, 'end', e.target.value)}
                                                 />
@@ -127,10 +127,10 @@ export function ClinicTable({
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex items-center justify-end gap-2">
-                                        <Button variant="ghost" size="icon" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer" onClick={() => onEdit(clinic)}>
+                                        <Button variant="ghost" size="icon" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 cursor-pointer" onClick={() => onEdit(clinic)}>
                                             <Edit className="w-4 h-4" />
                                         </Button>
-                                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer" onClick={() => onDelete(clinic.id)}>
+                                        <Button variant="ghost" size="icon" className="text-rose-500 hover:text-rose-700 hover:bg-rose-50 cursor-pointer" onClick={() => onDelete(clinic.id)}>
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>

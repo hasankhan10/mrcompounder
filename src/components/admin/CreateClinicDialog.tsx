@@ -101,7 +101,7 @@ export function CreateClinicDialog({
                     </div>
 
                     <div className="flex justify-end pt-4">
-                        <Button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white">
                             {isLoading ? 'Creating...' : 'Create Clinic'}
                         </Button>
                     </div>
