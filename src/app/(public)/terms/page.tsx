@@ -18,11 +18,6 @@ export default function TermsPage() {
         <div className="prose lg:prose-lg mx-auto">
           <h1 className="text-4xl font-bold text-center mb-8">Terms and Conditions</h1>
 
-          <div className="p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 mb-8">
-            <p className="font-bold">Disclaimer:</p>
-            <p>This is a template and not legal advice. You must consult with a legal professional to ensure your Terms and Conditions are compliant and suit your business needs.</p>
-          </div>
-
           <p className="lead">Last updated: November 27, 2025</p>
 
           <p>Please read these terms and conditions carefully before using Our Service.</p>
@@ -40,9 +35,9 @@ export default function TermsPage() {
           <p>You are responsible for safeguarding the password that You use to access the Service and for any activities or actions under Your password. You agree not to disclose Your password to any third party. You must notify Us immediately upon becoming aware of any breach of security or unauthorized use of Your account.</p>
 
           <h2>Billing and Payment</h2>
-          <p>Our Service operates on a prepaid, metered basis. Each clinic account maintains a prepaid balance. For each patient token marked as &quot;served,&quot; a fee of ₹1 (one Indian Rupee) will be deducted from Your prepaid balance.</p>
-          <p>You are responsible for maintaining a positive balance. If Your balance is zero or negative, We reserve the right to suspend or limit access to the Service, including preventing the creation of new patient tokens, until the balance is topped up.</p>
-          <p>All payments for top-ups are non-refundable.</p>
+          <p>Our Service operates on a postpaid, metered basis. Each clinic account tracks usage throughout the billing cycle. For each patient token marked as &quot;served,&quot; a fee of ₹1 (one Indian Rupee) is added to your current bill.</p>
+          <p>You are responsible for clearing your dues periodically. If your outstanding balance exceeds the allowed limit or is not paid within the stipulated time, We reserve the right to suspend or limit access to the Service, including preventing the creation of new patient tokens, until the dues are cleared.</p>
+          <p>All payments made for clearing dues are non-refundable.</p>
 
           <h2>Use of the Service</h2>
           <p>You agree to use the Service only for its intended purpose of queue management within your clinic. You may not use the Service for any illegal or unauthorized purpose.</p>
@@ -59,7 +54,7 @@ export default function TermsPage() {
           <h2>Contact Us</h2>
           <p>If you have any questions about these Terms and Conditions, You can contact us:</p>
           <ul>
-            <li>By email: support@clinicline.in</li>
+            <li>By email: <a href="mailto:mrcompounder.com@gmail.com" className="text-teal-600 hover:underline">mrcompounder.com@gmail.com</a></li>
           </ul>
         </div>
       </div>

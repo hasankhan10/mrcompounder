@@ -33,7 +33,11 @@ export default function ContactUsPage() {
               </svg>
               <div>
                 <p className="text-lg font-semibold">Email Us</p>
-                <p className="text-slate-600">Update Soon...</p>
+                <p className="text-slate-600">
+                  <a href="mailto:mrcompounder.com@gmail.com" className="text-teal-600 hover:underline">
+                    mrcompounder.com@gmail.com
+                  </a>
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-4">

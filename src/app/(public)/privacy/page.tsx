@@ -17,14 +17,9 @@ export default function PrivacyPage() {
         <div className="prose lg:prose-lg mx-auto">
           <h1 className="text-4xl font-bold text-center mb-8">Privacy Policy</h1>
 
-          <div className="p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 mb-8">
-            <p className="font-bold">Disclaimer:</p>
-            <p>This is a template and not legal advice. You must consult with a legal professional to ensure your Privacy Policy is compliant with regulations like the GDPR, CCPA, and local laws.</p>
-          </div>
-
           <p className="lead">Last updated: November 27, 2025</p>
 
-          <p>Clinic Line (&quot;We&quot;, &quot;Our&quot;, &quot;Us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.</p>
+          <p>Mr. Compounder (&quot;We&quot;, &quot;Our&quot;, &quot;Us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.</p>
 
           <h2>Information We Collect</h2>
           <p>We may collect information about you in a variety of ways. The information we may collect on the Service includes:</p>
@@ -73,7 +68,7 @@ export default function PrivacyPage() {
           <h2>Contact Us</h2>
           <p>If you have any questions about this Privacy Policy, You can contact us:</p>
           <ul>
-            <li>By email: support@clinicline.in</li>
+            <li>By email: <a href="mailto:mrcompounder.com@gmail.com" className="text-teal-600 hover:underline">mrcompounder.com@gmail.com</a></li>
           </ul>
         </div>
       </div>
