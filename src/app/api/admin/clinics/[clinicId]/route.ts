@@ -109,12 +109,13 @@ export async function PATCH(
       return NextResponse.json(updatedClinic);
     }
 
-    // 5. Handle General Info Update (Name, Slug, Logo) & Password
-    if (body.name || body.slug || body.logoUrl || body.password) {
+    // 5. Handle General Info Update (Name, Slug, Logo, Location) & Password
+    if (body.name || body.slug || body.logoUrl || body.location || body.password) {
       const updateData: Record<string, string> = {};
       if (body.name) updateData.name = body.name;
       if (body.slug) updateData.slug = body.slug;
       if (body.logoUrl) updateData.logo_url = body.logoUrl;
+      if (body.location) updateData.location = body.location; // Added location
 
       // Update Clinic Table
       if (Object.keys(updateData).length > 0) {

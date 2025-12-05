@@ -23,6 +23,7 @@ export interface Clinic {
   created_at: string; // timestamp
   name: string;
   slug: string;
+  location?: string; // Added field
   logo_url?: string;
   current_due: number;
   is_active: boolean;
@@ -112,6 +113,7 @@ export interface PaymentRequest {
 export interface CreateClinicRequest {
   name: string;
   slug: string;
+  location?: string; // Added field
   initialBalance: number;
   compounderEmail: string;
   compounderPassword: string;
@@ -136,6 +138,7 @@ export interface UpdateClinicRequest {
   trialEndDate?: string | null;
   name?: string;
   slug?: string;
+  location?: string; // Added field
   logoUrl?: string;
   password?: string;
 }

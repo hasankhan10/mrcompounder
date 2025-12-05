@@ -15,6 +15,8 @@ interface CreateClinicDialogProps {
     setName: (val: string) => void;
     slug: string;
     setSlug: (val: string) => void;
+    location: string;
+    setLocation: (val: string) => void;
     logoFile: File | null;
     setLogoFile: (file: File | null) => void;
     email: string;
@@ -25,7 +27,7 @@ interface CreateClinicDialogProps {
 
 export function CreateClinicDialog({
     isOpen, onOpenChange, onSubmit, isLoading,
-    name, setName, slug, setSlug, logoFile, setLogoFile,
+    name, setName, slug, setSlug, location, setLocation, logoFile, setLogoFile,
     email, setEmail, password, setPassword
 }: CreateClinicDialogProps) {
     const [showPassword, setShowPassword] = useState(false);
@@ -51,6 +53,11 @@ export function CreateClinicDialog({
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">/</span>
                             <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} className="pl-6" placeholder="maaclinic" required />
                         </div>
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="location">Location</Label>
+                        <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Mumbai, MH" />
                     </div>
 
                     <div className="grid gap-2">

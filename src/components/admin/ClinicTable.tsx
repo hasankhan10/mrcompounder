@@ -37,6 +37,7 @@ export function ClinicTable({
                 <TableHeader>
                     <TableRow className="bg-gray-50/50">
                         <TableHead className="w-[250px]">Clinic Details</TableHead>
+                        <TableHead>Location</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Served Today</TableHead>
                         <TableHead>Current Bill</TableHead>
@@ -47,7 +48,7 @@ export function ClinicTable({
                 <TableBody>
                     {clinics.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={6} className="h-24 text-center text-gray-500">
+                            <TableCell colSpan={7} className="h-24 text-center text-gray-500">
                                 No clinics found.
                             </TableCell>
                         </TableRow>
@@ -69,6 +70,11 @@ export function ClinicTable({
                                             <div className="font-medium text-gray-900">{clinic.name || 'Unnamed Clinic'}</div>
                                             <div className="text-xs text-gray-500">/{clinic.slug}</div>
                                         </div>
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <div className="text-sm text-gray-600">
+                                        {clinic.location || '-'}
                                     </div>
                                 </TableCell>
                                 <TableCell>

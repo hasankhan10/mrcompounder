@@ -80,10 +80,10 @@ export function NavbarAuth({ initialUser, initialRole, onLinkClick }: NavbarAuth
 
     return (
         <>
-            <Button asChild variant="ghost" className="text-gray-800 hover:bg-gray-200/50 font-semibold" onClick={onLinkClick}>
+            <Button asChild variant="ghost" className="text-gray-800 border border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold" onClick={onLinkClick}>
                 <Link href="/login">Login</Link>
             </Button>
-            <Button asChild variant="outline" className="bg-white/50 border-gray-300 hover:bg-white text-gray-800 font-semibold" onClick={onLinkClick}>
+            <Button asChild variant="outline" className="bg-white/50 border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold" onClick={onLinkClick}>
                 <Link href="/contact">Book Free Setup</Link>
             </Button>
         </>

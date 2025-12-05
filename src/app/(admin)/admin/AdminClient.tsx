@@ -217,6 +217,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   // Form state (Create/Edit)
   const [newClinicName, setNewClinicName] = useState('');
   const [newClinicSlug, setNewClinicSlug] = useState('');
+  const [newClinicLocation, setNewClinicLocation] = useState(''); // Added location state
   const [newClinicLogo, setNewClinicLogo] = useState<File | null>(null);
   const [newClinicEmail, setNewClinicEmail] = useState('');
   const [newClinicPassword, setNewClinicPassword] = useState('');
@@ -264,6 +265,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       const { clinic: newClinic } = await adminService.createClinic({
         name: newClinicName,
         slug: newClinicSlug,
+        location: newClinicLocation, // Pass location
         logoUrl: logoUrl,
         compounderEmail: newClinicEmail,
         compounderPassword: newClinicPassword,
@@ -278,9 +280,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       // Reset form
       setNewClinicName('');
       setNewClinicSlug('');
+      setNewClinicLocation(''); // Reset location
       setNewClinicLogo(null);
       setNewClinicEmail('');
-      setNewClinicPassword('');
       setNewClinicPassword('');
       toast.success('Clinic created successfully');
 
@@ -297,6 +299,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     setSelectedClinic(clinic);
     setNewClinicName(clinic.name);
     setNewClinicSlug(clinic.slug);
+    setNewClinicLocation(clinic.location || ''); // Set location
     setEditClinicLogoUrl(clinic.logo_url || '');
     setNewClinicPassword(''); // Don't show existing password
     setNewClinicLogo(null);
@@ -331,11 +334,11 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       const updatedClinic = await adminService.updateClinic(selectedClinic.id, {
         name: newClinicName,
         slug: newClinicSlug,
+        location: newClinicLocation, // Pass location
         logoUrl: logoUrl,
         password: newClinicPassword || undefined
       });
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
-      setIsEditModalOpen(false);
       setIsEditModalOpen(false);
       toast.success('Clinic updated successfully');
 
@@ -364,7 +367,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
       setClinics(clinics.filter(c => c.id !== selectedClinic.id));
       setIsDeleteAlertOpen(false);
-      setIsDeleteAlertOpen(false);
       toast.success('Clinic deleted successfully');
     } catch (err: unknown) {
       toast.error('Failed to delete clinic', {
@@ -376,7 +378,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     try {
       const updatedClinic = await adminService.toggleStatus(id, !currentStatus);
-      setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       toast.success(`Clinic ${!currentStatus ? 'activated' : 'deactivated'}`);
     } catch (err: unknown) {
@@ -556,13 +557,13 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
                       <h3 className="font-bold text-lg">{req.clinics?.name}</h3>
                       <p className="text-sm text-gray-500">Requested: {new Date(req.created_at).toLocaleString()}</p>
                       <div className="mt-2 flex items-center gap-2">
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-bold">₹{req.amount}</span>
-                        {req.transaction_id && <span className="text-sm text-gray-600 font-mono">Txn: {req.transaction_id}</span>}
+                        <span className="bg-teal-100 text-teal-800 px-2 py-1 rounded text-sm font-bold">₹{req.amount}</span>
+                        {req.transaction_id && <span className="text-sm text-slate-600 font-mono">Txn: {req.transaction_id}</span>}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <a href={req.screenshot_url} target="_blank" rel="noopener noreferrer" className="block w-24 h-24 border rounded overflow-hidden bg-gray-100 hover:opacity-80 transition relative">
+                      <a href={req.screenshot_url} target="_blank" rel="noopener noreferrer" className="block w-24 h-24 border rounded overflow-hidden bg-slate-100 hover:opacity-80 transition relative">
                         <Image src={req.screenshot_url} alt="Proof" fill className="object-cover" />
                       </a>
                       <div className="flex flex-col gap-2">
@@ -590,20 +591,20 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
       {activeTab === 'upi-settings' && (
         <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-sm animate-fade-in-up">
-          <h2 className="text-2xl font-bold mb-6">UPI Payment Settings</h2>
+          <h2 className="text-2xl font-bold mb-6 text-slate-900">UPI Payment Settings</h2>
           <form onSubmit={handleSaveSettings} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">UPI ID</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">UPI ID</label>
               <input
                 type="text"
                 value={upiSettings.upi_id}
                 onChange={e => setUpiSettings({ ...upiSettings, upi_id: e.target.value })}
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 placeholder="e.g. admin@upi"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">QR Code Image</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">QR Code Image</label>
               {upiSettings.qr_code_url && (
                 <div className="mb-2 relative w-48 h-48 border rounded">
                   <Image src={upiSettings.qr_code_url} alt="QR Code" fill className="object-contain" />
@@ -615,12 +616,12 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
                 accept="image/*"
                 label="Upload QR Code"
               />
-              <p className="text-xs text-gray-500 mt-1">Upload a clear image of your QR code.</p>
+              <p className="text-xs text-slate-500 mt-1">Upload a clear image of your QR code.</p>
             </div>
             <button
               type="submit"
               disabled={settingsLoading}
-              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 font-medium"
+              className="w-full bg-teal-600 text-white py-2 rounded-md hover:bg-teal-700 disabled:opacity-50 font-medium transition-colors"
             >
               {settingsLoading ? 'Saving...' : 'Save Settings'}
             </button>
@@ -638,6 +639,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setName={setNewClinicName}
         slug={newClinicSlug}
         setSlug={setNewClinicSlug}
+        location={newClinicLocation} // Pass location
+        setLocation={setNewClinicLocation} // Pass setLocation
         logoFile={newClinicLogo}
         setLogoFile={setNewClinicLogo}
         email={newClinicEmail}
@@ -655,6 +658,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setName={setNewClinicName}
         slug={newClinicSlug}
         setSlug={setNewClinicSlug}
+        location={newClinicLocation} // Pass location
+        setLocation={setNewClinicLocation} // Pass setLocation
         logoUrl={editClinicLogoUrl}
         logoFile={newClinicLogo}
         setLogoFile={setNewClinicLogo}
