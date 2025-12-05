@@ -76,6 +76,9 @@ export function ClinicTable({
                                     <div className="text-sm text-slate-600">
                                         {clinic.location || '-'}
                                     </div>
+                                    <div className="text-xs text-slate-500">
+                                        {clinic.contact_number || '-'}
+                                    </div>
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center space-x-2">

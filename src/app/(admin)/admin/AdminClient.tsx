@@ -216,6 +216,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const [newClinicName, setNewClinicName] = useState('');
   const [newClinicSlug, setNewClinicSlug] = useState('');
   const [newClinicLocation, setNewClinicLocation] = useState('');
+  const [newClinicContactNumber, setNewClinicContactNumber] = useState('');
   const [newClinicLogo, setNewClinicLogo] = useState<File | null>(null);
   const [newClinicEmail, setNewClinicEmail] = useState('');
   const [newClinicPassword, setNewClinicPassword] = useState('');
@@ -264,6 +265,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         name: newClinicName,
         slug: newClinicSlug,
         location: newClinicLocation,
+        contactNumber: newClinicContactNumber,
         logoUrl: logoUrl,
         compounderEmail: newClinicEmail,
         compounderPassword: newClinicPassword,
@@ -279,6 +281,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setNewClinicName('');
       setNewClinicSlug('');
       setNewClinicLocation('');
+      setNewClinicContactNumber('');
       setNewClinicLogo(null);
       setNewClinicEmail('');
       setNewClinicPassword('');
@@ -298,6 +301,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     setNewClinicName(clinic.name);
     setNewClinicSlug(clinic.slug);
     setNewClinicLocation(clinic.location || '');
+    setNewClinicContactNumber(clinic.contact_number || '');
     setEditClinicLogoUrl(clinic.logo_url || '');
     setNewClinicPassword('');
     setNewClinicLogo(null);
@@ -333,6 +337,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         name: newClinicName,
         slug: newClinicSlug,
         location: newClinicLocation,
+        contactNumber: newClinicContactNumber,
         logoUrl: logoUrl,
         password: newClinicPassword || undefined
       });
@@ -557,6 +562,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setSlug={setNewClinicSlug}
         location={newClinicLocation}
         setLocation={setNewClinicLocation}
+        contactNumber={newClinicContactNumber}
+        setContactNumber={setNewClinicContactNumber}
         logoFile={newClinicLogo}
         setLogoFile={setNewClinicLogo}
         email={newClinicEmail}
@@ -576,6 +583,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setSlug={setNewClinicSlug}
         location={newClinicLocation}
         setLocation={setNewClinicLocation}
+        contactNumber={newClinicContactNumber}
+        setContactNumber={setNewClinicContactNumber}
         logoUrl={editClinicLogoUrl}
         logoFile={newClinicLogo}
         setLogoFile={setNewClinicLogo}

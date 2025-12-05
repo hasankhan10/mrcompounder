@@ -24,6 +24,7 @@ export interface Clinic {
   name: string;
   slug: string;
   location?: string; // Added field
+  contact_number?: string; // Added field
   logo_url?: string;
   current_due: number;
   is_active: boolean;
@@ -114,6 +115,7 @@ export interface CreateClinicRequest {
   name: string;
   slug: string;
   location?: string; // Added field
+  contactNumber?: string; // Added field
   initialBalance: number;
   compounderEmail: string;
   compounderPassword: string;
@@ -139,6 +141,7 @@ export interface UpdateClinicRequest {
   name?: string;
   slug?: string;
   location?: string; // Added field
+  contactNumber?: string; // Added field
   logoUrl?: string;
   password?: string;
 }
