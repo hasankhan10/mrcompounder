@@ -177,7 +177,7 @@ export default function ReviewsPage() {
                     <Reveal width="100%">
                         <div className="relative bg-teal-700 rounded-2xl shadow-xl overflow-hidden text-white p-12 md:p-16">
                             <div className="relative z-10 text-center">
-                                <h2 className="text-3xl md:text-5xl font-extrabold mb-4">Ready to Modernize Your Clinic?</h2>
+                                <h2 className="text-3xl md:text-5xl font-extrabold mb-4 text-gray-200">Ready to Modernize Your Clinic?</h2>
                                 <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 mb-8">
                                     Transform your waiting room today. Join dozens of clinics who have brought calm and efficiency to their practice with {APP_NAME}.
                                 </p>
