@@ -50,12 +50,12 @@ export default function HomePage() {
 
         <div className="container mx-auto px-4 text-center relative z-10">
           <Reveal width="100%" direction="up">
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 drop-shadow-lg text-gray-200">
               End the Chaos. Bring Calm. <br /> {APP_NAME} for a Smarter Clinic.
             </h1>
           </Reveal>
           <Reveal width="100%" direction="up" delay={0.4}>
-            <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto opacity-90">
+            <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto opacity-90 text-white">
               Replace shouting names with a simple, digital token system. Patients wait stress-free, staff manage effortlessly.
             </p>
           </Reveal>
@@ -184,7 +184,7 @@ export default function HomePage() {
       {/* Why India Needs This Section */}
       <section className="py-20 bg-teal-700 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-12">Why India Needs {APP_NAME}</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-12 text-gray-200">Why India Needs {APP_NAME}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
             {[
               "Works on Cheap Androids: Designed for accessibility across all devices.",
@@ -253,7 +253,7 @@ export default function HomePage() {
           <Reveal width="100%">
             <div className="relative bg-teal-700 rounded-2xl shadow-xl overflow-hidden text-white p-12 md:p-16">
               <div className="relative z-10 text-center">
-                <h2 className="text-3xl md:text-5xl font-extrabold mb-4">Ready to Modernize Your Clinic?</h2>
+                <h2 className="text-3xl md:text-5xl font-extrabold mb-4 text-gray-200">Ready to Modernize Your Clinic?</h2>
                 <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 mb-8">
                   Transform your waiting room today. Join dozens of clinics who have brought calm and efficiency to their practice with {APP_NAME}.
                 </p>
