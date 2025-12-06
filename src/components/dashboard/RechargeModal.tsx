@@ -5,7 +5,8 @@ import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase-client';
 import { FileUpload } from '@/components/ui/file-upload';
-import Image from 'next/image';
+import { APP_NAME } from '@/lib/config';
+import QRCode from 'react-qr-code';
 
 interface RechargeModalProps {
     isOpen: boolean;
@@ -14,7 +15,7 @@ interface RechargeModalProps {
 }
 
 export function RechargeModal({ isOpen, onOpenChange, fixedAmount }: RechargeModalProps) {
-    const [settings, setSettings] = useState({ upi_id: 'admin@upi', qr_code_url: '' });
+    const [settings, setSettings] = useState({ upi_id: 'admin@upi' });
     const [amount, setAmount] = useState(fixedAmount ? fixedAmount.toString() : '');
     const [file, setFile] = useState<File | null>(null);
     const [submitting, setSubmitting] = useState(false);
@@ -31,8 +32,7 @@ export function RechargeModal({ isOpen, onOpenChange, fixedAmount }: RechargeMod
                         return acc;
                     }, {});
                     setSettings({
-                        upi_id: map.upi_id || 'admin@upi',
-                        qr_code_url: map.qr_code_url || ''
+                        upi_id: map.upi_id || 'admin@upi'
                     });
                 }
             };
@@ -88,13 +88,17 @@ export function RechargeModal({ isOpen, onOpenChange, fixedAmount }: RechargeMod
         }
     };
 
+    // Construct UPI Link dynamically
+    // Format: upi://pay?pa=<upi_id>&pn=<name>&am=<amount>&cu=INR
+    const upiLink = `upi://pay?pa=${settings.upi_id}&pn=${encodeURIComponent(APP_NAME)}${amount ? `&am=${amount}` : ''}&cu=INR`;
+
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md bg-white max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Pay Your Bill</DialogTitle>
                     <DialogDescription>
-                        1. Scan QR / Pay to UPI ID.<br />
+                        1. Scan generated QR code.<br />
                         2. Fill the form below to clear your dues.
                     </DialogDescription>
                 </DialogHeader>
@@ -102,19 +106,19 @@ export function RechargeModal({ isOpen, onOpenChange, fixedAmount }: RechargeMod
                 <div className="flex flex-col items-center space-y-6 py-4">
                     {/* QR Code Section */}
                     <div className="flex flex-col items-center space-y-4 w-full">
-                        <div className="w-64 h-64 bg-white rounded-xl shadow-sm border-2 border-gray-100 p-2 flex items-center justify-center">
-                            {settings.qr_code_url ? (
-                                <div className="relative w-full h-full">
-                                    <Image src={settings.qr_code_url} alt="Payment QR" fill className="object-contain rounded-lg" />
-                                </div>
-                            ) : (
-                                <div className="text-center text-gray-400">
-                                    <p className="text-sm">QR Code Loading...</p>
-                                </div>
-                            )}
+                        <div className="bg-white rounded-xl shadow-sm border-2 border-gray-100 p-4 flex items-center justify-center">
+                            <div className="relative">
+                                <QRCode
+                                    value={upiLink}
+                                    size={200}
+                                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                                    viewBox={`0 0 256 256`}
+                                />
+                            </div>
                         </div>
 
                         <div className="w-full max-w-xs space-y-2 text-center">
+
                             <p className="text-sm font-medium text-gray-500">Scan to Pay or use UPI ID</p>
                             <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
                                 <code className="flex-1 font-mono font-bold text-xl text-blue-900 break-all">

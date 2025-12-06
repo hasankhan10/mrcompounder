@@ -1,12 +1,10 @@
 import { FormEvent } from 'react';
-import Image from 'next/image';
-import { FileUpload } from '@/components/ui/file-upload';
+
+
 
 interface UpiSettingsTabProps {
-    upiSettings: { upi_id: string; qr_code_url: string };
-    setUpiSettings: (settings: { upi_id: string; qr_code_url: string }) => void;
-    qrFile: File | null;
-    setQrFile: (file: File | null) => void;
+    upiSettings: { upi_id: string };
+    setUpiSettings: (settings: { upi_id: string }) => void;
     onSave: (e: FormEvent) => void;
     isLoading: boolean;
 }
@@ -14,8 +12,6 @@ interface UpiSettingsTabProps {
 export function UpiSettingsTab({
     upiSettings,
     setUpiSettings,
-    qrFile,
-    setQrFile,
     onSave,
     isLoading,
 }: UpiSettingsTabProps) {
@@ -37,30 +33,7 @@ export function UpiSettingsTab({
                         placeholder="e.g. admin@upi"
                     />
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                        QR Code Image
-                    </label>
-                    {upiSettings.qr_code_url && (
-                        <div className="mb-2 relative w-48 h-48 border rounded">
-                            <Image
-                                src={upiSettings.qr_code_url}
-                                alt="QR Code"
-                                fill
-                                className="object-contain"
-                            />
-                        </div>
-                    )}
-                    <FileUpload
-                        value={qrFile}
-                        onChange={setQrFile}
-                        accept="image/*"
-                        label="Upload QR Code"
-                    />
-                    <p className="text-xs text-slate-500 mt-1">
-                        Upload a clear image of your QR code.
-                    </p>
-                </div>
+
                 <button
                     type="submit"
                     disabled={isLoading}

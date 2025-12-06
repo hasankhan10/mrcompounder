@@ -51,8 +51,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const [isLoadingPayments, setIsLoadingPayments] = useState(false);
 
   // UPI Settings State
-  const [upiSettings, setUpiSettings] = useState({ upi_id: '', qr_code_url: '' });
-  const [qrFile, setQrFile] = useState<File | null>(null);
+  const [upiSettings, setUpiSettings] = useState({ upi_id: '' });
+
   const [settingsLoading, setSettingsLoading] = useState(false);
 
   // Payment Requests State
@@ -94,8 +94,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     if (activeTab === 'upi-settings') {
       adminService.fetchSettings()
         .then(data => setUpiSettings({
-          upi_id: data.upi_id || '',
-          qr_code_url: data.qr_code_url || ''
+          upi_id: data.upi_id || ''
         }))
         .catch(err => {
           console.error(err);
@@ -110,20 +109,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     e.preventDefault();
     setSettingsLoading(true);
     try {
-      let url = upiSettings.qr_code_url;
+      await adminService.saveSettings(upiSettings);
 
-      if (qrFile) {
-        const fileName = `qr-${Date.now()}.png`;
-        const { error } = await supabase.storage.from('clinic-logos').upload(fileName, qrFile);
-        if (error) throw error;
-        const { data } = supabase.storage.from('clinic-logos').getPublicUrl(fileName);
-        url = data.publicUrl;
-      }
-
-      await adminService.saveSettings({ ...upiSettings, qr_code_url: url });
-
-      setUpiSettings(prev => ({ ...prev, qr_code_url: url }));
-      setQrFile(null);
+      setUpiSettings(prev => ({ ...prev }));
       toast.success('Settings saved');
     } catch (err: unknown) {
       toast.error('Failed to save settings', {
@@ -511,8 +499,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         <UpiSettingsTab
           upiSettings={upiSettings}
           setUpiSettings={setUpiSettings}
-          qrFile={qrFile}
-          setQrFile={setQrFile}
           onSave={handleSaveSettings}
           isLoading={settingsLoading}
         />

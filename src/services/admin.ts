@@ -23,7 +23,7 @@ export const adminService = {
         return res.json();
     },
 
-    async saveSettings(settings: { upi_id: string; qr_code_url: string }) {
+    async saveSettings(settings: { upi_id: string }) {
         const res = await fetch('/api/admin/settings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
