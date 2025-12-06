@@ -215,11 +215,11 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     toast.info('Logging out...');
     try {
       await supabase.auth.signOut();
+      router.push('/login');
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
-      router.push('/login');
-      router.refresh();
+      // Fallback: Force hard reload to login page
+      window.location.href = '/login';
     }
   };
 
