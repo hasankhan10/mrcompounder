@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { APP_NAME } from '@/lib/config';
 import { Reveal } from '@/components/shared/Reveal';
-import { FaqSection } from '@/components/shared/FaqSection';
+import FaqSection from '@/components/shared/FaqSection';
 
 
 // New Component for the floating medical plus icon

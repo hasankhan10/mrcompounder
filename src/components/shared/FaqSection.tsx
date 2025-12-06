@@ -13,7 +13,7 @@ const faqs = [
     { q: "Can I pre-book patients for tomorrow?", a: "Absolutely. Your compounder can register patients in advance directly from the dashboard, or patients can join the queue online if you enable remote joining." }
 ];
 
-export function FaqSection() {
+export default function FaqSection() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
 
     const toggleFaq = (index: number) => {
