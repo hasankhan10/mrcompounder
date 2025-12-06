@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Building2, Users, IndianRupee } from 'lucide-react';
+import { Building2, Users, IndianRupee, TrendingUp } from 'lucide-react';
 
 interface AdminStatsGridProps {
     totalClinics: number;
@@ -12,20 +12,20 @@ interface AdminStatsGridProps {
 export function AdminStatsGrid({ totalClinics, totalPatientsToday, totalRevenue, lastMonthRevenue }: AdminStatsGridProps) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="border-none shadow-md bg-gradient-to-br from-teal-500 to-teal-600 text-white overflow-hidden relative hover-lift">
+            <Card className="border-none shadow-md bg-white hover-lift">
                 <CardContent className="p-6">
                     <div className="flex justify-between items-start">
                         <div>
-                            <p className="text-teal-100 font-medium mb-1">Total Clinics</p>
-                            <h3 className="text-4xl font-bold">{totalClinics}</h3>
+                            <p className="text-slate-500 font-medium mb-1">Total Clinics</p>
+                            <h3 className="text-4xl font-bold text-slate-900">{totalClinics}</h3>
                         </div>
-                        <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                            <Building2 className="w-6 h-6 text-white" />
+                        <div className="bg-white border border-slate-100 p-3 rounded-xl">
+                            <Building2 className="w-6 h-6 text-teal-600" />
                         </div>
                     </div>
-                    <div className="mt-4 flex items-center text-teal-100 text-sm">
-                        <span className="bg-white/20 px-2 py-0.5 rounded text-xs mr-2">Active</span>
-                        Across all regions
+                    <div className="mt-4 flex items-center text-teal-600 text-sm font-medium">
+                        <TrendingUp className="w-4 h-4 mr-1" />
+                        <span>Active Across All Regions</span>
                     </div>
                 </CardContent>
             </Card>
@@ -60,8 +60,6 @@ export function AdminStatsGrid({ totalClinics, totalPatientsToday, totalRevenue,
                     </div>
                 </CardContent>
             </Card>
-
-
 
             <Card className="border-none shadow-md bg-white hover-lift" style={{ animationDelay: '0.4s' }}>
                 <CardContent className="p-6">

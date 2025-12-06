@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { APP_NAME } from '@/lib/config';
 import { Reveal } from '@/components/shared/Reveal';
+import { FaqSection } from '@/components/shared/FaqSection';
+
 
 // New Component for the floating medical plus icon
 function FloatingPlusIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
@@ -140,7 +142,7 @@ export default function HomePage() {
             {[
               "Live Token on Your Phone: Always know your turn and the current token number.",
               "Wait Anywhere, Comfortably: No need to stay confined to a crowded waiting room.",
-              "Get Notified: Receive an alert when it&apos;s almost your turn.",
+              "Get Notified: Receive an alert when it's almost your turn.",
               "Trust & Clarity: See the doctor's name on your screen, reducing confusion."
             ].map((benefit, index) => (
               <Reveal key={index} delay={index * 0.1} width="100%">
@@ -164,7 +166,7 @@ export default function HomePage() {
             {[
               { title: "Increase Patient Retention", desc: "Patients who wait comfortably are 3x more likely to return and recommend your clinic.", icon: "📈" },
               { title: "Streamline Operations", desc: "Reduce front-desk workload by 40%. Let your staff focus on care, not crowd control.", icon: "⚡" },
-              { title: "Real-time Analytics", desc: "Track daily footfall, peak hours, and doctor performance to optimize scheduling.", icon: "📊" },
+              { title: "Monthly Analytics", desc: "Track all the performance of your clinic at the end of the month.", icon: "📊" },
               { title: "Premium Brand Image", desc: "Stand out as a modern, patient-centric facility in your neighborhood.", icon: "🏥" }
             ].map((item, index) => (
               <Reveal key={index} delay={index * 0.1} width="100%">
@@ -182,18 +184,23 @@ export default function HomePage() {
       </section>
 
       {/* Why India Needs This Section */}
-      <section className="py-20 bg-teal-700 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-12 text-gray-200">Why India Needs {APP_NAME}</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+      <section className="py-20 bg-teal-900 relative overflow-hidden">
+        { /* Background Pattern */}
+        <div className="absolute inset-0 opacity-10 pattern-dots pattern-white pattern-size-4 pattern-opacity-100"></div>
+
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-3xl md:text-5xl font-bold mb-16 text-white tracking-tight">Why India Needs {APP_NAME}</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              "Works on Cheap Androids: Designed for accessibility across all devices.",
-              "Low Internet Requirement: Optimized for intermittent or slower connections.",
-              "Phone Number Identity: Familiar and trusted method for patient identification.",
-              "Fits Clinic Workflows: Integrates seamlessly into how clinics already operate, enhancing efficiency."
+              { title: "Universal Access", desc: "Works flawlessly on cheap Androids. No high-end tech required.", icon: "📱" },
+              { title: "Network Resilient", desc: "Optimized for 2G/3G networks. Intermittent internet? No problem.", icon: "📶" },
+              { title: "Trusted Identity", desc: "Uses Phone Numbers for ID. The most familiar method for every Indian.", icon: "🆔" },
+              { title: "Zero Friction", desc: "Fits seamlessly into existing clinic workflows. No learning curve.", icon: "⚡" }
             ].map((reason, index) => (
-              <div key={index} className="p-6 rounded-xl border-2 border-teal-500 shadow-lg transform hover:scale-105 transition-transform duration-300">
-                <p className="text-lg font-medium">{reason}</p>
+              <div key={index} className="bg-white/10 backdrop-blur-md p-8 rounded-2xl border border-white/20 shadow-2xl hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2 group text-left">
+                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">{reason.icon}</div>
+                <h3 className="text-xl font-bold text-white mb-3">{reason.title}</h3>
+                <p className="text-teal-100 leading-relaxed text-sm">{reason.desc}</p>
               </div>
             ))}
           </div>
@@ -227,25 +234,8 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 text-center mb-12">Frequently Asked Questions</h2>
-          <div className="max-w-3xl mx-auto space-y-6">
-            {[
-              { q: "Do I need special hardware?", a: "No. " + APP_NAME + " works on any smartphone, tablet, or computer you already own." },
-              { q: "Is there an app to download?", a: "No. It's entirely web-based, accessible directly through a browser." },
-              { q: "What if the internet is slow or unstable?", a: APP_NAME + " is designed to be lightweight and resilient, providing a functional experience even with basic internet." },
-              { q: "Can multiple doctors use it at the same time?", a: "Yes! You can easily start and manage separate 'sessions' for different doctors." },
-              { q: "Can I pre-book patients for tomorrow?", a: "Absolutely. Your compounder can register patients in advance directly from the dashboard." }
-            ].map((item, index) => (
-              <div key={index} className="border border-slate-200 rounded-lg p-6 bg-slate-50 shadow-sm transform hover:shadow-md transition-shadow duration-300">
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Q: {item.q}</h3>
-                <p className="text-slate-600 leading-relaxed">A: {item.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* FAQ Section */}
+      <FaqSection />
 
       {/* Premium CTA Section */}
       <section className="bg-white py-20">
