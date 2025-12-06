@@ -675,6 +675,7 @@ export function DashboardClient({
       <RechargeModal
         isOpen={isRechargeModalOpen}
         onOpenChange={setIsRechargeModalOpen}
+        fixedAmount={clinic?.current_due || 0}
       />
     </DashboardShell >
   );

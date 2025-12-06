@@ -10,17 +10,19 @@ import Image from 'next/image';
 interface RechargeModalProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
+    fixedAmount?: number;
 }
 
-export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
+export function RechargeModal({ isOpen, onOpenChange, fixedAmount }: RechargeModalProps) {
     const [settings, setSettings] = useState({ upi_id: 'admin@upi', qr_code_url: '' });
-    const [amount, setAmount] = useState('');
+    const [amount, setAmount] = useState(fixedAmount ? fixedAmount.toString() : '');
     const [file, setFile] = useState<File | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [supabase] = useState(() => createClient());
 
     useEffect(() => {
         if (isOpen) {
+            setAmount(fixedAmount ? fixedAmount.toString() : '');
             const fetchSettings = async () => {
                 const { data } = await supabase.from('system_settings').select('*');
                 if (data) {
@@ -36,7 +38,7 @@ export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
             };
             fetchSettings();
         }
-    }, [isOpen, supabase]);
+    }, [isOpen, supabase, fixedAmount]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(settings.upi_id);
@@ -132,9 +134,11 @@ export function RechargeModal({ isOpen, onOpenChange }: RechargeModalProps) {
                             <input
                                 type="number"
                                 value={amount}
-                                onChange={e => setAmount(e.target.value)}
-                                className="w-full p-2 border rounded-md"
+                                onChange={e => !fixedAmount && setAmount(e.target.value)}
+                                className={`w-full p-2 border rounded-md ${fixedAmount ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                 placeholder="e.g. 500"
+                                disabled={!!fixedAmount}
+                                readOnly={!!fixedAmount}
                             />
                         </div>
                         <div>
