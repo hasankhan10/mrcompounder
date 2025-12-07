@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { dashboardService } from '@/services/dashboard';
 import { toast } from 'sonner';
 
-import { FileDown, Loader2, Calendar, IndianRupee, Calculator } from 'lucide-react';
+import { FileDown, Loader2, Calendar, Calculator } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
@@ -219,9 +219,9 @@ function RevenueCalculator({ reportData }: { reportData: any[] }) {
         }
 
         // Count served patients for selected doctor
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // Count served patients for selected doctor
         const servedCount = reportData.filter(
-            (r: any) => (r.queues?.doctor_name || 'Unknown') === selectedDoctor && r.status === 'served'
+            (r: { queues: { doctor_name: string }; status: string }) => (r.queues?.doctor_name || 'Unknown') === selectedDoctor && r.status === 'served'
         ).length;
 
         const totalCollection = servedCount * fee;
@@ -296,7 +296,7 @@ function RevenueCalculator({ reportData }: { reportData: any[] }) {
                             <p className="text-2xl font-bold text-slate-900 mt-1">₹{result.total.toLocaleString()}</p>
                         </div>
                         <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100 shadow-sm">
-                            <p className="text-sm text-indigo-700 font-medium">Doctor's Earning</p>
+                            <p className="text-sm text-indigo-700 font-medium">Doctor&apos;s Earning</p>
                             <p className="text-2xl font-bold text-indigo-900 mt-1">₹{result.doctorShare.toLocaleString()}</p>
                         </div>
                         <div className="bg-teal-50 p-4 rounded-lg border border-teal-100 shadow-sm">
