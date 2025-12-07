@@ -49,9 +49,10 @@ export default async function PricingPage() {
                     <div className="space-y-4 mb-10 text-left">
                         {[
                             "Unlimited Doctors & Staff",
-                            "Unlimited SMS/WhatsApp Alerts",
-                            "14-Day Free Trial",
-                            "No Upfront Cost"
+                            "Unlimited Montly Report Generation",
+                            "Free Trial As Per Your Request",
+                            "No Upfront Cost",
+                            "100% Fully Satisfaction"
                         ].map((feature, i) => (
                             <div key={i} className="flex items-center gap-3">
                                 <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />

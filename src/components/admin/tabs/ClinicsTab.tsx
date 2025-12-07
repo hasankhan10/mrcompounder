@@ -14,6 +14,8 @@ interface ClinicsTabProps {
     onToggleTrial: (id: string, isActive: boolean) => void;
     trialDates: { [key: string]: { start: string; end: string } };
     onTrialDateChange: (id: string, type: 'start' | 'end', value: string) => void;
+    trialDurations: { [key: string]: number };
+    onTrialDurationChange: (id: string, days: number) => void;
 }
 
 export function ClinicsTab({
@@ -27,6 +29,8 @@ export function ClinicsTab({
     onToggleTrial,
     trialDates,
     onTrialDateChange,
+    trialDurations,
+    onTrialDurationChange,
 }: ClinicsTabProps) {
     return (
         <div className="space-y-8 animate-fade-in-up">
@@ -44,6 +48,8 @@ export function ClinicsTab({
                     onToggleTrial={onToggleTrial}
                     trialDates={trialDates}
                     onTrialDateChange={onTrialDateChange}
+                    trialDurations={trialDurations}
+                    onTrialDurationChange={onTrialDurationChange}
                 />
             </ErrorBoundary>
         </div>

@@ -41,6 +41,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const [trialDates, setTrialDates] = useState<{ [key: string]: { start: string, end: string } }>({});
+  const [trialDurations, setTrialDurations] = useState<{ [key: string]: number }>({});
   const [stats, setStats] = useState({
     totalClinics: 0,
     totalPatientsToday: 0,
@@ -378,7 +379,12 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     }
   };
 
-
+  const handleTrialDurationChange = (id: string, days: number) => {
+    setTrialDurations(prev => ({
+      ...prev,
+      [id]: days
+    }));
+  };
 
   const handleTrialDateChange = (id: string, type: 'start' | 'end', value: string) => {
     setTrialDates(prev => ({
@@ -410,11 +416,15 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       // Set defaults if missing
       if (!start || !end) {
         const today = new Date();
-        const nextWeek = new Date();
-        nextWeek.setDate(today.getDate() + 14);
-        start = today.toISOString().split('T')[0];
-        end = nextWeek.toISOString().split('T')[0];
+        const days = trialDurations[id] || 14; // Use custom duration or default 14
 
+        const endDate = new Date();
+        endDate.setDate(today.getDate() + days);
+
+        start = today.toISOString().split('T')[0];
+        end = endDate.toISOString().split('T')[0];
+
+        // Also update the dates state for immediate reflection if they open date picker
         setTrialDates(prev => ({
           ...prev,
           [id]: { start, end }
@@ -424,7 +434,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       try {
         const updatedClinic = await adminService.toggleTrial(id, start, end);
         setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
-        toast.success('Trial mode enabled');
+        toast.success(`Trial mode enabled for ${trialDurations[id] || 14} days`);
       } catch (err: unknown) {
         toast.error('Failed to enable trial', {
           description: err instanceof Error ? err.message : 'Could not update trial status.'
@@ -482,6 +492,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
           onToggleTrial={handleToggleTrial}
           trialDates={trialDates}
           onTrialDateChange={handleTrialDateChange}
+          trialDurations={trialDurations}
+          onTrialDurationChange={handleTrialDurationChange}
         />
       )}
 

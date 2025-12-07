@@ -14,6 +14,8 @@ interface ClinicTableProps {
     onToggleTrial: (id: string, isActive: boolean) => void;
     trialDates: { [key: string]: { start: string, end: string } };
     onTrialDateChange: (id: string, type: 'start' | 'end', value: string) => void;
+    trialDurations: { [key: string]: number };
+    onTrialDurationChange: (id: string, days: number) => void;
 }
 
 export function ClinicTable({
@@ -23,7 +25,9 @@ export function ClinicTable({
     onToggleStatus,
     onToggleTrial,
     trialDates,
-    onTrialDateChange
+    onTrialDateChange,
+    trialDurations,
+    onTrialDurationChange
 }: ClinicTableProps) {
     return (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -102,7 +106,18 @@ export function ClinicTable({
                                                 onCheckedChange={(checked) => onToggleTrial(clinic.id, checked)}
                                                 className="data-[state=checked]:bg-purple-500"
                                             />
-                                            <span className="text-xs text-slate-500">Trial Mode</span>
+                                            <span className="text-xs text-slate-500">Trial</span>
+                                            {!(clinic.trial_start_date && clinic.trial_end_date) && (
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    placeholder="14"
+                                                    className="w-12 text-xs border border-slate-200 rounded px-1 py-0.5 text-slate-700 focus:outline-none focus:border-teal-500"
+                                                    value={trialDurations[clinic.id] || ''}
+                                                    onChange={(e) => onTrialDurationChange(clinic.id, parseInt(e.target.value))}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
+                                            )}
                                         </div>
                                         {!!(clinic.trial_start_date && clinic.trial_end_date) && (
                                             <div className="flex flex-col gap-1">
