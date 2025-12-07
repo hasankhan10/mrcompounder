@@ -84,7 +84,7 @@ export function DashboardClient({
   const [formIsLoading, setFormIsLoading] = useState(false);
 
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       toast.success('Logging out...');
       await supabase.auth.signOut();
@@ -93,7 +93,7 @@ export function DashboardClient({
       console.error('Logout failed:', error);
       window.location.href = '/login';
     }
-  };
+  }, [supabase]);
 
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 

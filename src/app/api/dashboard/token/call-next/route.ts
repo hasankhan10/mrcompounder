@@ -52,10 +52,24 @@ export async function POST(request: NextRequest) {
         const isTrialActive = clinic.trial_end_date && new Date(clinic.trial_end_date) > new Date();
 
         if (!isTrialActive) {
-          const currentDue = clinic.current_due || 0;
-          const newDue = currentDue + 1;
 
-          // 2. Update current_due
+          // 2. Determine Cost Per Patient (Default 1)
+          let costPerPatient = 1;
+          const { data: setting } = await supabase
+            .from('system_settings')
+            .select('value')
+            .eq('key', 'cost_per_patient')
+            .single();
+
+          if (setting && setting.value) {
+            const parsed = parseFloat(setting.value);
+            if (!isNaN(parsed)) costPerPatient = parsed;
+          }
+
+          const currentDue = clinic.current_due || 0;
+          const newDue = currentDue + costPerPatient;
+
+          // 3. Update current_due
           await supabase
             .from('clinics')
             .update({ current_due: newDue })

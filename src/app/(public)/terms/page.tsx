@@ -35,7 +35,7 @@ export default function TermsPage() {
           <p>You are responsible for safeguarding the password that You use to access the Service and for any activities or actions under Your password. You agree not to disclose Your password to any third party. You must notify Us immediately upon becoming aware of any breach of security or unauthorized use of Your account.</p>
 
           <h2>Billing and Payment</h2>
-          <p>Our Service operates on a postpaid, metered basis. Each clinic account tracks usage throughout the billing cycle. For each patient token marked as &quot;served,&quot; a fee of ₹1 (one Indian Rupee) is added to your current bill.</p>
+          <p>Our Service operates on a postpaid, metered basis. Each clinic account tracks usage throughout the billing cycle. For each patient token marked as &quot;served,&quot; a fee of ₹2 (two Indian Rupees) is added to your current bill.</p>
           <p>You are responsible for clearing your dues periodically. If your outstanding balance exceeds the allowed limit or is not paid within the stipulated time, We reserve the right to suspend or limit access to the Service, including preventing the creation of new patient tokens, until the dues are cleared.</p>
           <p>All payments made for clearing dues are non-refundable.</p>
 

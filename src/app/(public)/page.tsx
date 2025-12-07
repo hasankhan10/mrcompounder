@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import { APP_NAME } from '@/lib/config';
 import { Reveal } from '@/components/shared/Reveal';
 import FaqSection from '@/components/shared/FaqSection';
+import { createServerSupabaseClient } from '@/lib/supabase-server';
 
 
 // New Component for the floating medical plus icon
@@ -30,7 +31,16 @@ export const metadata: Metadata = {
 
 // The Navbar and Footer are now in the layout.tsx file,
 // so this page only needs to render its specific content.
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createServerSupabaseClient();
+  const { data: setting } = await supabase
+    .from('system_settings')
+    .select('value')
+    .eq('key', 'cost_per_patient')
+    .single();
+
+  const price = setting?.value ? setting.value : '1';
+
   return (
     <>
       {/* Hero Section */}
@@ -214,7 +224,7 @@ export default function HomePage() {
           <Reveal width="100%" delay={0.2}>
             <div className="bg-white p-10 rounded-xl shadow-lg border border-slate-200 max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
               <div className="filter select-none mb-6 opacity-50">
-                <p className="text-5xl blur-sm font-extrabold text-green-600 mb-4">₹1</p>
+                <p className="text-5xl blur-sm font-extrabold text-green-600 mb-4">₹{price}</p>
                 <p className="text-2xl text-slate-800 font-semibold">per patient served</p>
               </div>
               <p className="text-lg text-slate-600 leading-relaxed mb-4">

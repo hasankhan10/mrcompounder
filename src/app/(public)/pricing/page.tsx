@@ -2,16 +2,26 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
 import { Metadata } from 'next';
+import { createServerSupabaseClient } from '@/lib/supabase-server';
 
 export const metadata: Metadata = {
     title: 'Pricing - Simple, Transparent & Honest',
-    description: 'No subscriptions, no hidden fees. Pay only ₹1 per patient served. 14-day free trial included.',
+    description: 'No subscriptions, no hidden fees. Pay only per patient served. 14-day free trial included.',
     alternates: {
         canonical: '/pricing',
     },
 };
 
-export default function PricingPage() {
+export default async function PricingPage() {
+    const supabase = await createServerSupabaseClient();
+    const { data: setting } = await supabase
+        .from('system_settings')
+        .select('value')
+        .eq('key', 'cost_per_patient')
+        .single();
+
+    const price = setting?.value ? setting.value : '1';
+
     return (
         <div className="bg-slate-50 min-h-screen py-20">
             <div className="container mx-auto px-4 text-center">
@@ -30,7 +40,7 @@ export default function PricingPage() {
                         <div className="flex items-baseline justify-center gap-1 mt-6">
                             <span className="text-4xl text-slate-500 font-extrabold mr-2">Only</span>
                             <span className="text-4xl font-extrabold text-green-600">₹</span>
-                            <span className="text-7xl font-extrabold text-green-600">1</span>
+                            <span className="text-7xl font-extrabold text-green-600">{price}</span>
                             <span className="text-xl text-slate-500 font-medium">/ patient</span>
                         </div>
                         <p className="text-slate-500 mt-4 text-sm">Use now, pay later. Monthly billing cycle.</p>
