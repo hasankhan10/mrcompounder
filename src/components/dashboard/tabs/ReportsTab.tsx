@@ -205,15 +205,15 @@ function RevenueCalculator({ reportData }: { reportData: any[] }) {
     const doctors = Array.from(new Set(reportData.map((r: any) => r.queues?.doctor_name || 'Unknown'))) as string[];
 
     const handleCalculate = () => {
-        if (!selectedDoctor || !doctorFee || !clinicCommission) {
-            toast.error('Please fill all fields');
+        if (!selectedDoctor || !doctorFee) {
+            toast.error('Please fill Doctor and Fees');
             return;
         }
 
         const fee = parseFloat(doctorFee);
-        const commission = parseFloat(clinicCommission);
+        const commission = clinicCommission ? parseFloat(clinicCommission) : 0;
 
-        if (isNaN(fee) || isNaN(commission)) {
+        if (isNaN(fee) || (clinicCommission && isNaN(commission))) {
             toast.error('Invalid numeric values');
             return;
         }
@@ -271,11 +271,11 @@ function RevenueCalculator({ reportData }: { reportData: any[] }) {
                         />
                     </div>
                     <div className="w-full">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Commission (₹)</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Commission (₹) <span className="text-slate-400 font-normal">(Optional)</span></label>
                         <input
                             type="number"
                             className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-slate-900"
-                            placeholder="e.g. 100"
+                            placeholder="0"
                             value={clinicCommission}
                             onChange={e => setClinicCommission(e.target.value)}
                         />
