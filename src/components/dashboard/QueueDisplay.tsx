@@ -69,7 +69,7 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                             </div>
                         )}
                         <div className="flex justify-center gap-4">
-                            {onMarkAbsent && !isLastPatient && (
+                            {onMarkAbsent && (
                                 <Button
                                     size="lg"
                                     variant="outline"
