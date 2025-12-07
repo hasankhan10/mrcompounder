@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { Clinic, Queue, Token, RecentDoctor } from '@/lib/types';
@@ -156,7 +156,7 @@ export function DashboardClient({
   // Handlers
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
-  const handleStartSession = async (e: FormEvent) => {
+  const handleStartSession = useCallback(async (e: FormEvent) => {
     e.preventDefault();
     if (loadingAction) return;
     setLoadingAction('start-session');
@@ -207,9 +207,9 @@ export function DashboardClient({
       setFormIsLoading(false);
       setLoadingAction(null);
     }
-  };
+  }, [loadingAction, newDoctorImage, selectedExistingImage, supabase, newDoctorName, newDoctorArrivalTime]);
 
-  const handleToggleBreak = async () => {
+  const handleToggleBreak = useCallback(async () => {
     if (!activeQueue || loadingAction) return;
     const newStatus = activeQueue.status === 'active' ? 'paused' : 'active';
     setLoadingAction('toggle-break');
@@ -225,9 +225,9 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  };
+  }, [activeQueue, loadingAction]);
 
-  const handleEndSession = async () => {
+  const handleEndSession = useCallback(async () => {
     if (!activeQueue || loadingAction) return;
     if (!confirm('Are you sure you want to end the session? This will clear the current queue.')) return;
     setLoadingAction('end-session');
@@ -247,9 +247,9 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  };
+  }, [activeQueue, loadingAction]);
 
-  const handleCancelSession = async () => {
+  const handleCancelSession = useCallback(async () => {
     if (!activeQueue || loadingAction) return;
     if (!confirm('Are you sure you want to CANCEL this session? This indicates the doctor did not arrive.')) return;
     setLoadingAction('cancel-session');
@@ -276,9 +276,9 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  };
+  }, [activeQueue, loadingAction]);
 
-  const handleActivateSession = async () => {
+  const handleActivateSession = useCallback(async () => {
     if (!activeQueue || loadingAction) return;
     setLoadingAction('activate-session');
     setFormIsLoading(true);
@@ -295,9 +295,9 @@ export function DashboardClient({
       setFormIsLoading(false);
       setLoadingAction(null);
     }
-  };
+  }, [activeQueue, loadingAction]);
 
-  const handleRegisterPatient = async (e: FormEvent) => {
+  const handleRegisterPatient = useCallback(async (e: FormEvent) => {
     e.preventDefault();
     if (!activeQueue || loadingAction) return;
 
@@ -361,9 +361,9 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  };
+  }, [activeQueue, loadingAction, newPatientName, newPatientPhone, newPatientPurpose, waitingTokens, servedTokens, clinic]);
 
-  const handleCallNext = async (queueId?: string) => {
+  const handleCallNext = useCallback(async (queueId?: string) => {
     if (loadingAction) return;
     const targetQueueId = queueId || activeQueue?.id;
     if (!targetQueueId) return;
@@ -435,9 +435,9 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  };
+  }, [loadingAction, activeQueue, activeQueues, tokens, clinic]);
 
-  const handleMarkAbsent = async () => {
+  const handleMarkAbsent = useCallback(async () => {
     if (loadingAction) return;
     const targetQueueId = activeQueue?.id;
     if (!targetQueueId) return;
@@ -495,9 +495,9 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  };
+  }, [loadingAction, activeQueue, tokens]);
 
-  const handleDeleteToken = async (tokenId: string) => {
+  const handleDeleteToken = useCallback(async (tokenId: string) => {
     if (loadingAction) return;
     if (!confirm('Are you sure you want to remove this patient from the queue?')) return;
 
@@ -515,7 +515,7 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  };
+  }, [loadingAction]);
 
 
   if (!clinic) return null;

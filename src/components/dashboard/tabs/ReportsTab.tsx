@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { dashboardService } from '@/services/dashboard';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
+
 import { FileDown, Loader2, Calendar } from 'lucide-react';
 
 
@@ -27,11 +27,13 @@ export function ReportsTab() {
         }
     };
 
-    const handleDownloadExcel = () => {
+    const handleDownloadExcel = async () => {
         if (!reportData || reportData.length === 0) {
             toast.error('No data to download');
             return;
         }
+
+        const XLSX = await import('xlsx');
 
         // 1. Prepare Summary Data (Doctor-wise)
         const doctorStats: Record<string, { booked: number; present: number; absent: number }> = {};
