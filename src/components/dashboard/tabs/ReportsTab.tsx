@@ -125,7 +125,7 @@ export function ReportsTab() {
                     {reportData && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
                             {/* Preview Table */}
-                            <div className="border rounded-lg overflow-hidden overflow-x-auto">
+                            <div className="border rounded-lg overflow-hidden overflow-x-auto max-w-[80vw] md:max-w-full mx-auto">
                                 <table className="w-full text-sm text-left min-w-[600px]">
                                     <thead className="bg-slate-50 text-slate-700 font-medium border-b">
                                         <tr>
