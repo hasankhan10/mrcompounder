@@ -192,7 +192,10 @@ export function DashboardClient({
         doctorImageUrl,
         doctorArrivalTime: newDoctorArrivalTime
       });
-      setActiveQueues(prev => [newQueue, ...prev]);
+      setActiveQueues(prev => {
+        if (prev.some(q => q.id === newQueue.id)) return prev;
+        return [newQueue, ...prev];
+      });
       setSelectedQueueId(newQueue.id);
       setNewDoctorName('');
       setNewDoctorImage(null);
