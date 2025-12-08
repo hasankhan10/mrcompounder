@@ -33,7 +33,7 @@ export default function AboutUsPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="prose lg:prose-lg max-w-none">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">Our Story: The <span className="font-bengali">&quot;দাদা, এখন কার সিরিয়াল?&quot;</span> Problem</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">Our Story: The <span className="font-bengali">&quot;এখন কার সিরিয়াল?&quot;</span> Problem</h2>
             <p className='text-lg text-slate-700'>
               Anyone who has visited a local clinic in India knows the scene: a crowded room, a stressed compounder shouting names, and patients anxiously asking, &quot;Is it my turn yet?&quot;. We&apos;ve been there, and we knew there had to be a better way.
             </p>

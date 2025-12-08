@@ -17,6 +17,7 @@ import { OverviewTab } from '@/components/dashboard/tabs/OverviewTab';
 import { BookingTab } from '@/components/dashboard/tabs/BookingTab';
 import { HistoryTab } from '@/components/dashboard/tabs/HistoryTab';
 import { ReportsTab } from '@/components/dashboard/tabs/ReportsTab';
+import { SettingsTab } from '@/components/dashboard/tabs/SettingsTab';
 import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { dashboardService } from '@/services/dashboard';
 
@@ -669,9 +670,7 @@ export function DashboardClient({
 
       {
         activeTab === 'settings' && (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            Settings coming soon...
-          </div>
+          <SettingsTab clinic={clinic} />
         )
       }
 

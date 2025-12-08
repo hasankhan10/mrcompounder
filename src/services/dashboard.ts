@@ -138,5 +138,19 @@ export const dashboardService = {
         const res = await fetch(`/api/dashboard/reports?month=${month}`);
         if (!res.ok) throw new Error('Failed to fetch report');
         return res.json();
+    },
+
+    async updateSettings(data: { logoUrl: string }) {
+        const response = await fetch('/api/dashboard/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Failed to update settings');
+        }
+        return response.json();
     }
 };
