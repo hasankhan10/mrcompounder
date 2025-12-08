@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { CallNextRequest } from '@/lib/types';
 
-// TODO: Implement authentication and authorization check for compounder
-// TODO: Get clinic_id from user's session
+// Auth is handled via Supabase RLS and Server Client checks
 
 /**
  * POST /api/dashboard/token/call-next
