@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         .from('queues')
         .update({
             status: 'cancelled',
-            ended_at: new Date().toISOString() // We still mark when it ended/cancelled
+            ended_at: new Date().toISOString()
         })
         .eq('id', sessionId)
         .select()
@@ -27,6 +27,20 @@ export async function POST(request: NextRequest) {
     if (error) {
         return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
     }
+
+    // 3. Cancel all pending tokens (waiting or called)
+    const { error: tokensError } = await supabase
+        .from('tokens')
+        .update({ status: 'cancelled' })
+        .eq('queue_id', sessionId)
+        .in('status', ['waiting', 'called']);
+
+    if (tokensError) {
+        console.error('Error cancelling related tokens:', tokensError);
+        // We don't fail the request since the session is already cancelled, but we log it.
+    }
+
+
 
     return NextResponse.json(updatedQueue, { status: 200 });
 }
