@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { StartSessionRequest } from '@/lib/types';
+import { z } from 'zod'; // Import zod
 
 import { getTodayIST } from '@/lib/date-utils';
 
@@ -14,14 +15,33 @@ import { getTodayIST } from '@/lib/date-utils';
  */
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 
+// Define Zod schema for validation
+const startSessionSchema = z.object({
+  doctorName: z.string().min(1, 'Doctor name is required'),
+  doctorImageUrl: z.string().optional(),
+  doctorArrivalTime: z.string().optional(),
+});
+
 export async function POST(request: NextRequest) {
   const supabase = await createServerSupabaseClient();
-  const body: StartSessionRequest = await request.json();
 
-  // 1. Auth Check
+  // 1. Auth Check - Early return
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  }
+
+  // Parse and validate body
+  let body: StartSessionRequest;
+  try {
+    const json = await request.json();
+    const parsed = startSessionSchema.safeParse(json);
+    if (!parsed.success) {
+      return new NextResponse(JSON.stringify({ error: parsed.error.issues[0].message }), { status: 400 });
+    }
+    body = parsed.data as StartSessionRequest;
+  } catch (e) {
+    return new NextResponse(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
   }
 
   // 2. Get Clinic ID
@@ -37,7 +57,20 @@ export async function POST(request: NextRequest) {
 
   const clinicId = profile.clinic_id;
 
+  // 3. Check for Existing Active/Waiting Session
+  // We should not allow starting a new session if one is already in progress or waiting.
+  const { data: existingQueue } = await supabase
+    .from('queues')
+    .select('id, status')
+    .eq('clinic_id', clinicId)
+    .in('status', ['active', 'waiting'])
+    .maybeSingle();
 
+  if (existingQueue) {
+    return new NextResponse(JSON.stringify({
+      error: `A session is already ${existingQueue.status}. Please end it first.`
+    }), { status: 400 });
+  }
 
   // 4. Create New Queue
   const { data: newQueue, error } = await supabase
@@ -54,7 +87,8 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
+    console.error("Queue creation error:", error);
+    return new NextResponse(JSON.stringify({ error: 'Failed to create session' }), { status: 500 });
   }
 
   return NextResponse.json(newQueue, { status: 201 });
