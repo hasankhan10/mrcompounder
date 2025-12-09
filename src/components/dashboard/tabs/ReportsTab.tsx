@@ -198,7 +198,7 @@ function RevenueCalculator({ reportData }: { reportData: any[] }) {
     const [selectedDoctor, setSelectedDoctor] = useState<string>('');
     const [doctorFee, setDoctorFee] = useState<string>('');
     const [clinicCommission, setClinicCommission] = useState<string>('');
-    const [result, setResult] = useState<{ served: number; total: number; doctorShare: number; clinicShare: number } | null>(null);
+    const [result, setResult] = useState<{ served: number; total: number; doctorShare: number; clinicShare: number; hasCommission: boolean } | null>(null);
 
     // Extract unique doctors
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -232,7 +232,8 @@ function RevenueCalculator({ reportData }: { reportData: any[] }) {
             served: servedCount,
             total: totalCollection,
             doctorShare,
-            clinicShare
+            clinicShare,
+            hasCommission: clinicCommission !== ''
         });
     };
 
@@ -299,10 +300,12 @@ function RevenueCalculator({ reportData }: { reportData: any[] }) {
                             <p className="text-sm text-indigo-700 font-medium">Doctor&apos;s Earning</p>
                             <p className="text-2xl font-bold text-indigo-900 mt-1">₹{result.doctorShare.toLocaleString()}</p>
                         </div>
-                        <div className="bg-teal-50 p-4 rounded-lg border border-teal-100 shadow-sm">
-                            <p className="text-sm text-teal-700 font-medium">Clinic Revenue</p>
-                            <p className="text-2xl font-bold text-teal-900 mt-1">₹{result.clinicShare.toLocaleString()}</p>
-                        </div>
+                        {result.hasCommission && (
+                            <div className="bg-teal-50 p-4 rounded-lg border border-teal-100 shadow-sm">
+                                <p className="text-sm text-teal-700 font-medium">Clinic Revenue</p>
+                                <p className="text-2xl font-bold text-teal-900 mt-1">₹{result.clinicShare.toLocaleString()}</p>
+                            </div>
+                        )}
                     </div>
                 )}
             </CardContent>
