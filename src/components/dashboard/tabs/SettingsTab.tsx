@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { dashboardService } from '@/services/dashboard';
 import { Copy } from 'lucide-react';
 
+
 interface SettingsTabProps {
     clinic: Clinic | null;
 }
@@ -43,10 +44,6 @@ export function SettingsTab({ clinic }: SettingsTabProps) {
 
             // Upload new logo if selected
             if (logoFile) {
-                if (logoFile.size > 2 * 1024 * 1024) {
-                    throw new Error('File size exceeds 2MB limit');
-                }
-
                 // Sanitize filename to avoid issues
                 const fileExt = logoFile.name.split('.').pop()?.toLowerCase() || 'jpg';
                 const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;

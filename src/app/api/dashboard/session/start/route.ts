@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse(JSON.stringify({ error: parsed.error.issues[0].message }), { status: 400 });
     }
     body = parsed.data as StartSessionRequest;
-  } catch (e) {
+  } catch {
     return new NextResponse(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
   }
 

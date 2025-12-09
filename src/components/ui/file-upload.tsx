@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { Upload, X, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { compressImage } from '@/lib/image-utils';
+import { toast } from 'sonner';
 
 interface FileUploadProps {
     onChange: (file: File | null) => void;
@@ -25,19 +27,35 @@ export function FileUpload({ onChange, value, accept, className, label = "SVG, P
         }
     };
 
-    const handleDrop = (e: React.DragEvent) => {
+    const processFile = async (file: File) => {
+        if (file.type.startsWith('image/') && file.size > 2 * 1024 * 1024) {
+            toast.info('Compressing large image...', { duration: 1500 });
+            try {
+                const compressed = await compressImage(file, 2);
+                onChange(compressed);
+            } catch (error) {
+                console.error("Compression failed", error);
+                toast.error('Image compression failed. Using original.');
+                onChange(file);
+            }
+        } else {
+            onChange(file);
+        }
+    };
+
+    const handleDrop = async (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            onChange(e.dataTransfer.files[0]);
+            await processFile(e.dataTransfer.files[0]);
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         if (e.target.files && e.target.files[0]) {
-            onChange(e.target.files[0]);
+            await processFile(e.target.files[0]);
         }
     };
 
