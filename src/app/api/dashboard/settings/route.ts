@@ -19,21 +19,24 @@ export async function POST(request: Request) {
         // Actually, the previous implementation in `token/call-next` uses:
         // `const { data: clinic } = await supabase.from('clinics').select('id').eq('compounder_email', session.user.email).single();`
 
-        const { data: clinic, error: clinicError } = await supabase
-            .from('clinics')
-            .select('id')
-            .eq('compounder_email', session.user.email)
+        // Use profile to get clinic_id, matching DashboardLayout logic
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('clinic_id')
+            .eq('id', session.user.id)
             .single();
 
-        if (clinicError || !clinic) {
-            return NextResponse.json({ error: 'Clinic not found' }, { status: 404 });
+        if (!profile || !profile.clinic_id) {
+            return NextResponse.json({ error: 'Clinic not found for this user' }, { status: 404 });
         }
+
+        const clinicId = profile.clinic_id;
 
         // Update logic
         const { error: updateError } = await supabase
             .from('clinics')
             .update({ logo_url: logoUrl })
-            .eq('id', clinic.id);
+            .eq('id', clinicId);
 
         if (updateError) {
             throw updateError;
