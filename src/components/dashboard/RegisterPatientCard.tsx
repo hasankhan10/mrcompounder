@@ -19,6 +19,8 @@ interface RegisterPatientCardProps {
     setPatientAge: (age: string) => void;
     patientPurpose: string;
     setPatientPurpose: (purpose: string) => void;
+    isEmergency: boolean;
+    setIsEmergency: (val: boolean) => void;
     isLoading: boolean;
     isSessionActive: boolean;
     onSubmit: (e: FormEvent) => void;
@@ -37,6 +39,8 @@ export function RegisterPatientCard({
     setPatientAge,
     patientPurpose,
     setPatientPurpose,
+    isEmergency,
+    setIsEmergency,
     isLoading,
     isSessionActive,
     onSubmit
@@ -106,7 +110,7 @@ export function RegisterPatientCard({
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">Gender</label>
-                                <Select value={patientGender} onValueChange={(val: 'male' | 'female' | 'other') => setPatientGender(val)}>
+                                <Select value={patientGender || ""} onValueChange={(val: 'male' | 'female' | 'other') => setPatientGender(val)}>
                                     <SelectTrigger className="text-lg bg-slate-50">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
@@ -127,6 +131,23 @@ export function RegisterPatientCard({
                                 className="text-lg bg-slate-50"
                             />
                         </div>
+
+                        <div className="flex items-center space-x-2 bg-red-50 p-3 rounded-lg border border-red-100">
+                            <input
+                                type="checkbox"
+                                id="emergency"
+                                checked={isEmergency}
+                                onChange={(e) => setIsEmergency(e.target.checked)}
+                                className="w-5 h-5 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                            />
+                            <label
+                                htmlFor="emergency"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-red-700"
+                            >
+                                🚨 Emergency / Priority Case
+                            </label>
+                        </div>
+
                         <Button
                             type="submit"
                             className="w-full bg-teal-600 hover:bg-teal-700 text-white text-lg py-6 shadow-md hover:shadow-lg transition-all"

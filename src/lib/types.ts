@@ -64,6 +64,7 @@ export interface Token {
   gender?: 'male' | 'female' | 'other'; // Added gender
   age?: number; // Added age
   purpose?: string; // Added purpose field
+  is_emergency?: boolean; // Added is_emergency field
   token_number: number; // serial
   status: TokenStatus;
   called_at?: string; // timestamp
@@ -188,6 +189,7 @@ export interface RegisterTokenRequest {
   gender?: 'male' | 'female' | 'other';
   age?: number;
   purpose?: string; // Added purpose field
+  is_emergency?: boolean; // Added is_emergency field
 }
 export type RegisterTokenResponse = Token;
 

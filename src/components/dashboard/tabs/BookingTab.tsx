@@ -48,6 +48,8 @@ interface BookingTabProps {
     setNewPatientAge: (val: string) => void;
     newPatientPurpose: string;
     setNewPatientPurpose: (val: string) => void;
+    isEmergency: boolean;
+    setIsEmergency: (val: boolean) => void;
     loadingAction: string | null;
 }
 
@@ -87,6 +89,8 @@ export function BookingTab({
     setNewPatientAge,
     newPatientPurpose,
     setNewPatientPurpose,
+    isEmergency,
+    setIsEmergency,
     loadingAction
 }: BookingTabProps) {
 
@@ -185,6 +189,8 @@ export function BookingTab({
                 setPatientAge={setNewPatientAge}
                 patientPurpose={newPatientPurpose}
                 setPatientPurpose={setNewPatientPurpose}
+                isEmergency={isEmergency}
+                setIsEmergency={setIsEmergency}
                 isLoading={formIsLoading || loadingAction === 'register-patient'}
                 isSessionActive={['active', 'waiting'].includes(activeQueue!.status)}
                 onSubmit={onRegisterPatient}

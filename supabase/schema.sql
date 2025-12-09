@@ -71,6 +71,7 @@ CREATE TABLE public.tokens (
     gender text, -- Added gender
     age integer, -- Added age
     purpose text, -- Added purpose
+    is_emergency boolean NOT NULL DEFAULT false, -- Added is_emergency
     token_number serial NOT NULL, -- Auto-incrementing for each queue
     status public.token_status NOT NULL DEFAULT 'waiting',
     called_at timestamp with time zone,

@@ -9,7 +9,7 @@ import { RechargeModal } from '@/components/dashboard/RechargeModal';
 import { PieChart, Settings, Users, History, IndianRupee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// Components
+import { CustomAlertDialog } from '@/components/dashboard/CustomAlertDialog';
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
 import { TrialCountdown } from '@/components/dashboard/TrialCountdown';
 
@@ -69,8 +69,21 @@ export function DashboardClient({
 
   // Derived Data
   const activeQueue = activeQueues.find(q => q.id === selectedQueueId) || null;
-  const waitingTokens = tokens.filter(t => t.queue_id === selectedQueueId && (t.status === 'waiting' || t.status === 'called')).sort((a, b) => a.token_number - b.token_number);
-  const servedTokens = tokens.filter(t => t.queue_id === selectedQueueId && (t.status === 'served' || t.status === 'no_show')).sort((a, b) => (b.served_at || '').localeCompare(a.served_at || ''));
+  const waitingTokens = tokens
+    .filter(t => t.queue_id === selectedQueueId && (t.status === 'waiting' || t.status === 'called'))
+    .sort((a, b) => {
+      // Priority to 'called' status always
+      if (a.status === 'called') return -1;
+      if (b.status === 'called') return 1;
+
+      // Then Priority to Emergency
+      if (a.is_emergency && !b.is_emergency) return -1;
+      if (!a.is_emergency && b.is_emergency) return 1;
+
+      // Then Token Number
+      return a.token_number - b.token_number;
+    });
+  const servedTokens = tokens.filter(t => t.queue_id === selectedQueueId && t.status === 'served').sort((a, b) => (b.served_at || '').localeCompare(a.served_at || ''));
   // Low balance warning removed for postpaid model
 
   // Form state
@@ -83,7 +96,9 @@ export function DashboardClient({
   const [newPatientName, setNewPatientName] = useState('');
   const [newPatientGender, setNewPatientGender] = useState<'male' | 'female' | 'other' | undefined>(undefined);
   const [newPatientAge, setNewPatientAge] = useState<string>('');
+
   const [newPatientPurpose, setNewPatientPurpose] = useState('');
+  const [isEmergency, setIsEmergency] = useState(false);
   const [formIsLoading, setFormIsLoading] = useState(false);
 
 
@@ -159,6 +174,20 @@ export function DashboardClient({
   // Handlers
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
+  const [dialogConfig, setDialogConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    variant: 'default' | 'destructive';
+    onConfirm: () => Promise<void>;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    variant: 'default',
+    onConfirm: async () => { },
+  });
+
   const handleStartSession = useCallback(async (e: FormEvent) => {
     e.preventDefault();
     if (loadingAction) return;
@@ -233,9 +262,8 @@ export function DashboardClient({
     }
   }, [activeQueue, loadingAction]);
 
-  const handleEndSession = useCallback(async () => {
-    if (!activeQueue || loadingAction) return;
-    if (!confirm('Are you sure you want to end the session? This will clear the current queue.')) return;
+  const performEndSession = useCallback(async () => {
+    if (!activeQueue) return;
     setLoadingAction('end-session');
 
     try {
@@ -253,11 +281,22 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  }, [activeQueue, loadingAction]);
+  }, [activeQueue]);
 
-  const handleCancelSession = useCallback(async () => {
+  const handleEndSession = useCallback(async () => {
     if (!activeQueue || loadingAction) return;
-    if (!confirm('Are you sure you want to CANCEL this session? This indicates the doctor did not arrive.')) return;
+
+    setDialogConfig({
+      isOpen: true,
+      title: 'End Session?',
+      description: 'Are you sure you want to end the session? This will clear the current queue.',
+      variant: 'destructive',
+      onConfirm: performEndSession
+    });
+  }, [activeQueue, loadingAction, performEndSession]);
+
+  const performCancelSession = useCallback(async () => {
+    if (!activeQueue) return;
     setLoadingAction('cancel-session');
 
     try {
@@ -282,7 +321,19 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  }, [activeQueue, loadingAction]);
+  }, [activeQueue]);
+
+  const handleCancelSession = useCallback(async () => {
+    if (!activeQueue || loadingAction) return;
+
+    setDialogConfig({
+      isOpen: true,
+      title: 'Cancel Session?',
+      description: 'Are you sure you want to CANCEL this session? This indicates the doctor did not arrive.',
+      variant: 'destructive',
+      onConfirm: performCancelSession
+    });
+  }, [activeQueue, loadingAction, performCancelSession]);
 
   const handleActivateSession = useCallback(async () => {
     if (!activeQueue || loadingAction) return;
@@ -312,12 +363,14 @@ export function DashboardClient({
     const gender = newPatientGender;
     const age = newPatientAge ? parseInt(newPatientAge) : undefined;
     const purpose = newPatientPurpose;
+    const isEmerg = isEmergency;
 
     // Clear inputs immediately for speed
     setNewPatientName('');
     setNewPatientPhone('');
     setNewPatientGender(undefined);
     setNewPatientAge('');
+    setIsEmergency(false);
 
     setLoadingAction('register-patient');
 
@@ -337,6 +390,7 @@ export function DashboardClient({
       phone: phone,
       gender: gender,
       age: age,
+      is_emergency: isEmerg,
       token_number: estTokenNum,
       status: 'waiting',
       created_at: new Date().toISOString(),
@@ -356,7 +410,8 @@ export function DashboardClient({
         patientName: name,
         gender,
         age,
-        purpose
+        purpose,
+        is_emergency: isEmerg
       });
 
       // Replace temp token with real one
@@ -400,10 +455,14 @@ export function DashboardClient({
       .sort((a, b) => a.token_number - b.token_number);
 
     const currentCalled = queueWaitingTokens.find(t => t.status === 'called');
-    // Find next waiting token (ensure sorted by token_number)
+    // Find next waiting token (ensure sorted by is_emergency desc, then token_number asc)
     const nextInLine = queueWaitingTokens
       .filter(t => t.status === 'waiting')
-      .sort((a, b) => a.token_number - b.token_number)[0];
+      .sort((a, b) => {
+        if (a.is_emergency && !b.is_emergency) return -1;
+        if (!a.is_emergency && b.is_emergency) return 1;
+        return a.token_number - b.token_number;
+      })[0];
 
     if (!currentCalled && !nextInLine) {
       toast.info('Queue is empty');
@@ -418,11 +477,7 @@ export function DashboardClient({
     if (currentCalled) {
       newTokens = newTokens.map(t => t.id === currentCalled.id ? { ...t, status: 'served' } : t);
 
-      // Optimistic Billing
-      if (clinic && !isTrialActive(clinic)) {
-        const newDue = (clinic.current_due || 0) + 1;
-        setClinic({ ...clinic, current_due: newDue });
-      }
+      // Removed optimistic billing update to support dynamic pricing from backend
     }
 
     // 2. Call Next
@@ -479,7 +534,11 @@ export function DashboardClient({
     // Find next waiting token
     const nextInLine = queueWaitingTokens
       .filter(t => t.status === 'waiting')
-      .sort((a, b) => a.token_number - b.token_number)[0];
+      .sort((a, b) => {
+        if (a.is_emergency && !b.is_emergency) return -1;
+        if (!a.is_emergency && b.is_emergency) return 1;
+        return a.token_number - b.token_number;
+      })[0];
 
     // Optimistic Updates
     let newTokens = [...tokens];
@@ -513,10 +572,7 @@ export function DashboardClient({
     }
   }, [loadingAction, activeQueue, tokens]);
 
-  const handleDeleteToken = useCallback(async (tokenId: string) => {
-    if (loadingAction) return;
-    if (!confirm('Are you sure you want to remove this patient from the queue?')) return;
-
+  const performDeleteToken = useCallback(async (tokenId: string) => {
     setLoadingAction(`delete-token-${tokenId}`);
 
     try {
@@ -531,7 +587,19 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  }, [loadingAction]);
+  }, []);
+
+  const handleDeleteToken = useCallback(async (tokenId: string) => {
+    if (loadingAction) return;
+
+    setDialogConfig({
+      isOpen: true,
+      title: 'Remove Patient?',
+      description: 'Are you sure you want to remove this patient from the queue?',
+      variant: 'destructive',
+      onConfirm: async () => performDeleteToken(tokenId)
+    });
+  }, [loadingAction, performDeleteToken]);
 
 
   if (!clinic) return null;
@@ -668,6 +736,8 @@ export function DashboardClient({
             setNewPatientAge={setNewPatientAge}
             newPatientPurpose={newPatientPurpose}
             setNewPatientPurpose={setNewPatientPurpose}
+            isEmergency={isEmergency}
+            setIsEmergency={setIsEmergency}
             loadingAction={loadingAction}
           />
         </div>
@@ -689,6 +759,18 @@ export function DashboardClient({
           <SettingsTab clinic={clinic} />
         )
       }
+
+      <CustomAlertDialog
+        isOpen={dialogConfig.isOpen}
+        onClose={() => setDialogConfig(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={async () => {
+          await dialogConfig.onConfirm();
+          setDialogConfig(prev => ({ ...prev, isOpen: false }));
+        }}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        variant={dialogConfig.variant}
+      />
 
       <RechargeModal
         isOpen={isRechargeModalOpen}

@@ -87,7 +87,8 @@ export async function POST(request: NextRequest) {
     .select('*')
     .eq('queue_id', body.queueId)
     .eq('status', 'waiting')
-    .order('token_number', { ascending: true })
+    .order('is_emergency', { ascending: false, nullsFirst: false }) // Prioritize emergency
+    .order('token_number', { ascending: true }) // Then FIFO
     .limit(1)
     .single();
 

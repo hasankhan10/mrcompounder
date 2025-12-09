@@ -114,12 +114,13 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                         ) : (
                             <div className="space-y-2">
                                 {waitingTokens.map((token) => (
-                                    <div key={token.id} className={`p-3 rounded-lg border flex justify-between items-center ${token.status === 'called' ? 'bg-teal-50 border-teal-200 ring-1 ring-teal-300' : 'bg-white border-slate-100'}`}>
+                                    <div key={token.id} className={`p-3 rounded-lg border flex justify-between items-center ${token.status === 'called' ? 'bg-teal-50 border-teal-200 ring-1 ring-teal-300' : (token.is_emergency ? 'bg-red-50 border-red-200' : 'bg-white border-slate-100')}`}>
                                         <div>
-                                            <span className={`font-bold text-lg ${token.status === 'called' ? 'text-teal-700' : 'text-slate-700'}`}>#{token.token_number}</span>
+                                            <span className={`font-bold text-lg ${token.status === 'called' ? 'text-teal-700' : (token.is_emergency ? 'text-red-700' : 'text-slate-700')}`}>#{token.token_number}</span>
                                             {token.patient_name && (
                                                 <div className="ml-2 inline-block">
                                                     <span className="text-slate-600 block flex items-center gap-2">
+                                                        {token.is_emergency && <span title="Emergency Case">🚨</span>}
                                                         {token.patient_name}
                                                         {token.is_present && (
                                                             <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" title="Present at Clinic"></span>

@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
         gender: body.gender, // Added
         age: body.age, // Added
         purpose: body.purpose,
+        is_emergency: body.is_emergency || false, // Added priority flag
         token_number: nextTokenNumber,
         status: 'waiting'
       })
