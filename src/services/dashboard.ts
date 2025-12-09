@@ -71,7 +71,7 @@ export const dashboardService = {
         return response.json() as Promise<Queue>;
     },
 
-    async registerPatient(data: { queueId: string; phone: string; patientName: string; purpose: string }) {
+    async registerPatient(data: { queueId: string; phone: string; patientName: string; gender?: 'male' | 'female' | 'other'; age?: number; purpose: string }) {
         const response = await fetch('/api/dashboard/token/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

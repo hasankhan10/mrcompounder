@@ -61,6 +61,8 @@ export interface Token {
   queue_id: string; // uuid
   phone: string;
   patient_name?: string;
+  gender?: 'male' | 'female' | 'other'; // Added gender
+  age?: number; // Added age
   purpose?: string; // Added purpose field
   token_number: number; // serial
   status: TokenStatus;
@@ -183,6 +185,8 @@ export interface RegisterTokenRequest {
   queueId: string;
   phone: string;
   patientName?: string;
+  gender?: 'male' | 'female' | 'other';
+  age?: number;
   purpose?: string; // Added purpose field
 }
 export type RegisterTokenResponse = Token;

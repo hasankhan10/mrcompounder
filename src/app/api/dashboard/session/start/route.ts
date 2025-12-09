@@ -57,18 +57,19 @@ export async function POST(request: NextRequest) {
 
   const clinicId = profile.clinic_id;
 
-  // 3. Check for Existing Active/Waiting Session
-  // We should not allow starting a new session if one is already in progress or waiting.
+  // 3. Check for Existing Active/Waiting Session FOR THE SAME DOCTOR
+  // We allow multiple sessions for different doctors, but not for the same doctor at once.
   const { data: existingQueue } = await supabase
     .from('queues')
     .select('id, status')
     .eq('clinic_id', clinicId)
+    .eq('doctor_name', body.doctorName) // Check by doctor name
     .in('status', ['active', 'waiting'])
     .maybeSingle();
 
   if (existingQueue) {
     return new NextResponse(JSON.stringify({
-      error: `A session is already ${existingQueue.status}. Please end it first.`
+      error: `A session for Dr. ${body.doctorName} is already ${existingQueue.status}.`
     }), { status: 400 });
   }
 

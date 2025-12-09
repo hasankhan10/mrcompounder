@@ -42,6 +42,10 @@ interface BookingTabProps {
     setNewPatientName: (val: string) => void;
     newPatientPhone: string;
     setNewPatientPhone: (val: string) => void;
+    newPatientGender?: 'male' | 'female' | 'other';
+    setNewPatientGender: (val: 'male' | 'female' | 'other' | undefined) => void;
+    newPatientAge: string;
+    setNewPatientAge: (val: string) => void;
     newPatientPurpose: string;
     setNewPatientPurpose: (val: string) => void;
     loadingAction: string | null;
@@ -77,6 +81,10 @@ export function BookingTab({
     setNewPatientName,
     newPatientPhone,
     setNewPatientPhone,
+    newPatientGender,
+    setNewPatientGender,
+    newPatientAge,
+    setNewPatientAge,
     newPatientPurpose,
     setNewPatientPurpose,
     loadingAction
@@ -171,6 +179,10 @@ export function BookingTab({
                 setPatientName={setNewPatientName}
                 patientPhone={newPatientPhone}
                 setPatientPhone={setNewPatientPhone}
+                patientGender={newPatientGender}
+                setPatientGender={setNewPatientGender}
+                patientAge={newPatientAge}
+                setPatientAge={setNewPatientAge}
                 patientPurpose={newPatientPurpose}
                 setPatientPurpose={setNewPatientPurpose}
                 isLoading={formIsLoading || loadingAction === 'register-patient'}

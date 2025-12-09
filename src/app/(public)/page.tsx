@@ -232,7 +232,7 @@ export default async function HomePage() {
               </p>
               <div className="mb-8">
                 <span className="inline-block bg-green-100 text-green-800 text-sm font-bold px-4 py-2 rounded-full animate-pulse">
-                  🎉 14 Days Free Trial Included
+                  🎉 Upto 14 Days Free Trial Included
                 </span>
               </div>
               <Button asChild size="lg" className="bg-teal-600 hover:bg-teal-700 text-white text-lg font-bold py-3 px-8 rounded-full">

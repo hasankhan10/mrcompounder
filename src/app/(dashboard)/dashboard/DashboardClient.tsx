@@ -81,6 +81,8 @@ export function DashboardClient({
   const [recentDoctors, setRecentDoctors] = useState<RecentDoctor[]>([]);
   const [newPatientPhone, setNewPatientPhone] = useState('');
   const [newPatientName, setNewPatientName] = useState('');
+  const [newPatientGender, setNewPatientGender] = useState<'male' | 'female' | 'other' | undefined>(undefined);
+  const [newPatientAge, setNewPatientAge] = useState<string>('');
   const [newPatientPurpose, setNewPatientPurpose] = useState('');
   const [formIsLoading, setFormIsLoading] = useState(false);
 
@@ -307,11 +309,15 @@ export function DashboardClient({
 
     const name = newPatientName;
     const phone = newPatientPhone;
+    const gender = newPatientGender;
+    const age = newPatientAge ? parseInt(newPatientAge) : undefined;
     const purpose = newPatientPurpose;
 
     // Clear inputs immediately for speed
     setNewPatientName('');
     setNewPatientPhone('');
+    setNewPatientGender(undefined);
+    setNewPatientAge('');
 
     setLoadingAction('register-patient');
 
@@ -329,6 +335,8 @@ export function DashboardClient({
       queue_id: activeQueue.id,
       patient_name: name,
       phone: phone,
+      gender: gender,
+      age: age,
       token_number: estTokenNum,
       status: 'waiting',
       created_at: new Date().toISOString(),
@@ -346,6 +354,8 @@ export function DashboardClient({
         queueId: activeQueue.id,
         phone: phone,
         patientName: name,
+        gender,
+        age,
         purpose
       });
 
@@ -358,6 +368,8 @@ export function DashboardClient({
       setTokens(prev => prev.filter(t => t.id !== tempId));
       setNewPatientName(name);
       setNewPatientPhone(phone);
+      setNewPatientGender(gender);
+      setNewPatientAge(age ? age.toString() : '');
       setNewPatientPurpose(purpose);
       toast.error('Failed to register patient', {
         description: err instanceof Error ? err.message : 'Could not add patient to queue.'
@@ -650,6 +662,10 @@ export function DashboardClient({
             setNewPatientName={setNewPatientName}
             newPatientPhone={newPatientPhone}
             setNewPatientPhone={setNewPatientPhone}
+            newPatientGender={newPatientGender}
+            setNewPatientGender={setNewPatientGender}
+            newPatientAge={newPatientAge}
+            setNewPatientAge={setNewPatientAge}
             newPatientPurpose={newPatientPurpose}
             setNewPatientPurpose={setNewPatientPurpose}
             loadingAction={loadingAction}

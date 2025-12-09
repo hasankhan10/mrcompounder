@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from 'lucide-react';
 
 interface RegisterPatientCardProps {
@@ -12,6 +13,10 @@ interface RegisterPatientCardProps {
     setPatientName: (name: string) => void;
     patientPhone: string;
     setPatientPhone: (phone: string) => void;
+    patientGender?: 'male' | 'female' | 'other';
+    setPatientGender: (gender: 'male' | 'female' | 'other' | undefined) => void;
+    patientAge: string;
+    setPatientAge: (age: string) => void;
     patientPurpose: string;
     setPatientPurpose: (purpose: string) => void;
     isLoading: boolean;
@@ -26,6 +31,10 @@ export function RegisterPatientCard({
     setPatientName,
     patientPhone,
     setPatientPhone,
+    patientGender,
+    setPatientGender,
+    patientAge,
+    setPatientAge,
     patientPurpose,
     setPatientPurpose,
     isLoading,
@@ -80,6 +89,34 @@ export function RegisterPatientCard({
                                 required
                                 className="text-lg bg-slate-50"
                             />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">Age</label>
+                                <Input
+                                    type="number"
+                                    placeholder="Age"
+                                    value={patientAge}
+                                    onChange={(e) => setPatientAge(e.target.value)}
+                                    className="text-lg bg-slate-50"
+                                    min="0"
+                                    max="120"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">Gender</label>
+                                <Select value={patientGender} onValueChange={(val: 'male' | 'female' | 'other') => setPatientGender(val)}>
+                                    <SelectTrigger className="text-lg bg-slate-50">
+                                        <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="male">Male</SelectItem>
+                                        <SelectItem value="female">Female</SelectItem>
+                                        <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-700">Purpose</label>

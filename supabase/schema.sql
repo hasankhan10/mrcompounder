@@ -68,6 +68,9 @@ CREATE TABLE public.tokens (
     queue_id uuid NOT NULL REFERENCES public.queues(id) ON DELETE CASCADE,
     phone text NOT NULL,
     patient_name text,
+    gender text, -- Added gender
+    age integer, -- Added age
+    purpose text, -- Added purpose
     token_number serial NOT NULL, -- Auto-incrementing for each queue
     status public.token_status NOT NULL DEFAULT 'waiting',
     called_at timestamp with time zone,
