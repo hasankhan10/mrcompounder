@@ -33,6 +33,10 @@ export async function POST(request: NextRequest) {
         .select()
         .single();
 
+    if (error) {
+        return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
+    }
+
     // 3. Find next waiting token (Same logic as call-next but prioritizing emergency)
     const { data: nextToken } = await supabase
         .from('tokens')

@@ -432,7 +432,7 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  }, [activeQueue, loadingAction, newPatientName, newPatientPhone, newPatientPurpose, waitingTokens, servedTokens, clinic]);
+  }, [activeQueue, loadingAction, newPatientName, newPatientPhone, newPatientPurpose, waitingTokens, servedTokens, clinic, isEmergency, newPatientAge, newPatientGender]);
 
   const handleCallNext = useCallback(async (queueId?: string) => {
     if (loadingAction) return;

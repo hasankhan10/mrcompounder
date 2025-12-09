@@ -10,7 +10,7 @@ import { LayoutDashboard, Building2, Settings, QrCode, IndianRupee } from 'lucid
 
 // Components
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
-import { AdminStatsGrid } from '@/components/admin/AdminStatsGrid';
+import { AdminStatsCharts } from '@/components/admin/AdminStatsCharts';
 import { CreateClinicDialog } from '@/components/admin/CreateClinicDialog';
 import { EditClinicDialog } from '@/components/admin/EditClinicDialog';
 import { DeleteClinicAlert } from '@/components/admin/DeleteClinicAlert';
@@ -42,11 +42,23 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
   const [trialDates, setTrialDates] = useState<{ [key: string]: { start: string, end: string } }>({});
   const [trialDurations, setTrialDurations] = useState<{ [key: string]: number }>({});
-  const [stats, setStats] = useState({
+
+  interface AdminStatsData {
+    totalClinics: number;
+    totalPatientsToday: number;
+    totalRevenue: number;
+    lastMonthRevenue: number;
+    patientsTrend?: { date: string; value: number }[];
+    revenueTrend?: { date: string; value: number }[];
+  }
+
+  const [stats, setStats] = useState<AdminStatsData>({
     totalClinics: 0,
     totalPatientsToday: 0,
     totalRevenue: 0,
-    lastMonthRevenue: 0
+    lastMonthRevenue: 0,
+    patientsTrend: [],
+    revenueTrend: []
   });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [isLoadingPayments, setIsLoadingPayments] = useState(false);
@@ -469,11 +481,13 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
             {isLoadingStats ? (
               <StatsGridSkeleton />
             ) : (
-              <AdminStatsGrid
+              <AdminStatsCharts
                 totalClinics={stats.totalClinics}
                 totalPatientsToday={stats.totalPatientsToday}
                 totalRevenue={stats.totalRevenue}
                 lastMonthRevenue={stats.lastMonthRevenue}
+                patientsTrend={stats.patientsTrend}
+                revenueTrend={stats.revenueTrend}
               />
             )}
           </ErrorBoundary>

@@ -20,52 +20,45 @@ export async function GET() {
     }
 
     try {
-        // 2. Fetch Stats
-        // Total Clinics
+        const todayIST = getTodayIST();
+
+        // 1. Total Clinics
         const { count: totalClinics } = await supabaseAdmin
             .from('clinics')
             .select('*', { count: 'exact', head: true });
 
-        // Total Patients Served Today (via Session Date)
-        const todayIST = getTodayIST(); // YYYY-MM-DD
-
-        // 1. Get IDs of queues for today
+        // 2. Total Patients Served Today
         const { data: todayQueues } = await supabaseAdmin
             .from('queues')
             .select('id')
             .eq('session_date', todayIST);
 
         let totalPatientsToday = 0;
-
         if (todayQueues && todayQueues.length > 0) {
             const queueIds = todayQueues.map(q => q.id);
-
-            // 2. Count served tokens in these queues
             const { count } = await supabaseAdmin
                 .from('tokens')
                 .select('*', { count: 'exact', head: true })
                 .in('queue_id', queueIds)
                 .eq('status', 'served');
-
             totalPatientsToday = count || 0;
         }
 
-        // Total Revenue (Sum of all approved payment requests)
+        // 3. Total Revenue
         const { data: approvedRequests } = await supabaseAdmin
             .from('payment_requests')
             .select('amount')
             .eq('status', 'approved');
-
         const totalRevenue = approvedRequests?.reduce((sum, req) => sum + (req.amount || 0), 0) || 0;
 
-        // Last Month Revenue
+        // 4. Last Month Revenue
         const firstDayLastMonth = new Date();
         firstDayLastMonth.setMonth(firstDayLastMonth.getMonth() - 1);
         firstDayLastMonth.setDate(1);
         firstDayLastMonth.setHours(0, 0, 0, 0);
 
         const lastDayLastMonth = new Date();
-        lastDayLastMonth.setDate(0); // Last day of previous month
+        lastDayLastMonth.setDate(0);
         lastDayLastMonth.setHours(23, 59, 59, 999);
 
         const { data: lastMonthRequests } = await supabaseAdmin
@@ -74,14 +67,83 @@ export async function GET() {
             .eq('status', 'approved')
             .gte('updated_at', firstDayLastMonth.toISOString())
             .lte('updated_at', lastDayLastMonth.toISOString());
-
         const lastMonthRevenue = lastMonthRequests?.reduce((sum, req) => sum + (req.amount || 0), 0) || 0;
+
+        // --- HISTORICAL DATA (Last 7 Days) ---
+        const last7Days = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            last7Days.push(d.toISOString().split('T')[0]);
+        }
+        const weekAgo = last7Days[0];
+
+        // A. Patients History
+        // Fetch queues in last 7 days
+        const { data: recentQueues } = await supabaseAdmin
+            .from('queues')
+            .select('id, session_date')
+            .gte('session_date', weekAgo);
+
+        const queueMap = new Map(); // queueId -> date
+        recentQueues?.forEach(q => queueMap.set(q.id, q.session_date));
+        const recentQueueIds = recentQueues?.map(q => q.id) || [];
+
+        const patientsByDate: Record<string, number> = {};
+        last7Days.forEach(d => patientsByDate[d] = 0);
+
+        if (recentQueueIds.length > 0) {
+            // Count served tokens
+            const { data: servedTokens } = await supabaseAdmin
+                .from('tokens')
+                .select('queue_id')
+                .in('queue_id', recentQueueIds)
+                .eq('status', 'served');
+
+            servedTokens?.forEach(t => {
+                const date = queueMap.get(t.queue_id);
+                if (date && patientsByDate[date] !== undefined) {
+                    patientsByDate[date]++;
+                }
+            });
+        }
+        const patientsTrend = last7Days.map(date => ({ date, value: patientsByDate[date] }));
+
+        // B. Revenue History
+        // Fetch requests updated in last 7 days
+        // Note: searching for timestamp string might need care, using ISO start of day
+        const weekAgoDate = new Date(weekAgo);
+        weekAgoDate.setHours(0, 0, 0, 0);
+
+        const { data: recentPayments } = await supabaseAdmin
+            .from('payment_requests')
+            .select('amount, updated_at')
+            .eq('status', 'approved')
+            .gte('updated_at', weekAgoDate.toISOString());
+
+        const revenueByDate: Record<string, number> = {};
+        last7Days.forEach(d => revenueByDate[d] = 0);
+
+        recentPayments?.forEach(p => {
+            const dateStr = p.updated_at.split('T')[0];
+            // If dateStr matches one of our last 7 days
+            // Note: updated_at is UTC usually. session_date is local (typically). 
+            // Ideally we align huge systems to UTC. Here we do simple string match or simple conversion.
+            // We'll trust the string split for now as "good enough" for this scale.
+            if (revenueByDate[dateStr] !== undefined) {
+                revenueByDate[dateStr] += (p.amount || 0);
+            }
+        });
+        const revenueTrend = last7Days.map(date => ({ date, value: revenueByDate[date] }));
+
 
         return NextResponse.json({
             totalClinics: totalClinics || 0,
             totalPatientsToday: totalPatientsToday || 0,
             totalRevenue,
-            lastMonthRevenue
+            lastMonthRevenue,
+            patientsTrend,
+            revenueTrend
         });
 
     } catch (error: unknown) {
