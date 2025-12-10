@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Clinic, AdminStats, PaymentRequest } from '@/lib/types';
-import { adminService } from '@/services/admin';
+import { Clinic, AdminStats } from '@/lib/types';
+
 
 interface UseAdminRealtimeProps {
     supabase: SupabaseClient;
     setClinics: (updater: (prev: Clinic[]) => Clinic[]) => void;
     setStats: (updater: (prev: AdminStats) => AdminStats) => void;
-    setPaymentRequests: (updater: (prev: PaymentRequest[]) => PaymentRequest[]) => void;
     activeTab: string;
     fetchStats: (showLoading?: boolean) => Promise<void>;
     fetchClinicStats: () => Promise<void>;
@@ -17,7 +16,6 @@ export function useAdminRealtime({
     supabase,
     setClinics,
     setStats,
-    setPaymentRequests,
     activeTab,
     fetchStats,
     fetchClinicStats
@@ -119,11 +117,6 @@ export function useAdminRealtime({
                 { event: '*', schema: 'public', table: 'payment_requests' },
                 () => {
                     fetchStats(false);
-                    if (activeTab === 'payment-requests') {
-                        adminService.fetchPaymentRequests()
-                            .then(data => setPaymentRequests(() => data))
-                            .catch(err => console.error(err));
-                    }
                 }
             )
             .subscribe();
@@ -131,5 +124,5 @@ export function useAdminRealtime({
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [supabase, activeTab, fetchStats, fetchClinicStats, setClinics, setPaymentRequests]);
+    }, [supabase, activeTab, fetchStats, fetchClinicStats, setClinics]);
 }

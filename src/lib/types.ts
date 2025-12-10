@@ -126,9 +126,10 @@ export interface CreateClinicRequest {
 }
 
 export interface CreateClinicResponse {
-  clinicId: string;
-  userId: string;
+  clinicId?: string; // Legacy support if needed, but API returns clinic object
+  userId?: string;
   message: string;
+  clinic: Clinic;
 }
 
 export interface ClinicSummary extends Clinic {
@@ -245,4 +246,15 @@ export interface BookingData {
   currentToken: Token | null;
   lastServedTokenNumber: number;
   lastServedTokens: Token[];
+}
+
+export interface ReportItem {
+  status: string;
+  created_at: string;
+  patient_name: string;
+  phone: string;
+  token_number: number;
+  queues: {
+    doctor_name: string;
+  };
 }

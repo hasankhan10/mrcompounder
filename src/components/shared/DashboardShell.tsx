@@ -3,7 +3,7 @@
 import React, { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
-import { LayoutDashboard, Menu, LogOut, ChevronRight, Home } from 'lucide-react';
+import { LayoutDashboard, Menu, LogOut, ChevronRight, Home, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
@@ -26,6 +26,7 @@ interface DashboardShellProps {
     children: ReactNode;
     userType: 'admin' | 'clinic';
     trialEndDate?: string;
+    isLoggingOut?: boolean;
 }
 
 interface SidebarContentProps {
@@ -38,6 +39,7 @@ interface SidebarContentProps {
     setIsMobileOpen: (open: boolean) => void;
     router: AppRouterInstance;
     onLogout: () => void;
+    isLoggingOut?: boolean;
 }
 
 function SidebarContent({
@@ -49,8 +51,10 @@ function SidebarContent({
     onTabChange,
     setIsMobileOpen,
     router,
-    onLogout
+    onLogout,
+    isLoggingOut
 }: SidebarContentProps) {
+    const [isHomeLoading, setIsHomeLoading] = React.useState(false);
     return (
         <div className="flex flex-col h-full bg-white border-r border-gray-200 w-64">
             <div className="p-6 border-b border-gray-100">
@@ -99,19 +103,24 @@ function SidebarContent({
             <div className="p-4 border-t border-gray-100 space-y-2">
                 <Button
                     variant="ghost"
-                    onClick={() => router.push('/')}
+                    onClick={() => {
+                        setIsHomeLoading(true);
+                        router.push('/');
+                    }}
+                    disabled={isHomeLoading}
                     className="w-full justify-start text-gray-600 hover:text-gray-900 hover:bg-gray-50 cursor-pointer"
                 >
-                    <Home className="w-4 h-4 mr-2" />
+                    {isHomeLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Home className="w-4 h-4 mr-2" />}
                     Home
                 </Button>
                 <Button
                     variant="ghost"
                     onClick={onLogout}
+                    disabled={isLoggingOut}
                     className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
                 >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    {isLoggingOut ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <LogOut className="w-4 h-4 mr-2" />}
+                    {isLoggingOut ? 'Logging out...' : 'Logout'}
                 </Button>
             </div>
         </div>
@@ -127,12 +136,10 @@ export function DashboardShell({
     onTabChange,
     onLogout,
     children,
-
+    isLoggingOut
 }: DashboardShellProps) {
     const router = useRouter();
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
-
-
 
     return (
         <div className="min-h-screen bg-gray-50/50 flex">
@@ -148,6 +155,7 @@ export function DashboardShell({
                     setIsMobileOpen={setIsMobileOpen}
                     router={router}
                     onLogout={onLogout}
+                    isLoggingOut={isLoggingOut}
                 />
             </aside>
 
@@ -171,7 +179,7 @@ export function DashboardShell({
                             setIsMobileOpen={setIsMobileOpen}
                             router={router}
                             onLogout={onLogout}
-
+                            isLoggingOut={isLoggingOut}
                         />
                     </SheetContent>
                 </Sheet>

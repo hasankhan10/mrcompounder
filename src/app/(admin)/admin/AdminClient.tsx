@@ -4,9 +4,9 @@ import { APP_NAME } from '@/lib/config';
 import { useState, useEffect, FormEvent, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
-import { Clinic, PaymentRequest } from '@/lib/types';
+import { Clinic } from '@/lib/types';
 import { toast } from 'sonner';
-import { LayoutDashboard, Building2, Settings, QrCode, IndianRupee } from 'lucide-react';
+import { LayoutDashboard, Building2, Settings } from 'lucide-react';
 
 // Components
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
@@ -21,8 +21,6 @@ import { useAdminRealtime } from '@/hooks/useAdminRealtime';
 
 // Tabs
 import { ClinicsTab } from '@/components/admin/tabs/ClinicsTab';
-import { PaymentsTab } from '@/components/admin/tabs/PaymentsTab';
-import { UpiSettingsTab } from '@/components/admin/tabs/UpiSettingsTab';
 import { SettingsTab } from '@/components/admin/tabs/SettingsTab';
 
 interface AdminClientProps {
@@ -61,85 +59,12 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     revenueTrend: []
   });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
-  const [isLoadingPayments, setIsLoadingPayments] = useState(false);
 
-  // UPI Settings State
-  const [upiSettings, setUpiSettings] = useState({ upi_id: '' });
 
-  const [settingsLoading, setSettingsLoading] = useState(false);
-
-  // Payment Requests State
-  const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
-
-  // Fetch Payment Requests
-  useEffect(() => {
-    if (activeTab === 'payment-requests') {
-      adminService.fetchPaymentRequests()
-        .then(data => setPaymentRequests(data))
-        .catch(err => console.error(err));
-    }
-  }, [activeTab]);
-
-  const handleRequestAction = async (requestId: string, action: 'approve' | 'reject', amount?: number) => {
-    try {
-      await adminService.approvePaymentRequest(requestId, action);
-
-      toast.success(`Request ${action}d`);
-      setPaymentRequests(prev => prev.filter(r => r.id !== requestId));
-
-      if (action === 'approve' && amount) {
-        setStats(prev => ({
-          ...prev,
-          totalRevenue: prev.totalRevenue + amount
-        }));
-      }
-
-      fetchStats(); // Refresh stats to update revenue immediately
-    } catch (err: unknown) {
-      toast.error('Failed to process request', {
-        description: err instanceof Error ? err.message : 'Could not approve/reject payment.'
-      });
-    }
-  };
-
-  // Fetch UPI Settings
-  useEffect(() => {
-    if (activeTab === 'upi-settings') {
-      adminService.fetchSettings()
-        .then(data => setUpiSettings({
-          upi_id: data.upi_id || ''
-        }))
-        .catch(err => {
-          console.error(err);
-          toast.error('Failed to load settings', {
-            description: 'Could not fetch UPI settings.'
-          });
-        });
-    }
-  }, [activeTab]);
-
-  const handleSaveSettings = async (e: FormEvent) => {
-    e.preventDefault();
-    setSettingsLoading(true);
-    try {
-      await adminService.saveSettings(upiSettings);
-
-      setUpiSettings(prev => ({ ...prev }));
-      toast.success('Settings saved');
-    } catch (err: unknown) {
-      toast.error('Failed to save settings', {
-        description: err instanceof Error ? err.message : 'Could not update UPI settings.'
-      });
-    } finally {
-      setSettingsLoading(false);
-    }
-  };
 
   const navItems: NavItem[] = [
     { label: 'Overview', value: 'overview', icon: LayoutDashboard },
     { label: 'Clinics', value: 'clinics', icon: Building2 },
-    { label: 'Bill Payments', value: 'payment-requests', icon: IndianRupee },
-    { label: 'UPI Settings', value: 'upi-settings', icon: QrCode },
     { label: 'Settings', value: 'settings', icon: Settings },
   ];
 
@@ -165,7 +90,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       const counts = await adminService.fetchClinicStatsMap();
       setClinics(prev => prev.map(c => ({
         ...c,
-        served_today_count: counts[c.id] || 0
+        served_today_count: (counts[c.id] as number) || 0
       })));
     } catch (error) {
       console.error('Failed to fetch clinic stats', error);
@@ -180,28 +105,11 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     fetchStats();
   }, [fetchStats]);
 
-  useEffect(() => {
-    if (activeTab === 'payment-requests') {
-      setIsLoadingPayments(true);
-      fetch('/api/admin/recharge/requests')
-        .then(res => res.json())
-        .then(data => setPaymentRequests(data))
-        .catch(err => {
-          console.error(err);
-          toast.error('Failed to load payments', {
-            description: 'Could not fetch pending payment requests.'
-          });
-        })
-        .finally(() => setIsLoadingPayments(false));
-    }
-  }, [activeTab]);
-
   // Real-time Subscriptions
   useAdminRealtime({
     supabase,
     setClinics,
     setStats,
-    setPaymentRequests,
     activeTab,
     fetchStats,
     fetchClinicStats
@@ -223,8 +131,10 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const [newClinicPassword, setNewClinicPassword] = useState('');
   const [editClinicLogoUrl, setEditClinicLogoUrl] = useState('');
   const [formIsLoading, setFormIsLoading] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     toast.info('Logging out...');
     try {
       await supabase.auth.signOut();
@@ -469,6 +379,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       activeTab={activeTab}
       onTabChange={setActiveTab}
       onLogout={handleLogout}
+      isLoggingOut={isLoggingOut}
       userType="admin"
     >
       {activeTab === 'overview' && (
@@ -513,22 +424,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
       {activeTab === 'settings' && <SettingsTab />}
 
-      {activeTab === 'payment-requests' && (
-        <PaymentsTab
-          paymentRequests={paymentRequests}
-          isLoading={isLoadingPayments}
-          onAction={handleRequestAction}
-        />
-      )}
 
-      {activeTab === 'upi-settings' && (
-        <UpiSettingsTab
-          upiSettings={upiSettings}
-          setUpiSettings={setUpiSettings}
-          onSave={handleSaveSettings}
-          isLoading={settingsLoading}
-        />
-      )}
+
+
 
       {/* Dialogs */}
       <CreateClinicDialog

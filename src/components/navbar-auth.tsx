@@ -80,11 +80,31 @@ export function NavbarAuth({ initialUser, initialRole, onLinkClick }: NavbarAuth
 
     return (
         <>
-            <Button asChild variant="ghost" className="text-gray-800 border border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold" onClick={onLinkClick}>
-                <Link href="/login">Login</Link>
+            <Button
+                variant="ghost"
+                className="text-gray-800 border border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold cursor-pointer"
+                onClick={() => {
+                    setIsNavigating(true);
+                    onLinkClick?.();
+                    router.push('/login');
+                }}
+                disabled={isNavigating}
+            >
+                {isNavigating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                Login
             </Button>
-            <Button asChild variant="outline" className="bg-white/50 border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold" onClick={onLinkClick}>
-                <Link href="/contact">Book Free Setup</Link>
+            <Button
+                variant="outline"
+                className="bg-white/50 border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold cursor-pointer"
+                onClick={() => {
+                    setIsNavigating(true);
+                    onLinkClick?.();
+                    router.push('/contact');
+                }}
+                disabled={isNavigating}
+            >
+                {isNavigating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                Book Free Setup
             </Button>
         </>
     );

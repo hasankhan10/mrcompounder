@@ -1,82 +1,25 @@
-import { CreateClinicRequest, UpdateClinicRequest } from '@/lib/types';
+import { api } from '@/lib/api-client';
+import { CreateClinicRequest, UpdateClinicRequest, CreateClinicResponse, AdminStats, Clinic } from '@/lib/types';
 
 export const adminService = {
-    async fetchPaymentRequests() {
-        const res = await fetch('/api/admin/recharge/requests');
-        if (!res.ok) throw new Error('Failed to fetch payment requests');
-        return res.json();
-    },
-
-    async approvePaymentRequest(requestId: string, action: 'approve' | 'reject') {
-        const res = await fetch('/api/admin/recharge/approve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ requestId, action })
-        });
-        if (!res.ok) throw new Error('Action failed');
-        return res.json();
-    },
-
-    async fetchSettings() {
-        const res = await fetch('/api/admin/settings');
-        if (!res.ok) throw new Error('Failed to fetch settings');
-        return res.json();
-    },
-
-    async saveSettings(settings: { upi_id: string }) {
-        const res = await fetch('/api/admin/settings', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(settings)
-        });
-        if (!res.ok) throw new Error('Failed to save settings');
-        return res.json();
-    },
-
     async fetchStats() {
-        const res = await fetch('/api/admin/stats');
-        if (!res.ok) throw new Error('Failed to fetch stats');
-        return res.json();
+        return api.get<AdminStats>('/api/admin/stats');
     },
 
     async fetchClinicStatsMap() {
-        const res = await fetch('/api/admin/clinics/stats-map');
-        if (!res.ok) throw new Error('Failed to fetch clinic stats');
-        return res.json();
+        return api.get<Record<string, unknown>>('/api/admin/clinics/stats-map');
     },
 
     async createClinic(data: CreateClinicRequest) {
-        const res = await fetch('/api/admin/clinics', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || 'Failed to create clinic');
-        }
-        return res.json();
+        return api.post<CreateClinicResponse>('/api/admin/clinics', data);
     },
 
     async updateClinic(id: string, data: UpdateClinicRequest) {
-        const res = await fetch(`/api/admin/clinics/${id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || 'Failed to update clinic');
-        }
-        return res.json();
+        return api.patch<Clinic>(`/api/admin/clinics/${id}`, data);
     },
 
     async deleteClinic(id: string) {
-        const res = await fetch(`/api/admin/clinics/${id}`, {
-            method: 'DELETE',
-        });
-        if (!res.ok) throw new Error('Failed to delete clinic');
-        return res.json();
+        return api.delete<{ message: string }>(`/api/admin/clinics/${id}`);
     },
 
     async toggleStatus(id: string, isActive: boolean) {
@@ -95,3 +38,5 @@ export const adminService = {
         return this.updateClinic(id, updateData);
     }
 };
+
+

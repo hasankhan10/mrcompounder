@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { Clinic, Queue, Token, RecentDoctor } from '@/lib/types';
 import { toast } from 'sonner';
-import { RechargeModal } from '@/components/dashboard/RechargeModal';
 import { PieChart, Settings, Users, History, IndianRupee } from 'lucide-react';
+import { useRazorpay } from '@/hooks/useRazorpay';
 import { Button } from '@/components/ui/button';
 
 import { CustomAlertDialog } from '@/components/dashboard/CustomAlertDialog';
@@ -56,7 +56,7 @@ export function DashboardClient({
 
   // Page-level state
   const [activeTab, setActiveTab] = useState('overview');
-  const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
+  const { processPayment, isLoading: isPaymentLoading } = useRazorpay();
 
   // Data state
   const [clinic, setClinic] = useState<Clinic | null>(initialClinic);
@@ -100,9 +100,11 @@ export function DashboardClient({
   const [newPatientPurpose, setNewPatientPurpose] = useState('');
   const [isEmergency, setIsEmergency] = useState(false);
   const [formIsLoading, setFormIsLoading] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 
   const handleLogout = useCallback(async () => {
+    setIsLoggingOut(true);
     try {
       toast.success('Logging out...');
       await supabase.auth.signOut();
@@ -632,6 +634,7 @@ export function DashboardClient({
       activeTab={activeTab}
       onTabChange={setActiveTab}
       onLogout={handleLogout}
+      isLoggingOut={isLoggingOut}
       userType="clinic"
       trialEndDate={trialActive ? clinic.trial_end_date : undefined}
     >
@@ -663,9 +666,14 @@ export function DashboardClient({
                       size="sm"
                       variant="outline"
                       className="h-8 text-xs gap-1 bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100 hover:text-teal-800"
-                      onClick={() => setIsRechargeModalOpen(true)}
+                      onClick={() => processPayment(clinic.current_due, {
+                        clinicId: clinic.id,
+                        clinicName: clinic.name,
+                        clinicContact: clinic.contact_number
+                      })}
+                      disabled={isPaymentLoading}
                     >
-                      <IndianRupee className="w-3 h-3" /> Pay Bill
+                      {isPaymentLoading ? 'Processing...' : <><IndianRupee className="w-3 h-3" /> Pay Bill</>}
                     </Button>
                   </>
                 )}
@@ -772,11 +780,7 @@ export function DashboardClient({
         variant={dialogConfig.variant}
       />
 
-      <RechargeModal
-        isOpen={isRechargeModalOpen}
-        onOpenChange={setIsRechargeModalOpen}
-        fixedAmount={clinic?.current_due || 0}
-      />
+
     </DashboardShell >
   );
 }
