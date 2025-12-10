@@ -105,12 +105,21 @@ export function DashboardClient({
 
   const handleLogout = useCallback(async () => {
     setIsLoggingOut(true);
+    toast.info('Logging out...');
+
+    // Safety timeout: if signOut hangs, force redirect after 2s
+    const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 2000));
+
     try {
-      toast.success('Logging out...');
-      await supabase.auth.signOut();
-      window.location.href = '/login';
+      await Promise.race([
+        supabase.auth.signOut(),
+        timeoutPromise
+      ]);
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Logout failed (non-blocking):', error);
+    } finally {
+      localStorage.clear();
+      sessionStorage.clear();
       window.location.href = '/login';
     }
   }, [supabase]);

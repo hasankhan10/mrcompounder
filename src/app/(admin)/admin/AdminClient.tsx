@@ -136,12 +136,23 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     toast.info('Logging out...');
+
+    // Safety timeout: if signOut hangs, force redirect after 2s
+    const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 2000));
+
     try {
-      await supabase.auth.signOut();
-      router.push('/login');
+      // Attempt clean sign out
+      await Promise.race([
+        supabase.auth.signOut(),
+        timeoutPromise
+      ]);
     } catch (error) {
-      console.error('Logout error:', error);
-      // Fallback: Force hard reload to login page
+      console.error('Logout error (non-blocking):', error);
+    } finally {
+      // Force cleanup
+      localStorage.clear();
+      sessionStorage.clear();
+      // Hard redirect to ensure clean state
       window.location.href = '/login';
     }
   };
