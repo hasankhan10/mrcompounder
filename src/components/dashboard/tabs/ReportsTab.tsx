@@ -10,14 +10,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 
 export function ReportsTab() {
-    const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7)); // YYYY-MM
+    const [reportType, setReportType] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
+    const [dateValue, setDateValue] = useState<string>(new Date().toISOString().slice(0, 7)); // Default to current month
     const [isGenerating, setIsGenerating] = useState(false);
     const [reportData, setReportData] = useState<{ queues: { doctor_name: string }; status: string; created_at: string; patient_name: string; phone: string; token_number: number }[] | null>(null);
 
     const handleGenerateReport = async () => {
+        if (!dateValue) {
+            toast.error('Please select a date');
+            return;
+        }
         setIsGenerating(true);
         try {
-            const data = await dashboardService.fetchMonthlyReport(selectedMonth);
+            const data = await dashboardService.fetchReport(reportType, dateValue);
             setReportData(data);
             toast.success('Report data fetched successfully');
         } catch (error) {
@@ -27,6 +32,8 @@ export function ReportsTab() {
             setIsGenerating(false);
         }
     };
+
+    // ... (existing handleDownloadExcel logic, kept same)
 
     const handleDownloadExcel = async () => {
         if (!reportData || reportData.length === 0) {
@@ -39,7 +46,8 @@ export function ReportsTab() {
         // 1. Prepare Summary Data (Doctor-wise)
         const doctorStats: Record<string, { booked: number; present: number; absent: number }> = {};
 
-        reportData.forEach((token: { queues: { doctor_name: string }; status: string }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        reportData.forEach((token: any) => {
             const doctorName = token.queues?.doctor_name || 'Unknown';
             if (!doctorStats[doctorName]) {
                 doctorStats[doctorName] = { booked: 0, present: 0, absent: 0 };
@@ -63,7 +71,8 @@ export function ReportsTab() {
         }));
 
         // 2. Prepare Detailed Log Data
-        const logSheetData = reportData.map((token) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const logSheetData = reportData.map((token: any) => ({
             'Date': new Date(token.created_at).toLocaleDateString(),
             'Time': new Date(token.created_at).toLocaleTimeString(),
             'Doctor Name': token.queues?.doctor_name || 'Unknown',
@@ -83,35 +92,62 @@ export function ReportsTab() {
         XLSX.utils.book_append_sheet(wb, logWs, "Detailed Logs");
 
         // 4. Download
-        XLSX.writeFile(wb, `Clinic_Report_${selectedMonth}.xlsx`);
+        XLSX.writeFile(wb, `Clinic_Report_${reportType}_${dateValue}.xlsx`);
         toast.success('Excel file downloaded');
     };
 
     return (
         <div className="space-y-8 animate-fade-in-up">
             <div>
-                <h1 className="text-3xl font-bold text-slate-900">Monthly Reports</h1>
-                <p className="text-slate-500 mt-1">Generate and download detailed performance reports.</p>
+                <h1 className="text-3xl font-bold text-slate-900">Reports</h1>
+                <p className="text-slate-500 mt-1">Generate and download performance reports.</p>
             </div>
 
             <Card className="border-none shadow-md">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-teal-600" />
-                        Select Month
+                        Generate Report
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="flex flex-col md:flex-row gap-4 items-end">
+
+                        <div className="w-full md:w-48">
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Report Type</label>
+                            <Select
+                                value={reportType}
+                                onValueChange={(val: 'daily' | 'weekly' | 'monthly') => {
+                                    setReportType(val);
+                                    // Reset date value based on type to avoid invalid formats
+                                    if (val === 'daily') setDateValue(new Date().toISOString().slice(0, 10));
+                                    else if (val === 'monthly') setDateValue(new Date().toISOString().slice(0, 7));
+                                    else if (val === 'weekly') setDateValue(`${new Date().getFullYear()}-W${Math.ceil((new Date().getDate() + 6 - new Date().getDay()) / 7)}`); // Rough default week, improved by user pick
+                                }}
+                            >
+                                <SelectTrigger className="bg-white">
+                                    <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="daily">Daily</SelectItem>
+                                    <SelectItem value="weekly">Weekly</SelectItem>
+                                    <SelectItem value="monthly">Monthly</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
                         <div className="w-full md:w-64">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Month</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                                {reportType === 'daily' ? 'Select Date' : reportType === 'weekly' ? 'Select Week' : 'Select Month'}
+                            </label>
                             <input
-                                type="month"
+                                type={reportType === 'daily' ? 'date' : reportType === 'weekly' ? 'week' : 'month'}
                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={selectedMonth}
-                                onChange={(e) => setSelectedMonth(e.target.value)}
+                                value={dateValue}
+                                onChange={(e) => setDateValue(e.target.value)}
                             />
                         </div>
+
                         <Button
                             onClick={handleGenerateReport}
                             disabled={isGenerating}
@@ -169,7 +205,7 @@ export function ReportsTab() {
                                 <div>
                                     <h3 className="text-lg font-bold text-green-900">Report Ready!</h3>
                                     <p className="text-green-700">
-                                        Found <span className="font-bold">{reportData.length}</span> records for {selectedMonth}.
+                                        Found <span className="font-bold">{reportData.length}</span> records for {dateValue}.
                                     </p>
                                 </div>
                                 <Button

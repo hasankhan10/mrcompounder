@@ -1,19 +1,23 @@
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, parseISO } from 'date-fns';
 
 /**
  * GET /api/dashboard/reports
- * @summary Fetches report data for a specific month.
- * @param {string} month - Query param in YYYY-MM format.
+ * @summary Fetches report data for a specific period (daily, weekly, monthly).
+ * @param {string} type - 'daily' | 'weekly' | 'monthly'
+ * @param {string} value - The date value (YYYY-MM-DD, YYYY-Www, or YYYY-MM)
  */
 export async function GET(request: NextRequest) {
     const supabase = await createServerSupabaseClient();
     const searchParams = request.nextUrl.searchParams;
-    const month = searchParams.get('month'); // YYYY-MM
+    const type = searchParams.get('type');
+    const value = searchParams.get('value');
 
-    if (!month) {
-        return new NextResponse(JSON.stringify({ error: 'Month is required' }), { status: 400 });
+    if (!type || !value) {
+        return new NextResponse(JSON.stringify({ error: 'Type and Value are required' }), { status: 400 });
     }
 
     // 1. Auth Check
@@ -28,14 +32,44 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. Calculate Date Range
-    const [year, monthNum] = month.split('-').map(Number);
-    const startDate = new Date(year, monthNum - 1, 1).toISOString();
-    // End date is the first day of the NEXT month
-    const endDate = new Date(year, monthNum, 1).toISOString();
+    let startDate: Date;
+    let endDate: Date;
+
+    try {
+        if (type === 'daily') {
+            // value: YYYY-MM-DD
+            const date = parseISO(value);
+            startDate = startOfDay(date);
+            endDate = endOfDay(date);
+        } else if (type === 'weekly') {
+            // value: YYYY-Www (ISO Week)
+            // Handling HTML input type="week" format (e.g., 2023-W01)
+            const [yearStr, weekStr] = value.split('-W');
+            const year = parseInt(yearStr);
+            const week = parseInt(weekStr);
+
+            // Calculate start of week (Monday) from ISO week year
+            const d = new Date(year, 0, 1 + (week - 1) * 7);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day == 0 ? -6 : 1);
+            const weekStart = new Date(d.setDate(diff));
+
+            startDate = startOfDay(weekStart);
+            endDate = endOfWeek(weekStart, { weekStartsOn: 1 }); // Monday start
+        } else if (type === 'monthly') {
+            // value: YYYY-MM
+            const date = parseISO(`${value}-01`);
+            startDate = startOfMonth(date);
+            endDate = endOfMonth(date);
+        } else {
+            return new NextResponse(JSON.stringify({ error: 'Invalid report type' }), { status: 400 });
+        }
+    } catch (e) {
+        return new NextResponse(JSON.stringify({ error: 'Invalid date format' }), { status: 400 });
+    }
 
     try {
         // 3. Fetch Data
-        // We need tokens joined with queues to get doctor info
         const { data: tokens, error } = await supabase
             .from('tokens')
             .select(`
@@ -46,8 +80,8 @@ export async function GET(request: NextRequest) {
         )
       `)
             .eq('clinic_id', profile.clinic_id)
-            .gte('created_at', startDate)
-            .lt('created_at', endDate)
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString()) // Use lte for inclusive end of day
             .order('created_at', { ascending: true });
 
         if (error) throw error;

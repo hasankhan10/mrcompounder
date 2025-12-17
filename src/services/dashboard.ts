@@ -52,8 +52,8 @@ export const dashboardService = {
         });
     },
 
-    async fetchMonthlyReport(month: string) {
-        return api.get<import('@/lib/types').ReportItem[]>(`/api/dashboard/reports?month=${month}`);
+    async fetchReport(type: 'daily' | 'weekly' | 'monthly', value: string) {
+        return api.get<import('@/lib/types').ReportItem[]>(`/api/dashboard/reports?type=${type}&value=${value}`);
     },
 
     async updateSettings(data: { logoUrl: string }) {

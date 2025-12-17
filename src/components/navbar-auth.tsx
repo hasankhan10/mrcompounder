@@ -49,10 +49,10 @@ export function NavbarAuth({ initialUser, initialRole, onLinkClick }: NavbarAuth
         };
     }, [supabase, router]);
 
-    const [isNavigating, setIsNavigating] = useState(false);
+    const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
 
     const handleDashboardClick = () => {
-        setIsNavigating(true);
+        setNavigatingTo('dashboard');
         onLinkClick?.();
         if (role === 'super_admin') {
             router.push('/admin');
@@ -71,8 +71,8 @@ export function NavbarAuth({ initialUser, initialRole, onLinkClick }: NavbarAuth
 
     if (user && role) {
         return (
-            <Button onClick={handleDashboardClick} variant="ghost" className="text-black cursor-pointer hover:bg-teal-50 hover:text-teal-700 font-bold border border-teal-100" disabled={isNavigating}>
-                {isNavigating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+            <Button onClick={handleDashboardClick} variant="ghost" className="text-black cursor-pointer hover:bg-teal-50 hover:text-teal-700 font-bold border border-teal-100" disabled={!!navigatingTo}>
+                {navigatingTo === 'dashboard' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 Dashboard
             </Button>
         );
@@ -84,26 +84,26 @@ export function NavbarAuth({ initialUser, initialRole, onLinkClick }: NavbarAuth
                 variant="ghost"
                 className="text-gray-800 border border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold cursor-pointer"
                 onClick={() => {
-                    setIsNavigating(true);
+                    setNavigatingTo('login');
                     onLinkClick?.();
                     router.push('/login');
                 }}
-                disabled={isNavigating}
+                disabled={!!navigatingTo}
             >
-                {isNavigating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                {navigatingTo === 'login' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                 Login
             </Button>
             <Button
                 variant="outline"
                 className="bg-white/50 border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold cursor-pointer"
                 onClick={() => {
-                    setIsNavigating(true);
+                    setNavigatingTo('contact');
                     onLinkClick?.();
                     router.push('/contact');
                 }}
-                disabled={isNavigating}
+                disabled={!!navigatingTo}
             >
-                {isNavigating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                {navigatingTo === 'contact' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                 Book Free Setup
             </Button>
         </>
