@@ -25,18 +25,20 @@ interface CreateClinicDialogProps {
     setEmail: (val: string) => void;
     password: string;
     setPassword: (val: string) => void;
+    ownerEmail: string;
+    setOwnerEmail: (val: string) => void;
 }
 
 export function CreateClinicDialog({
     isOpen, onOpenChange, onSubmit, isLoading,
     name, setName, slug, setSlug, location, setLocation, contactNumber, setContactNumber, logoFile, setLogoFile,
-    email, setEmail, password, setPassword
+    email, setEmail, password, setPassword, ownerEmail, setOwnerEmail
 }: CreateClinicDialogProps) {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] animate-scale-in">
+            <DialogContent className="sm:max-w-[500px] animate-scale-in max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Create New Clinic</DialogTitle>
                     <DialogDescription>
@@ -83,6 +85,19 @@ export function CreateClinicDialog({
                     <div className="grid gap-2">
                         <Label htmlFor="compounderEmail">Clinic Email (Login)</Label>
                         <Input id="compounderEmail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="clinic@example.com" required />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="ownerEmail">Owner Email (Doctor Group) <span className="text-gray-400 font-normal">(Optional)</span></Label>
+                        <Input
+                            id="ownerEmail"
+                            type="email"
+                            value={ownerEmail}
+                            onChange={(e) => setOwnerEmail(e.target.value)}
+                            placeholder="dr.smith@example.com"
+                            className="bg-purple-50 border-purple-200"
+                        />
+                        <p className="text-xs text-purple-600">Enter the doctor&apos;s email to link this clinic to their Multi-Clinic Dashboard.</p>
                     </div>
 
                     <div className="grid gap-2">

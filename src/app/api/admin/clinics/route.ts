@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body: CreateClinicRequest = await request.json();
-    const { name, slug, compounderEmail, compounderPassword, logoUrl, location, contactNumber } = body;
+    const { name, slug, compounderEmail, compounderPassword, logoUrl, location, contactNumber, ownerEmail } = body;
 
     // Validate required fields
     if (!name || !slug || !compounderEmail || !compounderPassword) {
@@ -75,7 +75,8 @@ export async function POST(request: NextRequest) {
         name,
         slug,
         location: location || null,
-        contact_number: contactNumber || null, // Added contact_number
+        contact_number: contactNumber || null,
+        owner_email: ownerEmail || null, // Map ownerEmail to DB field
         current_due: 0,
         logo_url: logoUrl || null,
         is_active: true,

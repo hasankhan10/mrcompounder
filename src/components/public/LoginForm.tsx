@@ -53,6 +53,9 @@ export function LoginForm() {
             // Redirect based on role
             if (profile.role === 'super_admin') {
                 router.push('/admin');
+            } else if (profile.role === 'doctor') {
+                localStorage.setItem('doctor_email', email); // For backward compatibility with existing dashboard
+                router.push('/doctor/dashboard');
             } else if (profile.role === 'compounder') {
                 if (!profile.clinic_id) {
                     await supabase.auth.signOut();

@@ -20,6 +20,7 @@ export function StatsGridSkeleton() {
     )
 }
 
+
 export function ClinicTableSkeleton() {
     return (
         <div className="space-y-4">
@@ -41,6 +42,68 @@ export function ClinicTableSkeleton() {
                             <div className="flex items-center space-x-4">
                                 <Skeleton className="h-4 w-[80px]" />
                                 <Skeleton className="h-8 w-[100px]" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export function DoctorTableSkeleton() {
+    return (
+        <div className="space-y-4">
+            {/* Header / Search Skeleton */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <Skeleton className="h-8 w-48" />
+                <div className="flex gap-3">
+                    <Skeleton className="h-10 w-64" />
+                    <Skeleton className="h-10 w-32" />
+                </div>
+            </div>
+
+            {/* Table Skeleton */}
+            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                <div className="p-0">
+                    <div className="bg-slate-50/50 p-4 border-b border-slate-100 flex gap-4">
+                        <Skeleton className="h-4 w-1/4" />
+                        <Skeleton className="h-4 w-1/4" />
+                        <Skeleton className="h-4 w-1/6" />
+                        <Skeleton className="h-4 w-1/6" />
+                    </div>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="flex items-center p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50/50">
+                            {/* Doctor Details */}
+                            <div className="flex items-center space-x-3 w-1/4">
+                                <Skeleton className="h-10 w-10 rounded-full" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-32" />
+                                    <Skeleton className="h-3 w-20" />
+                                </div>
+                            </div>
+
+                            {/* Contact */}
+                            <div className="w-1/4">
+                                <div className="flex items-center gap-2">
+                                    <Skeleton className="h-4 w-4" />
+                                    <Skeleton className="h-4 w-40" />
+                                </div>
+                            </div>
+
+                            {/* Locations */}
+                            <div className="w-1/6">
+                                <Skeleton className="h-6 w-24 rounded-full" />
+                            </div>
+
+                            {/* Joined */}
+                            <div className="w-1/6">
+                                <Skeleton className="h-4 w-28" />
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex-1 flex justify-end">
+                                <Skeleton className="h-8 w-16" />
                             </div>
                         </div>
                     ))}

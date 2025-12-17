@@ -6,7 +6,10 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { Clinic } from '@/lib/types';
 import { toast } from 'sonner';
-import { LayoutDashboard, Building2, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { LayoutDashboard, Building2, Settings, Stethoscope } from 'lucide-react';
+
 
 // Components
 import { DashboardShell, NavItem } from '@/components/shared/DashboardShell';
@@ -22,6 +25,7 @@ import { useAdminRealtime } from '@/hooks/useAdminRealtime';
 // Tabs
 import { ClinicsTab } from '@/components/admin/tabs/ClinicsTab';
 import { SettingsTab } from '@/components/admin/tabs/SettingsTab';
+import { DoctorsTab } from '@/components/admin/tabs/DoctorsTab';
 
 interface AdminClientProps {
   initialClinics: Clinic[];
@@ -60,11 +64,29 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
 
+  // Doctors State
+  const [doctors, setDoctors] = useState<import('@/lib/types').Doctor[]>([]);
+  const [isDoctorsLoading, setIsDoctorsLoading] = useState(false);
+
+  // Fetch Doctors Helper
+  const fetchDoctors = useCallback(async () => {
+    setIsDoctorsLoading(true);
+    try {
+      const data = await adminService.fetchDoctors();
+      setDoctors(data.doctors);
+    } catch (error) {
+      console.error("Failed to fetch doctors", error);
+    } finally {
+      setIsDoctorsLoading(false);
+    }
+  }, []);
+
 
 
   const navItems: NavItem[] = [
     { label: 'Overview', value: 'overview', icon: LayoutDashboard },
     { label: 'Clinics', value: 'clinics', icon: Building2 },
+    { label: 'Doctors', value: 'doctors', icon: Stethoscope },
     { label: 'Settings', value: 'settings', icon: Settings },
   ];
 
@@ -103,7 +125,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   // Initial Fetch
   useEffect(() => {
     fetchStats();
-  }, [fetchStats]);
+    fetchClinicStats();
+    fetchDoctors();
+  }, [fetchStats, fetchClinicStats, fetchDoctors]);
 
   // Real-time Subscriptions
   useAdminRealtime({
@@ -121,6 +145,31 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
 
+  // Doctor Delete State
+  const [isDeleteDoctorAlertOpen, setIsDeleteDoctorAlertOpen] = useState(false);
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
+
+  /* ... */
+
+  const handleDeleteDoctor = (id: string) => {
+    setSelectedDoctorId(id);
+    setIsDeleteDoctorAlertOpen(true);
+  };
+
+  const confirmDeleteDoctor = async () => {
+    if (!selectedDoctorId) return;
+    try {
+      await adminService.deleteDoctor(selectedDoctorId);
+      toast.success("Doctor deleted successfully");
+      setDoctors(prev => prev.filter(d => d.id !== selectedDoctorId));
+      setIsDeleteDoctorAlertOpen(false);
+      setSelectedDoctorId(null);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete doctor");
+    }
+  };
+
   // Form state (Create/Edit)
   const [newClinicName, setNewClinicName] = useState('');
   const [newClinicSlug, setNewClinicSlug] = useState('');
@@ -129,6 +178,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const [newClinicLogo, setNewClinicLogo] = useState<File | null>(null);
   const [newClinicEmail, setNewClinicEmail] = useState('');
   const [newClinicPassword, setNewClinicPassword] = useState('');
+  const [newClinicOwnerEmail, setNewClinicOwnerEmail] = useState('');
   const [editClinicLogoUrl, setEditClinicLogoUrl] = useState('');
   const [formIsLoading, setFormIsLoading] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -188,10 +238,11 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         slug: newClinicSlug,
         location: newClinicLocation,
         contactNumber: newClinicContactNumber,
-        logoUrl: logoUrl,
+        initialBalance: 0,
         compounderEmail: newClinicEmail,
         compounderPassword: newClinicPassword,
-        initialBalance: 0
+        logoUrl,
+        ownerEmail: newClinicOwnerEmail || undefined // Pass owner email if provided
       });
       setClinics(prev => {
         if (prev.some(c => c.id === newClinic.id)) return prev;
@@ -207,6 +258,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setNewClinicLogo(null);
       setNewClinicEmail('');
       setNewClinicPassword('');
+      setNewClinicOwnerEmail('');
       toast.success('Clinic created successfully');
 
     } catch (err: unknown) {
@@ -433,6 +485,15 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         />
       )}
 
+      {activeTab === 'doctors' && (
+        <DoctorsTab
+          doctors={doctors}
+          isLoading={isDoctorsLoading}
+          onRefresh={fetchDoctors}
+          onDelete={handleDeleteDoctor}
+        />
+      )}
+
       {activeTab === 'settings' && <SettingsTab />}
 
 
@@ -459,7 +520,35 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setEmail={setNewClinicEmail}
         password={newClinicPassword}
         setPassword={setNewClinicPassword}
+
+        ownerEmail={newClinicOwnerEmail}
+        setOwnerEmail={setNewClinicOwnerEmail}
       />
+
+      {/* Delete Clinic Alert */}
+      <DeleteClinicAlert
+        isOpen={isDeleteAlertOpen}
+        onOpenChange={setIsDeleteAlertOpen}
+        onConfirm={handleConfirmDelete}
+        clinicName={selectedClinic?.name || ''}
+      />
+
+      {/* Delete Doctor Alert */}
+      <Dialog open={isDeleteDoctorAlertOpen} onOpenChange={setIsDeleteDoctorAlertOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Doctor?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this doctor? This action cannot be undone.
+              Linked clinics will NOT be deleted, but they will be unlinked.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDoctorAlertOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDeleteDoctor}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <EditClinicDialog
         isOpen={isEditModalOpen}

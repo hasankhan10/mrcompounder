@@ -36,7 +36,18 @@ export const adminService = {
             trialEndDate: endDate
         };
         return this.updateClinic(id, updateData);
+    },
+
+    async createDoctor(data: { name: string; email: string; password: string; avatarUrl?: string }) {
+        return api.post('/api/admin/doctors', data);
+    },
+
+    async fetchDoctors() {
+        return api.get<{ doctors: import('@/lib/types').Doctor[] }>('/api/admin/doctors');
+    },
+
+    async deleteDoctor(id: string) {
+        return api.delete<{ message: string }>(`/api/admin/doctors?id=${id}`);
     }
 };
-
 

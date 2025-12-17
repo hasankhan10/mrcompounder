@@ -3,7 +3,7 @@
 // These types mirror the structure of your Supabase tables.
 // ================================================================= //
 
-export type UserRole = 'super_admin' | 'compounder';
+export type UserRole = 'super_admin' | 'compounder' | 'doctor';
 export type QueueStatus = 'active' | 'paused' | 'ended' | 'waiting' | 'cancelled';
 export type TokenStatus = 'waiting' | 'called' | 'served' | 'no_show';
 export type TransactionType = 'topup' | 'usage';
@@ -25,6 +25,7 @@ export interface Clinic {
   slug: string;
   location?: string; // Added field
   contact_number?: string; // Added field
+  owner_email?: string; // Grouping ID for Doctor Dashboard
   logo_url?: string;
   current_due: number;
   is_active: boolean;
@@ -39,6 +40,13 @@ export interface Profile {
   clinic_id?: string; // uuid, references clinics(id)
   role: UserRole;
   full_name?: string;
+  avatar_url?: string;
+}
+
+export interface Doctor extends Profile {
+  email?: string; // Enriched manually from auth.users
+  clinic_count?: number; // Enriched manually
+  created_at: string;
 }
 
 export interface Queue {
@@ -117,12 +125,13 @@ export interface PaymentRequest {
 export interface CreateClinicRequest {
   name: string;
   slug: string;
-  location?: string; // Added field
-  contactNumber?: string; // Added field
+  location?: string;
+  contactNumber?: string;
   initialBalance: number;
   compounderEmail: string;
   compounderPassword: string;
   logoUrl?: string;
+  ownerEmail?: string; // Links this clinic to a Doctor Group
 }
 
 export interface CreateClinicResponse {
@@ -144,10 +153,11 @@ export interface UpdateClinicRequest {
   trialEndDate?: string | null;
   name?: string;
   slug?: string;
-  location?: string; // Added field
-  contactNumber?: string; // Added field
+  location?: string;
+  contactNumber?: string;
   logoUrl?: string;
   password?: string;
+  ownerEmail?: string; // Allow updating the owner
 }
 export type UpdateClinicResponse = Clinic;
 

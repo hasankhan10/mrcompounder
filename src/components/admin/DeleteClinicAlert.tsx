@@ -14,9 +14,10 @@ interface DeleteClinicAlertProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
     onConfirm: () => void;
+    clinicName?: string;
 }
 
-export function DeleteClinicAlert({ isOpen, onOpenChange, onConfirm }: DeleteClinicAlertProps) {
+export function DeleteClinicAlert({ isOpen, onOpenChange, onConfirm, clinicName }: DeleteClinicAlertProps) {
     return (
         <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
             <AlertDialogContent className="bg-white">
