@@ -635,6 +635,20 @@ export function DashboardClient({
 
 
 
+  // --- AUTOMATION: Manual WhatsApp Link ---
+  const handleSendWhatsApp = useCallback((token: Token) => {
+    if (!clinic?.slug) return;
+    const trackingUrl = `${window.location.origin}/${clinic.slug}?phone=${token.phone}`;
+    const name = token.patient_name || 'Patient';
+    const message = encodeURIComponent(
+      `Hello ${name},\n\nYour token number is *${token.token_number}*.\n` +
+      `Track your live status here: ${trackingUrl}\n\n` +
+      `- ${clinic.name}`
+    );
+    const waUrl = `https://wa.me/91${token.phone}?text=${message}`;
+    window.open(waUrl, '_blank');
+  }, [clinic]);
+
   return (
     <DashboardShell
       title={clinic.name}
@@ -756,6 +770,7 @@ export function DashboardClient({
             isEmergency={isEmergency}
             setIsEmergency={setIsEmergency}
             loadingAction={loadingAction}
+            onSendWhatsApp={handleSendWhatsApp}
           />
         </div>
       )}

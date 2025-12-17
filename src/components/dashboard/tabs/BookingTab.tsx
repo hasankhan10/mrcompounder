@@ -51,6 +51,7 @@ interface BookingTabProps {
     isEmergency: boolean;
     setIsEmergency: (val: boolean) => void;
     loadingAction: string | null;
+    onSendWhatsApp: (token: Token) => void;
 }
 
 export function BookingTab({
@@ -91,7 +92,8 @@ export function BookingTab({
     setNewPatientPurpose,
     isEmergency,
     setIsEmergency,
-    loadingAction
+    loadingAction,
+    onSendWhatsApp
 }: BookingTabProps) {
 
     if (isLoading) {
@@ -208,6 +210,7 @@ export function BookingTab({
                     onDeleteToken={onDeleteToken}
                     showControls={false}
                     loadingAction={loadingAction}
+                    onSendWhatsApp={onSendWhatsApp}
                 />
             </div>
         </>

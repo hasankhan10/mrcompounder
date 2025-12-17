@@ -16,9 +16,10 @@ interface QueueDisplayProps {
     onMarkAbsent?: () => void;
     showControls?: boolean;
     loadingAction: string | null;
+    onSendWhatsApp?: (token: Token) => void;
 }
 
-export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, servedTokens, onCallNext, onMarkAbsent, isSessionActive, onDeleteToken, showControls = true, loadingAction }: QueueDisplayProps) {
+export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, servedTokens, onCallNext, onMarkAbsent, isSessionActive, onDeleteToken, showControls = true, loadingAction, onSendWhatsApp }: QueueDisplayProps) {
     const currentToken = waitingTokens.find(t => t.status === 'called');
     const pendingTokens = waitingTokens.filter(t => t.status === 'waiting');
     const isLastPatient = currentToken && pendingTokens.length === 0;
@@ -132,6 +133,16 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <div className="text-sm text-slate-400">{token.phone}</div>
+                                            {onSendWhatsApp && (
+                                                <button
+                                                    onClick={() => onSendWhatsApp(token)}
+                                                    className="text-green-500 hover:text-green-600 p-1.5 rounded-full hover:bg-green-50 transition-colors"
+                                                    title="Send WhatsApp Link"
+                                                    disabled={!!loadingAction}
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>
+                                                </button>
+                                            )}
                                             {onDeleteToken && token.status === 'waiting' && (
                                                 <button
                                                     onClick={() => onDeleteToken(token.id)}
