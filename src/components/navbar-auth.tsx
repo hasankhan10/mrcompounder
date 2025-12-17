@@ -58,6 +58,8 @@ export function NavbarAuth({ initialUser, initialRole, onLinkClick }: NavbarAuth
             router.push('/admin');
         } else if (role === 'compounder') {
             router.push('/dashboard');
+        } else if (role === 'doctor') {
+            router.push('/doctor/dashboard');
         }
     };
 

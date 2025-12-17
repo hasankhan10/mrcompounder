@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, MapPin, Users, Activity, LogOut, ArrowRight, TrendingUp } from 'lucide-react';
+import { Loader2, MapPin, Users, Activity, LogOut, ArrowRight, TrendingUp, Home } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase-client';
 
@@ -22,6 +22,9 @@ export default function DoctorDashboard() {
     const [email, setEmail] = useState<string | null>(null);
     const [clinics, setClinics] = useState<ClinicSummary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [doctorName, setDoctorName] = useState<string>('');
+    const [greeting, setGreeting] = useState<string>('');
+
     const router = useRouter();
     const supabase = createClient();
 
@@ -37,17 +40,25 @@ export default function DoctorDashboard() {
                 return;
             }
             setEmail(user.email);
-            fetchClinics(user.email);
+            fetchClinics(user.email, user.id);
+            setGreeting(getGreeting());
         };
         checkUser();
     }, [router, supabase]);
 
-    const fetchClinics = async (doctorEmail: string) => {
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return "Good Morning";
+        if (hour < 18) return "Good Afternoon";
+        return "Good Evening";
+    };
+
+    const fetchClinics = async (doctorEmail: string, userId: string) => {
         try {
             const res = await fetch('/api/doctor/clinics', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: doctorEmail })
+                body: JSON.stringify({ email: doctorEmail, userId })
             });
 
             if (!res.ok) {
@@ -64,6 +75,7 @@ export default function DoctorDashboard() {
 
             const data = await res.json();
             setClinics(data.clinics);
+            setDoctorName(data.doctorName || 'Doctor');
         } catch (error) {
             console.error(error);
             toast.error('Failed to load clinics');
@@ -109,14 +121,22 @@ export default function DoctorDashboard() {
                             <Activity className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-slate-900">Command Center</h1>
-                            <p className="text-xs text-slate-500 hidden sm:block">Real-time Multi-Clinic Monitoring</p>
+                            <h1 className="text-xl font-bold text-slate-900">{greeting}, {doctorName}</h1>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="hidden md:flex gap-2 text-slate-600"
+                            onClick={() => router.push('/')}
+                        >
+                            <Home className="w-4 h-4" />
+                            Home
+                        </Button>
                         <div className="text-right hidden md:block">
-                            <p className="text-sm font-medium text-slate-900">{email}</p>
+                            <p className="text-sm font-medium text-slate-900">{doctorName}</p>
                             <p className="text-xs text-slate-500">Super Doctor</p>
                         </div>
                         <Button variant="ghost" size="icon" onClick={handleLogout} className="text-red-500 hover:text-red-600 hover:bg-red-50">
@@ -130,7 +150,7 @@ export default function DoctorDashboard() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
                 {/* Stats Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="bg-white border-none shadow-sm shadow-slate-200">
                         <CardContent className="p-6 flex items-center gap-4">
                             <div className="p-4 rounded-full bg-blue-50 text-blue-600">
@@ -150,17 +170,6 @@ export default function DoctorDashboard() {
                             <div>
                                 <p className="text-sm font-medium text-slate-500">Active Locations</p>
                                 <h3 className="text-3xl font-bold text-slate-900">{activeClinics} <span className="text-slate-300 text-xl font-normal">/ {clinics.length}</span></h3>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-white border-none shadow-sm shadow-slate-200">
-                        <CardContent className="p-6 flex items-center gap-4">
-                            <div className="p-4 rounded-full bg-purple-50 text-purple-600">
-                                <TrendingUp className="w-8 h-8" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-slate-500">System Status</p>
-                                <h3 className="text-3xl font-bold text-slate-900">Optimal</h3>
                             </div>
                         </CardContent>
                     </Card>
@@ -196,7 +205,7 @@ export default function DoctorDashboard() {
                                 </div>
 
                                 <Button
-                                    className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium group-hover:bg-teal-600 transition-colors"
+                                    className="w-full bg-slate-900 text-white font-medium group-hover:bg-teal-600 transition-colors"
                                     onClick={() => handleImpersonate(clinic.slug)}
                                 >
                                     View Live Status <ArrowRight className="w-4 h-4 ml-2" />

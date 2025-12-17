@@ -4,10 +4,23 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(req: Request) {
     try {
-        const { email } = await req.json();
+        const { email, userId } = await req.json();
 
         if (!email) {
             return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+        }
+
+        // Fetch Doctor Name if userId provided
+        let doctorName = 'Doctor';
+        if (userId) {
+            const { data: profile } = await supabaseAdmin
+                .from('profiles')
+                .select('full_name')
+                .eq('id', userId)
+                .single();
+            if (profile?.full_name) {
+                doctorName = profile.full_name;
+            }
         }
 
         // 1. Find clinics owned by this email
@@ -43,7 +56,7 @@ export async function POST(req: Request) {
             };
         }));
 
-        return NextResponse.json({ clinics: enrichedClinics });
+        return NextResponse.json({ clinics: enrichedClinics, doctorName });
 
     } catch (e: any) {
         return NextResponse.json({ error: e.message }, { status: 500 });
