@@ -82,15 +82,34 @@ export async function POST(request: NextRequest) {
   }
 
   // 3. Find next waiting token
-  const { data: nextToken } = await supabase
-    .from('tokens')
-    .select('*')
-    .eq('queue_id', body.queueId)
-    .eq('status', 'waiting')
-    .order('is_emergency', { ascending: false, nullsFirst: false }) // Prioritize emergency
-    .order('token_number', { ascending: true }) // Then FIFO
-    .limit(1)
-    .single();
+  // 3. Find next waiting token
+  let nextToken = null;
+
+  if (body.targetTokenId) {
+    // MANUAL CALL MODE
+    const { data: specificToken } = await supabase
+      .from('tokens')
+      .select('*')
+      .eq('id', body.targetTokenId)
+      .eq('queue_id', body.queueId)
+      .eq('status', 'waiting')
+      .single();
+
+    nextToken = specificToken;
+  } else {
+    // AUTO NEXT MODE
+    const { data: autoToken } = await supabase
+      .from('tokens')
+      .select('*')
+      .eq('queue_id', body.queueId)
+      .eq('status', 'waiting')
+      .order('is_emergency', { ascending: false, nullsFirst: false }) // Prioritize emergency
+      .order('token_number', { ascending: true }) // Then FIFO
+      .limit(1)
+      .single();
+
+    nextToken = autoToken;
+  }
 
   if (!nextToken) {
     return NextResponse.json({

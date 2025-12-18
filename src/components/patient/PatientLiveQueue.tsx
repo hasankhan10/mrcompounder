@@ -101,7 +101,7 @@ export function PatientLiveQueue({
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="text-8xl font-black text-slate-900 tracking-tighter overflow-hidden h-32 flex items-center justify-center relative">
+                                        <div className="text-8xl font-black text-slate-900 tracking-tighter overflow-hidden h-48 flex items-center justify-center relative">
                                             <AnimatePresence mode="popLayout">
                                                 <motion.div
                                                     key={currentToken ? currentToken.token_number : 'none'}
@@ -109,9 +109,17 @@ export function PatientLiveQueue({
                                                     animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
                                                     exit={{ y: -50, opacity: 0, filter: 'blur(10px)' }}
                                                     transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
-                                                    className="absolute"
+                                                    className="absolute flex flex-col items-center w-full"
                                                 >
-                                                    {currentToken ? currentToken.token_number : '--'}
+                                                    <span>{currentToken ? currentToken.token_number : '--'}</span>
+                                                    {currentToken && (currentToken.is_emergency || currentToken.purpose) && (
+                                                        <span className={`text-lg px-4 py-1.5 rounded-full font-bold uppercase tracking-wider mt-2 shadow-sm border ${currentToken.is_emergency ? 'bg-red-50 text-red-600 border-red-100' :
+                                                            currentToken.purpose?.toLowerCase().includes('report') ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                                'bg-teal-50 text-teal-600 border-teal-100'
+                                                            }`}>
+                                                            {currentToken.is_emergency ? 'Emergency' : currentToken.purpose}
+                                                        </span>
+                                                    )}
                                                 </motion.div>
                                             </AnimatePresence>
                                         </div>

@@ -24,7 +24,7 @@ interface BookingTabProps {
 
     onCancelSession: () => void;
     onRegisterPatient: (e: FormEvent) => void;
-    onCallNext: () => void;
+    onCallNext: (queueId?: string, targetTokenId?: string) => void;
     onDeleteToken: (id: string) => void;
     onMarkAbsent: () => void;
 

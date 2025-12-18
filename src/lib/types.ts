@@ -207,6 +207,7 @@ export type RegisterTokenResponse = Token;
 export interface CallNextRequest {
   queueId: string;
   currentCalledTokenId?: string;
+  targetTokenId?: string; // For manual "Pass" / Call Now
 }
 export interface CallNextResponse {
   servedToken?: Token;

@@ -34,10 +34,11 @@ export const dashboardService = {
         return api.post<Token>('/api/dashboard/token/register', data);
     },
 
-    async callNext(queueId: string, currentCalledTokenId?: string) {
+    async callNext(queueId: string, currentCalledTokenId?: string, targetTokenId?: string) {
         return api.post<{ servedToken?: Token; calledToken?: Token; message?: string }>('/api/dashboard/token/call-next', {
             queueId,
-            currentCalledTokenId
+            currentCalledTokenId,
+            targetTokenId
         });
     },
 

@@ -445,7 +445,7 @@ export function DashboardClient({
     }
   }, [activeQueue, loadingAction, newPatientName, newPatientPhone, newPatientPurpose, waitingTokens, servedTokens, clinic, isEmergency, newPatientAge, newPatientGender]);
 
-  const handleCallNext = useCallback(async (queueId?: string) => {
+  const handleCallNext = useCallback(async (queueId?: string, targetTokenId?: string) => {
     if (loadingAction) return;
     const targetQueueId = queueId || activeQueue?.id;
     if (!targetQueueId) return;
@@ -466,14 +466,20 @@ export function DashboardClient({
       .sort((a, b) => a.token_number - b.token_number);
 
     const currentCalled = queueWaitingTokens.find(t => t.status === 'called');
-    // Find next waiting token (ensure sorted by is_emergency desc, then token_number asc)
-    const nextInLine = queueWaitingTokens
-      .filter(t => t.status === 'waiting')
-      .sort((a, b) => {
-        if (a.is_emergency && !b.is_emergency) return -1;
-        if (!a.is_emergency && b.is_emergency) return 1;
-        return a.token_number - b.token_number;
-      })[0];
+    // Find next waiting token
+    let nextInLine: Token | undefined;
+
+    if (targetTokenId) {
+      nextInLine = queueWaitingTokens.find(t => t.id === targetTokenId);
+    } else {
+      nextInLine = queueWaitingTokens
+        .filter(t => t.status === 'waiting')
+        .sort((a, b) => {
+          if (a.is_emergency && !b.is_emergency) return -1;
+          if (!a.is_emergency && b.is_emergency) return 1;
+          return a.token_number - b.token_number;
+        })[0];
+    }
 
     if (!currentCalled && !nextInLine) {
       toast.info('Queue is empty');
@@ -487,7 +493,6 @@ export function DashboardClient({
     // 1. Serve Current
     if (currentCalled) {
       newTokens = newTokens.map(t => t.id === currentCalled.id ? { ...t, status: 'served' } : t);
-
       // Removed optimistic billing update to support dynamic pricing from backend
     }
 
@@ -495,7 +500,7 @@ export function DashboardClient({
     if (nextInLine) {
       const calledToken = { ...nextInLine, status: 'called' as const };
       newTokens = newTokens.map(t => t.id === nextInLine.id ? calledToken : t);
-      toast.success(`Calling Token #${calledToken.token_number}`);
+      toast.success(targetTokenId ? `Priority Call: Token #${calledToken.token_number}` : `Calling Token #${calledToken.token_number}`);
     } else {
       toast.info('Patient served. Queue is empty.');
     }
@@ -503,7 +508,7 @@ export function DashboardClient({
     setTokens(newTokens);
 
     try {
-      await dashboardService.callNext(targetQueueId, currentCalled?.id);
+      await dashboardService.callNext(targetQueueId, currentCalled?.id, targetTokenId);
 
       // Best practice: Trust Optimistic, let Real-time fix drift.
 
@@ -746,7 +751,7 @@ export function DashboardClient({
 
             onCancelSession={handleCancelSession}
             onRegisterPatient={handleRegisterPatient}
-            onCallNext={handleCallNext}
+            onCallNext={() => handleCallNext()}
             onMarkAbsent={handleMarkAbsent}
             onDeleteToken={handleDeleteToken}
             newDoctorName={newDoctorName}

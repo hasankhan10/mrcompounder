@@ -19,7 +19,7 @@ interface OverviewTabProps {
     servedTokens: Token[];
     onToggleBreak: () => void;
     onEndSession: () => void;
-    onCallNext: (queueId?: string) => void;
+    onCallNext: (queueId?: string, targetTokenId?: string) => void;
     onDeleteToken: (id: string) => void;
     onMarkAbsent: () => void;
     loadingAction: string | null;
