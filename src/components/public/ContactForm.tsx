@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 export function ContactForm() {
     const [formData, setFormData] = useState({
@@ -20,19 +21,34 @@ export function ContactForm() {
         setFormData(prevState => ({ ...prevState, [name]: value }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         setIsSubmitting(true);
         setSubmissionStatus(null);
 
+        const formPayload = new FormData(event.currentTarget);
+        formPayload.append("access_key", "1e4fe8c3-901f-46ab-8a40-99623595be86");
+
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            setSubmissionStatus('success');
-            setFormData({ name: '', email: '', message: '' }); // Clear form
+            const response = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                body: formPayload
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setSubmissionStatus('success');
+                setFormData({ name: '', email: '', message: '' }); // Clear form
+                toast.success("Message sent successfully!");
+            } else {
+                setSubmissionStatus('error');
+                toast.error("Error sending message: " + data.message);
+            }
         } catch (error) {
             console.error('Failed to submit contact form:', error);
             setSubmissionStatus('error');
+            toast.error("Failed to connect to the server.");
         } finally {
             setIsSubmitting(false);
         }
@@ -54,6 +70,9 @@ export function ContactForm() {
                     <Label htmlFor="message">Your Message</Label>
                     <Textarea id="message" name="message" value={formData.message} onChange={handleChange} rows={5} required className="mt-1 bg-white" />
                 </div>
+                {/* Gotcha field for spam protection */}
+                <Input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
+
                 <Button type="submit" className="w-full bg-teal-700 text-lg py-3 text-white hover:scale-105 transition-all" disabled={isSubmitting}>
                     {isSubmitting ? 'Sending...' : 'Send Message'}
                 </Button>
