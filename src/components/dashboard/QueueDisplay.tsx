@@ -136,11 +136,11 @@ export function QueueDisplay({ doctorName, doctorImageUrl, waitingTokens, served
                                             {onCallNext && token.status === 'waiting' && isSessionActive && (
                                                 <button
                                                     onClick={() => onCallNext(token.id)}
-                                                    className="text-teal-600 hover:text-teal-700 p-1.5 rounded-full hover:bg-teal-50 transition-colors"
+                                                    className="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-3 py-1.5 rounded-md shadow-sm transition-colors"
                                                     title="Pass / Call Now"
                                                     disabled={!!loadingAction}
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                                                    Call
                                                 </button>
                                             )}
                                             {onSendWhatsApp && (

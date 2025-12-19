@@ -751,7 +751,7 @@ export function DashboardClient({
 
             onCancelSession={handleCancelSession}
             onRegisterPatient={handleRegisterPatient}
-            onCallNext={() => handleCallNext()}
+            onCallNext={handleCallNext}
             onMarkAbsent={handleMarkAbsent}
             onDeleteToken={handleDeleteToken}
             newDoctorName={newDoctorName}

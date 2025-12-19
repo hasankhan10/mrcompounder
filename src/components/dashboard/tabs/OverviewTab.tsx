@@ -102,7 +102,7 @@ export function OverviewTab({
                     doctorImageUrl={activeQueue!.doctor_image_url}
                     waitingTokens={waitingTokens}
                     servedTokens={servedTokens}
-                    onCallNext={onCallNext}
+                    onCallNext={(tokenId) => onCallNext(undefined, tokenId)}
                     onMarkAbsent={onMarkAbsent}
                     isSessionActive={activeQueue!.status === 'active'}
                     onDeleteToken={onDeleteToken}
