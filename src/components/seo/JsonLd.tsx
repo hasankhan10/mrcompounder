@@ -8,6 +8,14 @@ export function JsonLd() {
         description: APP_DESCRIPTION,
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Web',
+        author: {
+            '@type': 'Person',
+            name: 'Mehedi Hassan'
+        },
+        creator: {
+            '@type': 'Person',
+            name: 'Mehedi Hassan'
+        },
         offers: {
             '@type': 'Offer',
             price: '0',

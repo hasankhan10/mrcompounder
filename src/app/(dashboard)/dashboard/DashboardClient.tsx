@@ -675,9 +675,23 @@ export function DashboardClient({
               <p className="text-slate-500 mt-1">Monitor queue status and call patients.</p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-lg font-medium bg-white px-4 py-2 rounded-lg border border-slate-100 shadow-sm flex items-center gap-3">
+              {/* Billing Status Display */}
+              <div className={`text-lg font-medium bg-white px-4 py-2 rounded-lg border shadow-sm flex items-center gap-3 relative overflow-hidden ${
+                // Dynamic Border Color
+                (() => {
+                  const today = new Date().getDate();
+                  if (clinic.current_due > 0 && today > 6) return 'border-red-500 ring-1 ring-red-100'; // Overdue
+                  if (clinic.current_due > 0 && today > 3) return 'border-orange-300'; // Grace
+                  return 'border-slate-100'; // Normal
+                })()
+                }`}>
+                {/* Nag Strip for Overdue */}
+                {clinic.current_due > 0 && new Date().getDate() > 6 && (
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-red-600 animate-pulse" />
+                )}
+
                 {trialActive ? (
-                  <span className="text-green-600 font-bold flex items-center">
+                  <span className="text-green-600 font-bold flex items-center pl-2">
                     <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
                     Trial Active
                     <div className="ml-2 pl-2 border-l border-slate-200">
@@ -686,23 +700,41 @@ export function DashboardClient({
                   </span>
                 ) : (
                   <>
-                    <span className="font-bold flex items-center gap-1">
-                      <span className="text-slate-900">Current Bill:</span>
-                      <span className={getBalanceColor()}>₹{clinic.current_due}</span>
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8 text-xs gap-1 bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100 hover:text-teal-800"
-                      onClick={() => processPayment(clinic.current_due, {
-                        clinicId: clinic.id,
-                        clinicName: clinic.name,
-                        clinicContact: clinic.contact_number
-                      })}
-                      disabled={isPaymentLoading}
-                    >
-                      {isPaymentLoading ? 'Processing...' : <><IndianRupee className="w-3 h-3" /> Pay Bill</>}
-                    </Button>
+                    <div className="flex flex-col items-end leading-tight pl-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        {(() => {
+                          const day = new Date().getDate();
+                          if (clinic.current_due > 0) {
+                            if (day > 6) return 'Payment Overdue';
+                            if (day > 3) return 'Bill Generated';
+                          }
+                          return 'Unbilled Amount';
+                        })()}
+                      </span>
+                      <span className={`font-bold text-xl flex items-center gap-1 ${clinic.current_due > 0 && new Date().getDate() > 6 ? 'text-red-600' :
+                          clinic.current_due > 0 && new Date().getDate() > 3 ? 'text-orange-600' : 'text-slate-700'
+                        }`}>
+                        ₹{clinic.current_due}
+                      </span>
+                    </div>
+
+                    {clinic.current_due > 0 && (
+                      <Button
+                        size="sm"
+                        className={`ml-2 h-8 text-xs gap-1 shadow-sm transition-all ${new Date().getDate() > 6
+                            ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse hover:animate-none'
+                            : 'bg-teal-600 hover:bg-teal-700 text-white'
+                          }`}
+                        onClick={() => processPayment(clinic.current_due, {
+                          clinicId: clinic.id,
+                          clinicName: clinic.name,
+                          clinicContact: clinic.contact_number
+                        })}
+                        disabled={isPaymentLoading}
+                      >
+                        {isPaymentLoading ? 'Processing...' : <><IndianRupee className="w-3 h-3" /> Pay Now</>}
+                      </Button>
+                    )}
                   </>
                 )}
               </div>

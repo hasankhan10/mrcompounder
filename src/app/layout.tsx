@@ -25,9 +25,9 @@ export const metadata: Metadata = {
   },
   description: APP_DESCRIPTION,
   keywords: ['clinic management', 'queue management', 'token system', 'smart clinic', 'doctor appointment', 'patient queue', 'digital token', 'mr compounder'],
-  authors: [{ name: 'Stova Media', url: 'https://stovamedia.in' }],
-  creator: 'Stova Media',
-  publisher: 'Stova Media',
+  authors: [{ name: 'Mehedi Hassan' }],
+  creator: 'Mehedi Hassan',
+  publisher: 'Mehedi Hassan',
   robots: {
     index: true,
     follow: true,
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     title: `${APP_NAME} - Smart Queue Management`,
     description: APP_DESCRIPTION,
     images: ['/og-image.png'],
-    creator: '@stovamedia',
+    creator: '@mrcompounder', // Updated to generic or remove
   },
   verification: {
     google: 'rUa5vkdxLeHoXy5bVbe0pRkZ1NsmDne-nwcaRvnUVBI',

@@ -16,6 +16,9 @@ function SiteFooter() {
           <Link href="/privacy" className="hover:text-blue-400 transition-colors duration-200">Privacy Policy</Link>
         </div>
         <p className="text-gray-400">&copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.</p>
+        <p className="text-gray-500 text-sm mt-2">
+          Created by <span className="text-gray-300 font-medium">Mehedi Hassan</span>
+        </p>
       </div>
     </footer>
   );
