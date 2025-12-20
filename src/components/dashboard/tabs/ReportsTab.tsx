@@ -1,20 +1,26 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { dashboardService } from '@/services/dashboard';
 import { toast } from 'sonner';
+import { Calendar, FileDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-import { FileDown, Loader2, Calendar, Calculator } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ReportItem } from '@/lib/types';
+import { useReportStats } from '@/hooks/useReportStats';
+import { exportReportsToExcel } from '@/utils/exportReports';
 
-
+import { ReportsFilter } from '@/components/dashboard/reports/ReportsFilter';
+import { ReportsSummaryTable } from '@/components/dashboard/reports/ReportsSummaryTable';
+import { ReportsDetailedTable } from '@/components/dashboard/reports/ReportsDetailedTable';
+import { RevenueCalculator } from '@/components/dashboard/reports/RevenueCalculator';
 
 export function ReportsTab() {
     const [reportType, setReportType] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
     const [dateValue, setDateValue] = useState<string>(new Date().toISOString().slice(0, 7)); // Default to current month
     const [isGenerating, setIsGenerating] = useState(false);
-    const [showDetails, setShowDetails] = useState(false);
-    const [reportData, setReportData] = useState<{ queues: { doctor_name: string }; status: string; created_at: string; patient_name: string; phone: string; token_number: number; is_emergency?: boolean; purpose?: string }[] | null>(null);
+    const [reportData, setReportData] = useState<ReportItem[] | null>(null);
+
+    const { doctorStats, catStats } = useReportStats(reportData);
 
     const handleGenerateReport = async () => {
         if (!dateValue) {
@@ -34,67 +40,10 @@ export function ReportsTab() {
         }
     };
 
-    // ... (existing handleDownloadExcel logic, kept same)
-
     const handleDownloadExcel = async () => {
-        if (!reportData || reportData.length === 0) {
-            toast.error('No data to download');
-            return;
+        if (reportData) {
+            await exportReportsToExcel(reportData, reportType, dateValue);
         }
-
-        const XLSX = await import('xlsx');
-
-        // 1. Prepare Summary Data (Doctor-wise)
-        const doctorStats: Record<string, { booked: number; present: number; absent: number }> = {};
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        reportData.forEach((token: any) => {
-            const doctorName = token.queues?.doctor_name || 'Unknown';
-            if (!doctorStats[doctorName]) {
-                doctorStats[doctorName] = { booked: 0, present: 0, absent: 0 };
-            }
-
-            doctorStats[doctorName].booked++;
-
-            if (token.status === 'served') {
-                doctorStats[doctorName].present++;
-            } else if (token.status === 'no_show') {
-                doctorStats[doctorName].absent++;
-            }
-        });
-
-        const summarySheetData = Object.entries(doctorStats).map(([docName, stats]) => ({
-            'Doctor Name': docName,
-            'Total Booked': stats.booked,
-            'Present (Served)': stats.present,
-            'Absent (No Show)': stats.absent,
-            'Attendance Rate': stats.booked > 0 ? `${((stats.present / stats.booked) * 100).toFixed(1)}%` : '0%'
-        }));
-
-        // 2. Prepare Detailed Log Data
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const logSheetData = reportData.map((token: any) => ({
-            'Date': new Date(token.created_at).toLocaleDateString(),
-            'Time': new Date(token.created_at).toLocaleTimeString(),
-            'Doctor Name': token.queues?.doctor_name || 'Unknown',
-            'Patient Name': token.patient_name || 'N/A',
-            'Phone': token.phone,
-            'Token Number': token.token_number,
-            'Status': token.status.toUpperCase()
-        }));
-
-        // 3. Create Workbook
-        const wb = XLSX.utils.book_new();
-
-        const summaryWs = XLSX.utils.json_to_sheet(summarySheetData);
-        XLSX.utils.book_append_sheet(wb, summaryWs, "Doctor Performance");
-
-        const logWs = XLSX.utils.json_to_sheet(logSheetData);
-        XLSX.utils.book_append_sheet(wb, logWs, "Detailed Logs");
-
-        // 4. Download
-        XLSX.writeFile(wb, `Clinic_Report_${reportType}_${dateValue}.xlsx`);
-        toast.success('Excel file downloaded');
     };
 
     return (
@@ -112,95 +61,19 @@ export function ReportsTab() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="flex flex-col md:flex-row gap-4 items-end">
-
-                        <div className="w-full md:w-48">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Report Type</label>
-                            <Select
-                                value={reportType}
-                                onValueChange={(val: 'daily' | 'weekly' | 'monthly') => {
-                                    setReportType(val);
-                                    // Reset date value based on type to avoid invalid formats
-                                    if (val === 'daily') setDateValue(new Date().toISOString().slice(0, 10));
-                                    else if (val === 'monthly') setDateValue(new Date().toISOString().slice(0, 7));
-                                    else if (val === 'weekly') setDateValue(`${new Date().getFullYear()}-W${Math.ceil((new Date().getDate() + 6 - new Date().getDay()) / 7)}`); // Rough default week, improved by user pick
-                                }}
-                            >
-                                <SelectTrigger className="bg-white">
-                                    <SelectValue placeholder="Select type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="daily">Daily</SelectItem>
-                                    <SelectItem value="weekly">Weekly</SelectItem>
-                                    <SelectItem value="monthly">Monthly</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="w-full md:w-64">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">
-                                {reportType === 'daily' ? 'Select Date' : reportType === 'weekly' ? 'Select Week' : 'Select Month'}
-                            </label>
-                            <input
-                                type={reportType === 'daily' ? 'date' : reportType === 'weekly' ? 'week' : 'month'}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={dateValue}
-                                onChange={(e) => setDateValue(e.target.value)}
-                            />
-                        </div>
-
-                        <Button
-                            onClick={handleGenerateReport}
-                            disabled={isGenerating}
-                            className="bg-teal-600 hover:bg-teal-700 text-white"
-                        >
-                            {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                            {isGenerating ? 'Fetching Data...' : 'Get Report'}
-                        </Button>
-                    </div>
+                    <ReportsFilter
+                        reportType={reportType}
+                        setReportType={setReportType}
+                        dateValue={dateValue}
+                        setDateValue={setDateValue}
+                        handleGenerateReport={handleGenerateReport}
+                        isGenerating={isGenerating}
+                    />
 
                     {reportData && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
                             {/* Preview Table */}
-                            <div className="border rounded-lg overflow-hidden overflow-x-auto max-w-[80vw] md:max-w-full mx-auto">
-                                <table className="w-full text-sm text-left min-w-[600px]">
-                                    <thead className="bg-slate-50 text-slate-700 font-medium border-b">
-                                        <tr>
-                                            <th className="px-4 py-3 whitespace-nowrap">Doctor Name</th>
-                                            <th className="px-4 py-3 text-center whitespace-nowrap">Total Booked</th>
-                                            <th className="px-4 py-3 text-center whitespace-nowrap">Present</th>
-                                            <th className="px-4 py-3 text-center whitespace-nowrap">Absent</th>
-                                            <th className="px-4 py-3 text-right whitespace-nowrap">Attendance Rate</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100 bg-white">
-                                        {(() => {
-                                            const doctorStats: Record<string, { booked: number; present: number; absent: number }> = {};
-                                            reportData.forEach((token) => {
-                                                const doctorName = token.queues?.doctor_name || 'Unknown';
-                                                if (!doctorStats[doctorName]) {
-                                                    doctorStats[doctorName] = { booked: 0, present: 0, absent: 0 };
-                                                }
-                                                doctorStats[doctorName].booked++;
-                                                if (token.status === 'served') doctorStats[doctorName].present++;
-                                                else if (token.status === 'no_show') doctorStats[doctorName].absent++;
-                                            });
-
-                                            return Object.entries(doctorStats).map(([docName, stats]) => (
-                                                <tr key={docName} className="hover:bg-slate-50">
-                                                    <td className="px-4 py-3 font-medium text-slate-900 whitespace-nowrap">{docName}</td>
-                                                    <td className="px-4 py-3 text-center">{stats.booked}</td>
-                                                    <td className="px-4 py-3 text-center text-green-600">{stats.present}</td>
-                                                    <td className="px-4 py-3 text-center text-red-600">{stats.absent}</td>
-                                                    <td className="px-4 py-3 text-right font-bold">
-                                                        {stats.booked > 0 ? `${((stats.present / stats.booked) * 100).toFixed(1)}%` : '0%'}
-                                                    </td>
-                                                </tr>
-                                            ));
-                                        })()}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <ReportsSummaryTable doctorStats={doctorStats} />
 
                             <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
                                 <div>
@@ -219,74 +92,8 @@ export function ReportsTab() {
                                 </Button>
                             </div>
 
-                            {/* Category Breakdown Toggle */}
-                            <div className="flex justify-center">
-                                <Button
-                                    onClick={() => setShowDetails(!showDetails)}
-                                    variant="outline"
-                                    className="border-teal-200 text-teal-700"
-                                >
-                                    {showDetails ? 'Hide Detailed Breakdown' : 'Show Detailed Report (Categories)'}
-                                </Button>
-                            </div>
-
-                            {/* Detailed Stats Section */}
-                            {showDetails && (
-                                <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
-                                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <div className="w-2 h-6 bg-indigo-500 rounded-full"></div>
-                                        Patient Category Breakdown
-                                    </h3>
-                                    <div className="border rounded-lg overflow-hidden overflow-x-auto">
-                                        <table className="w-full text-sm text-left min-w-[600px]">
-                                            <thead className="bg-indigo-50 text-indigo-900 font-medium border-b border-indigo-100">
-                                                <tr>
-                                                    <th className="px-4 py-3 whitespace-nowrap">Doctor Name</th>
-                                                    <th className="px-4 py-3 text-center whitespace-nowrap">Total Served</th>
-                                                    <th className="px-4 py-3 text-center whitespace-nowrap text-red-600">🚨 Emergency</th>
-                                                    <th className="px-4 py-3 text-center whitespace-nowrap text-blue-600">📄 Reports</th>
-                                                    <th className="px-4 py-3 text-center whitespace-nowrap text-teal-600">🩺 Checkups</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-slate-100 bg-white">
-                                                {(() => {
-                                                    const catStats: Record<string, { total: number; emergency: number; report: number; checkup: number }> = {};
-
-                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                    reportData.forEach((token: any) => {
-                                                        const doctorName = token.queues?.doctor_name || 'Unknown';
-                                                        if (!catStats[doctorName]) {
-                                                            catStats[doctorName] = { total: 0, emergency: 0, report: 0, checkup: 0 };
-                                                        }
-
-                                                        if (token.status === 'served') {
-                                                            catStats[doctorName].total++;
-
-                                                            if (token.is_emergency) {
-                                                                catStats[doctorName].emergency++;
-                                                            } else if (token.purpose?.toLowerCase().includes('report')) {
-                                                                catStats[doctorName].report++;
-                                                            } else {
-                                                                catStats[doctorName].checkup++;
-                                                            }
-                                                        }
-                                                    });
-
-                                                    return Object.entries(catStats).map(([docName, stats]) => (
-                                                        <tr key={docName} className="hover:bg-slate-50">
-                                                            <td className="px-4 py-3 font-medium text-slate-900">{docName}</td>
-                                                            <td className="px-4 py-3 text-center font-bold">{stats.total}</td>
-                                                            <td className="px-4 py-3 text-center bg-red-50/50 text-red-700 font-medium border-l border-r border-slate-100">{stats.emergency}</td>
-                                                            <td className="px-4 py-3 text-center bg-blue-50/50 text-blue-700 font-medium border-r border-slate-100">{stats.report}</td>
-                                                            <td className="px-4 py-3 text-center bg-teal-50/50 text-teal-700 font-medium">{stats.checkup}</td>
-                                                        </tr>
-                                                    ));
-                                                })()}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
+                            {/* Category Breakdown */}
+                            <ReportsDetailedTable catStats={catStats} />
 
                             {/* Revenue Calculator */}
                             <RevenueCalculator reportData={reportData} />
@@ -296,125 +103,5 @@ export function ReportsTab() {
             </Card>
         </div>
     );
-
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function RevenueCalculator({ reportData }: { reportData: any[] }) {
-    const [selectedDoctor, setSelectedDoctor] = useState<string>('');
-    const [doctorFee, setDoctorFee] = useState<string>('');
-    const [clinicCommission, setClinicCommission] = useState<string>('');
-    const [result, setResult] = useState<{ served: number; total: number; doctorShare: number; clinicShare: number; hasCommission: boolean } | null>(null);
-
-    // Extract unique doctors
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const doctors = Array.from(new Set(reportData.map((r: any) => r.queues?.doctor_name || 'Unknown'))) as string[];
-
-    const handleCalculate = () => {
-        if (!selectedDoctor || !doctorFee) {
-            toast.error('Please fill Doctor and Fees');
-            return;
-        }
-
-        const fee = parseFloat(doctorFee);
-        const commission = clinicCommission ? parseFloat(clinicCommission) : 0;
-
-        if (isNaN(fee) || (clinicCommission && isNaN(commission))) {
-            toast.error('Invalid numeric values');
-            return;
-        }
-
-        // Count served patients for selected doctor
-        // Count served patients for selected doctor
-        const servedCount = reportData.filter(
-            (r: { queues: { doctor_name: string }; status: string }) => (r.queues?.doctor_name || 'Unknown') === selectedDoctor && r.status === 'served'
-        ).length;
-
-        const totalCollection = servedCount * fee;
-        const clinicShare = servedCount * commission;
-        const doctorShare = totalCollection - clinicShare;
-
-        setResult({
-            served: servedCount,
-            total: totalCollection,
-            doctorShare,
-            clinicShare,
-            hasCommission: clinicCommission !== ''
-        });
-    };
-
-    return (
-        <Card className="border shadow-none bg-slate-50">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-slate-800">
-                    <Calculator className="w-5 h-5 text-indigo-600" />
-                    Revenue Calculator
-                </CardTitle>
-                <p className="text-sm text-slate-500">Calculate doctor earnings and clinic commission.</p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <div className="w-full">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Doctor</label>
-                        <Select onValueChange={setSelectedDoctor} value={selectedDoctor}>
-                            <SelectTrigger className="bg-white text-slate-900 border-slate-200">
-                                <SelectValue placeholder="Select Doctor" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {doctors.map((doc) => (
-                                    <SelectItem key={doc} value={doc}>{doc}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="w-full">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Doctor Fee (₹)</label>
-                        <input
-                            type="number"
-                            className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-slate-900"
-                            placeholder="e.g. 500"
-                            value={doctorFee}
-                            onChange={e => setDoctorFee(e.target.value)}
-                        />
-                    </div>
-                    <div className="w-full">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Commission (₹) <span className="text-slate-400 font-normal">(Optional)</span></label>
-                        <input
-                            type="number"
-                            className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-slate-900"
-                            placeholder="0"
-                            value={clinicCommission}
-                            onChange={e => setClinicCommission(e.target.value)}
-                        />
-                    </div>
-                    <Button onClick={handleCalculate} className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium">
-                        Calculate
-                    </Button>
-                </div>
-
-                {result && (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 animate-in slide-in-from-top-2">
-                        <div className="bg-white p-4 rounded-lg border shadow-sm">
-                            <p className="text-sm text-slate-500 font-medium">Patients Served</p>
-                            <p className="text-2xl font-bold text-slate-900 mt-1">{result.served}</p>
-                        </div>
-                        <div className="bg-white p-4 rounded-lg border shadow-sm">
-                            <p className="text-sm text-slate-500 font-medium">Total Collection</p>
-                            <p className="text-2xl font-bold text-slate-900 mt-1">₹{result.total.toLocaleString()}</p>
-                        </div>
-                        <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100 shadow-sm">
-                            <p className="text-sm text-indigo-700 font-medium">Doctor&apos;s Earning</p>
-                            <p className="text-2xl font-bold text-indigo-900 mt-1">₹{result.doctorShare.toLocaleString()}</p>
-                        </div>
-                        {result.hasCommission && (
-                            <div className="bg-teal-50 p-4 rounded-lg border border-teal-100 shadow-sm">
-                                <p className="text-sm text-teal-700 font-medium">Clinic Revenue</p>
-                                <p className="text-2xl font-bold text-teal-900 mt-1">₹{result.clinicShare.toLocaleString()}</p>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </CardContent>
-        </Card>
-    );
-}

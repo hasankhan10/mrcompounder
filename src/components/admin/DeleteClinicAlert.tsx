@@ -11,15 +11,14 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface DeleteClinicAlertProps {
-    isOpen: boolean;
+    open: boolean;
     onOpenChange: (open: boolean) => void;
     onConfirm: () => void;
-    clinicName?: string;
 }
 
-export function DeleteClinicAlert({ isOpen, onOpenChange, onConfirm, clinicName }: DeleteClinicAlertProps) {
+export function DeleteClinicAlert({ open, onOpenChange, onConfirm }: DeleteClinicAlertProps) {
     return (
-        <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+        <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent className="bg-white">
                 <AlertDialogHeader>
                     <AlertDialogTitle className="text-red-600">Are you absolutely sure?</AlertDialogTitle>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, FormEvent, useCallback } from 'react';
+import { useState, useEffect, FormEvent, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { Clinic, Queue, Token, RecentDoctor } from '@/lib/types';
@@ -69,21 +69,29 @@ export function DashboardClient({
 
   // Derived Data
   const activeQueue = activeQueues.find(q => q.id === selectedQueueId) || null;
-  const waitingTokens = tokens
-    .filter(t => t.queue_id === selectedQueueId && (t.status === 'waiting' || t.status === 'called'))
-    .sort((a, b) => {
-      // Priority to 'called' status always
-      if (a.status === 'called') return -1;
-      if (b.status === 'called') return 1;
 
-      // Then Priority to Emergency
-      if (a.is_emergency && !b.is_emergency) return -1;
-      if (!a.is_emergency && b.is_emergency) return 1;
+  const waitingTokens = useMemo(() => {
+    return tokens
+      .filter(t => t.queue_id === selectedQueueId && (t.status === 'waiting' || t.status === 'called'))
+      .sort((a, b) => {
+        // Priority to 'called' status always
+        if (a.status === 'called') return -1;
+        if (b.status === 'called') return 1;
 
-      // Then Token Number
-      return a.token_number - b.token_number;
-    });
-  const servedTokens = tokens.filter(t => t.queue_id === selectedQueueId && t.status === 'served').sort((a, b) => (b.served_at || '').localeCompare(a.served_at || ''));
+        // Then Priority to Emergency
+        if (a.is_emergency && !b.is_emergency) return -1;
+        if (!a.is_emergency && b.is_emergency) return 1;
+
+        // Then Token Number
+        return a.token_number - b.token_number;
+      });
+  }, [tokens, selectedQueueId]);
+
+  const servedTokens = useMemo(() => {
+    return tokens
+      .filter(t => t.queue_id === selectedQueueId && t.status === 'served')
+      .sort((a, b) => (b.served_at || '').localeCompare(a.served_at || ''));
+  }, [tokens, selectedQueueId]);
   // Low balance warning removed for postpaid model
 
   // Form state
@@ -618,7 +626,7 @@ export function DashboardClient({
   }, [loadingAction, performDeleteToken]);
 
 
-  if (!clinic) return null;
+
 
   const navItems: NavItem[] = [
     { label: 'Overview', value: 'overview', icon: PieChart },
@@ -628,12 +636,7 @@ export function DashboardClient({
     { label: 'Settings', value: 'settings', icon: Settings },
   ];
 
-  const getBalanceColor = () => {
-    const day = new Date().getDate();
-    if (day <= 10) return 'text-green-600';
-    if (day <= 20) return 'text-yellow-600';
-    return 'text-red-600';
-  };
+
 
   const trialActive = isTrialActive(clinic, mounted ? new Date() : new Date(serverTime));
 
@@ -653,6 +656,8 @@ export function DashboardClient({
     const waUrl = `https://wa.me/91${token.phone}?text=${message}`;
     window.open(waUrl, '_blank');
   }, [clinic]);
+
+  if (!clinic) return null;
 
   return (
     <DashboardShell
@@ -712,7 +717,7 @@ export function DashboardClient({
                         })()}
                       </span>
                       <span className={`font-bold text-xl flex items-center gap-1 ${clinic.current_due > 0 && new Date().getDate() > 6 ? 'text-red-600' :
-                          clinic.current_due > 0 && new Date().getDate() > 3 ? 'text-orange-600' : 'text-slate-700'
+                        clinic.current_due > 0 && new Date().getDate() > 3 ? 'text-orange-600' : 'text-slate-700'
                         }`}>
                         ₹{clinic.current_due}
                       </span>
@@ -722,8 +727,8 @@ export function DashboardClient({
                       <Button
                         size="sm"
                         className={`ml-2 h-8 text-xs gap-1 shadow-sm transition-all ${new Date().getDate() > 6
-                            ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse hover:animate-none'
-                            : 'bg-teal-600 hover:bg-teal-700 text-white'
+                          ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse hover:animate-none'
+                          : 'bg-teal-600 hover:bg-teal-700 text-white'
                           }`}
                         onClick={() => processPayment(clinic.current_due, {
                           clinicId: clinic.id,

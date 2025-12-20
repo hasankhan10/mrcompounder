@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, UserPlus } from 'lucide-react';
+import { Search, UserPlus } from 'lucide-react';
 
 interface DoctorListHeaderProps {
     searchQuery: string;

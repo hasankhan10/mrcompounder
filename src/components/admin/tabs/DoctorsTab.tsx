@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { DoctorListHeader } from '@/components/admin/DoctorListHeader';
 import { DoctorTable } from '@/components/admin/DoctorTable';
 import { CreateDoctorDialog } from '@/components/admin/CreateDoctorDialog';
@@ -18,10 +18,6 @@ interface DoctorsTabProps {
 }
 
 export function DoctorsTab({ doctors, isLoading, onRefresh, onDelete }: DoctorsTabProps) {
-    if (isLoading) {
-        return <DoctorTableSkeleton />;
-    }
-
     const [searchQuery, setSearchQuery] = useState('');
 
     // Create Dialog State
@@ -32,6 +28,10 @@ export function DoctorsTab({ doctors, isLoading, onRefresh, onDelete }: DoctorsT
     const [newPassword, setNewPassword] = useState('');
     const [logoFile, setLogoFile] = useState<File | null>(null);
     const [supabase] = useState(() => createClient()); // Need client for storage upload
+
+    if (isLoading) {
+        return <DoctorTableSkeleton />;
+    }
 
 
 
@@ -73,6 +73,7 @@ export function DoctorsTab({ doctors, isLoading, onRefresh, onDelete }: DoctorsT
 
             // Refresh list
             onRefresh();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error(error);
             toast.error(error.message || 'Failed to create doctor');

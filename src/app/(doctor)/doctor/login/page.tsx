@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -7,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { Loader2, ArrowRight, LayoutDashboard, MapPin, Users } from 'lucide-react';
+import { Loader2, ArrowRight, LayoutDashboard } from 'lucide-react';
 
 export default function DoctorLogin() {
     const [email, setEmail] = useState('');
@@ -39,6 +38,7 @@ export default function DoctorLogin() {
             router.push('/doctor/dashboard');
             toast.success('Welcome back, Doctor!');
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             toast.error(error.message);
         } finally {

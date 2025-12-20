@@ -58,7 +58,9 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ clinics: enrichedClinics, doctorName });
 
-    } catch (e: any) {
-        return NextResponse.json({ error: e.message }, { status: 500 });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
+

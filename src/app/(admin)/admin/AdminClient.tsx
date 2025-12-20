@@ -2,7 +2,6 @@
 
 import { APP_NAME } from '@/lib/config';
 import { useState, useEffect, FormEvent, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { Clinic } from '@/lib/types';
 import { toast } from 'sonner';
@@ -33,7 +32,7 @@ interface AdminClientProps {
 
 export function AdminClient({ initialClinics }: AdminClientProps) {
   const [supabase] = useState(() => createClient());
-  const router = useRouter();
+  // const router = useRouter();
 
   // Page-level state
   const [activeTab, setActiveTab] = useState('overview');
@@ -527,10 +526,9 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
       {/* Delete Clinic Alert */}
       <DeleteClinicAlert
-        isOpen={isDeleteAlertOpen}
+        open={isDeleteAlertOpen}
         onOpenChange={setIsDeleteAlertOpen}
         onConfirm={handleConfirmDelete}
-        clinicName={selectedClinic?.name || ''}
       />
 
       {/* Delete Doctor Alert */}
@@ -571,7 +569,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       />
 
       <DeleteClinicAlert
-        isOpen={isDeleteAlertOpen}
+        open={isDeleteAlertOpen}
         onOpenChange={setIsDeleteAlertOpen}
         onConfirm={handleConfirmDelete}
       />

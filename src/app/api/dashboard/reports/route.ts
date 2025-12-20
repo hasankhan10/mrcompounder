@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, parseISO } from 'date-fns';
+import { startOfDay, endOfDay, endOfWeek, startOfMonth, endOfMonth, parseISO } from 'date-fns';
 
 /**
  * GET /api/dashboard/reports
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         } else {
             return new NextResponse(JSON.stringify({ error: 'Invalid report type' }), { status: 400 });
         }
-    } catch (e) {
+    } catch {
         return new NextResponse(JSON.stringify({ error: 'Invalid date format' }), { status: 400 });
     }
 
@@ -73,12 +73,12 @@ export async function GET(request: NextRequest) {
         const { data: tokens, error } = await supabase
             .from('tokens')
             .select(`
-        *,
-        queues (
-          doctor_name,
-          session_date
-        )
-      `)
+    *,
+    queues(
+        doctor_name,
+        session_date
+    )
+        `)
             .eq('clinic_id', profile.clinic_id)
             .gte('created_at', startDate.toISOString())
             .lte('created_at', endDate.toISOString()) // Use lte for inclusive end of day

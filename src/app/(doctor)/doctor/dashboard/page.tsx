@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, MapPin, Users, Activity, LogOut, ArrowRight, TrendingUp, Home } from 'lucide-react';
+import { Users, Activity, LogOut, ArrowRight, Home, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase-client';
 
@@ -19,14 +19,14 @@ interface ClinicSummary {
 }
 
 export default function DoctorDashboard() {
-    const [email, setEmail] = useState<string | null>(null);
+    const [supabase] = useState(() => createClient());
+
     const [clinics, setClinics] = useState<ClinicSummary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [doctorName, setDoctorName] = useState<string>('');
     const [greeting, setGreeting] = useState<string>('');
 
     const router = useRouter();
-    const supabase = createClient();
 
     useEffect(() => {
         const checkUser = async () => {
@@ -39,7 +39,7 @@ export default function DoctorDashboard() {
                 toast.error("User email is missing");
                 return;
             }
-            setEmail(user.email);
+            // setEmail(user.email); // Removed
             fetchClinics(user.email, user.id);
             setGreeting(getGreeting());
         };

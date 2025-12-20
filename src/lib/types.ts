@@ -268,4 +268,6 @@ export interface ReportItem {
   queues: {
     doctor_name: string;
   };
+  is_emergency?: boolean;
+  purpose?: string;
 }

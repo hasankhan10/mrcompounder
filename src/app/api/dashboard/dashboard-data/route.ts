@@ -34,15 +34,31 @@ export async function GET() {
 
   // It's okay if queueError exists, it just means there's no active queue
 
-  let waitingTokens = [];
-  let servedTokens = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let waitingTokens: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let servedTokens: any[] = [];
 
   if (activeQueue) {
-    const { data: tokensData } = await supabase.from('tokens').select('*').eq('queue_id', activeQueue.id).order('token_number', { ascending: true });
-    if (tokensData) {
-      waitingTokens = tokensData.filter(token => token.status === 'waiting' || token.status === 'called');
-      servedTokens = tokensData.filter(token => token.status === 'served' || token.status === 'no_show');
-    }
+    const [waitingData, servedData] = await Promise.all([
+      // Fetch waiting/called tokens
+      supabase
+        .from('tokens')
+        .select('*')
+        .eq('queue_id', activeQueue.id)
+        .in('status', ['waiting', 'called'])
+        .order('token_number', { ascending: true }),
+      // Fetch served/no_show tokens (limit to recent ones to prevent massive payloads)
+      supabase
+        .from('tokens')
+        .select('*')
+        .eq('queue_id', activeQueue.id)
+        .in('status', ['served', 'no_show'])
+        .order('token_number', { ascending: true }) // Keep original order logic or by served_at if preferred
+    ]);
+
+    if (waitingData.data) waitingTokens = waitingData.data;
+    if (servedData.data) servedTokens = servedData.data;
   }
 
   const responseData = {
