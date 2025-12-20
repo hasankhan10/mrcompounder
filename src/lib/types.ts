@@ -79,6 +79,8 @@ export interface Token {
   served_at?: string; // timestamp
   is_booked_online?: boolean;
   is_present?: boolean;
+  location_id?: string; // Added location_id
+  location_name?: string; // Added location_name
 }
 
 export interface Transaction {
@@ -99,6 +101,14 @@ export interface NotificationSubscription {
   clinic_id: string; // uuid
   token_id: string; // uuid
   fcm_token: string;
+}
+
+export interface ClinicLocation {
+  id: string; // uuid
+  created_at: string; // timestamp
+  clinic_id: string; // uuid
+  name: string;
+  is_active: boolean;
 }
 
 export interface PaymentRequest {
@@ -201,6 +211,7 @@ export interface RegisterTokenRequest {
   age?: number;
   purpose?: string; // Added purpose field
   is_emergency?: boolean; // Added is_emergency field
+  locationId?: string; // Added locationId field
 }
 export type RegisterTokenResponse = Token;
 

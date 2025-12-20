@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { Clinic, Queue, Token, RecentDoctor } from '@/lib/types';
 import { toast } from 'sonner';
-import { PieChart, Settings, Users, History, IndianRupee } from 'lucide-react';
+import { PieChart, Settings, Users, History, IndianRupee, MapPin } from 'lucide-react';
 import { useRazorpay } from '@/hooks/useRazorpay';
 import { Button } from '@/components/ui/button';
 
@@ -17,6 +17,7 @@ import { OverviewTab } from '@/components/dashboard/tabs/OverviewTab';
 import { BookingTab } from '@/components/dashboard/tabs/BookingTab';
 import { HistoryTab } from '@/components/dashboard/tabs/HistoryTab';
 import { ReportsTab } from '@/components/dashboard/tabs/ReportsTab';
+import { LocationsTab } from '@/components/dashboard/tabs/LocationsTab';
 import { SettingsTab } from '@/components/dashboard/tabs/SettingsTab';
 import { useRealtimeDashboard } from '@/hooks/useRealtimeDashboard';
 import { dashboardService } from '@/services/dashboard';
@@ -66,6 +67,7 @@ export function DashboardClient({
 
   // Selection State
   const [selectedQueueId, setSelectedQueueId] = useState<string | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
   // Derived Data
   const activeQueue = activeQueues.find(q => q.id === selectedQueueId) || null;
@@ -430,7 +432,8 @@ export function DashboardClient({
         gender,
         age,
         purpose,
-        is_emergency: isEmerg
+        is_emergency: isEmerg,
+        locationId: selectedLocationId || undefined
       });
 
       // Replace temp token with real one
@@ -451,7 +454,7 @@ export function DashboardClient({
     } finally {
       setLoadingAction(null);
     }
-  }, [activeQueue, loadingAction, newPatientName, newPatientPhone, newPatientPurpose, waitingTokens, servedTokens, clinic, isEmergency, newPatientAge, newPatientGender]);
+  }, [activeQueue, loadingAction, newPatientName, newPatientPhone, newPatientPurpose, waitingTokens, servedTokens, clinic, isEmergency, newPatientAge, newPatientGender, selectedLocationId]);
 
   const handleCallNext = useCallback(async (queueId?: string, targetTokenId?: string) => {
     if (loadingAction) return;
@@ -633,6 +636,7 @@ export function DashboardClient({
     { label: 'Patient Booking', value: 'patient-booking', icon: Users },
     { label: 'Session History', value: 'history', icon: History },
     { label: 'Reports', value: 'reports', icon: PieChart },
+    { label: 'Locations', value: 'locations', icon: MapPin },
     { label: 'Settings', value: 'settings', icon: Settings },
   ];
 
@@ -813,6 +817,9 @@ export function DashboardClient({
             setIsEmergency={setIsEmergency}
             loadingAction={loadingAction}
             onSendWhatsApp={handleSendWhatsApp}
+            clinicId={clinic?.id || ''}
+            selectedLocationId={selectedLocationId}
+            setSelectedLocationId={setSelectedLocationId}
           />
         </div>
       )}
@@ -825,7 +832,11 @@ export function DashboardClient({
       )}
 
       {activeTab === 'reports' && (
-        <ReportsTab />
+        <ReportsTab clinicId={clinic.id} />
+      )}
+
+      {activeTab === 'locations' && (
+        <LocationsTab clinicId={clinic.id} />
       )}
 
       {

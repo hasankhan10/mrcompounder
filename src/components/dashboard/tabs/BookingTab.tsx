@@ -52,6 +52,9 @@ interface BookingTabProps {
     setIsEmergency: (val: boolean) => void;
     loadingAction: string | null;
     onSendWhatsApp: (token: Token) => void;
+    clinicId: string;
+    selectedLocationId: string | null;
+    setSelectedLocationId: (id: string | null) => void;
 }
 
 export function BookingTab({
@@ -93,7 +96,10 @@ export function BookingTab({
     isEmergency,
     setIsEmergency,
     loadingAction,
-    onSendWhatsApp
+    onSendWhatsApp,
+    clinicId,
+    selectedLocationId,
+    setSelectedLocationId
 }: BookingTabProps) {
 
     if (isLoading) {
@@ -196,6 +202,9 @@ export function BookingTab({
                 isLoading={formIsLoading || loadingAction === 'register-patient'}
                 isSessionActive={['active', 'waiting'].includes(activeQueue!.status)}
                 onSubmit={onRegisterPatient}
+                clinicId={clinicId}
+                selectedLocationId={selectedLocationId}
+                setSelectedLocationId={setSelectedLocationId}
             />
 
             <div className="mt-8">

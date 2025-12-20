@@ -1,10 +1,13 @@
-import React, { FormEvent } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from 'lucide-react';
+import { Loader2, MapPin } from 'lucide-react';
+import { createClient } from '@/lib/supabase-client';
+import { ClinicLocation } from '@/lib/types';
+import { toast } from 'sonner';
 
 interface RegisterPatientCardProps {
     doctorName?: string;
@@ -24,6 +27,9 @@ interface RegisterPatientCardProps {
     isLoading: boolean;
     isSessionActive: boolean;
     onSubmit: (e: FormEvent) => void;
+    clinicId: string;
+    selectedLocationId: string | null;
+    setSelectedLocationId: (id: string | null) => void;
 }
 
 export function RegisterPatientCard({
@@ -43,8 +49,41 @@ export function RegisterPatientCard({
     setIsEmergency,
     isLoading,
     isSessionActive,
-    onSubmit
+    onSubmit,
+    clinicId,
+    selectedLocationId,
+    setSelectedLocationId
 }: RegisterPatientCardProps) {
+    const [supabase] = useState(() => createClient());
+    const [locations, setLocations] = useState<ClinicLocation[]>([]);
+    const [isLoadingLocations, setIsLoadingLocations] = useState(false);
+
+    useEffect(() => {
+        const fetchLocations = async () => {
+            if (!clinicId) return;
+            setIsLoadingLocations(true);
+            try {
+                const { data, error } = await supabase
+                    .from('clinic_locations')
+                    .select('*')
+                    .eq('clinic_id', clinicId)
+                    .eq('is_active', true);
+
+                if (error) throw error;
+                setLocations(data || []);
+            } catch (error) {
+                console.error("Error fetching locations:", error);
+                toast.error("Failed to load locations");
+            } finally {
+                setIsLoadingLocations(false);
+            }
+        };
+        fetchLocations();
+    }, [clinicId, supabase]);
+
+    const isLocationRequired = locations.length > 0;
+    const isLocationMissing = isLocationRequired && !selectedLocationId;
+
     return (
         <div className="max-w-md mx-auto mt-8">
             {/* Doctor Info Header */}
@@ -74,6 +113,34 @@ export function RegisterPatientCard({
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={onSubmit} className="space-y-4">
+
+                        {/* Location Select - Only if locations exist */}
+                        {isLocationRequired && (
+                            <div className="space-y-2 bg-blue-50 p-4 rounded-lg border border-blue-200 animate-in fade-in zoom-in duration-300">
+                                <label className="text-sm font-bold text-blue-800 flex items-center gap-2">
+                                    <MapPin className="w-4 h-4" /> Select Booking Location <span className="text-red-500">*</span>
+                                </label>
+                                <Select
+                                    value={selectedLocationId || ""}
+                                    onValueChange={setSelectedLocationId}
+                                >
+                                    <SelectTrigger className="text-lg bg-white border-blue-300 focus:ring-blue-500">
+                                        <SelectValue placeholder="Choose Room/Location" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {locations.map(loc => (
+                                            <SelectItem key={loc.id} value={loc.id} className="font-medium">
+                                                {loc.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {isLocationMissing && (
+                                    <p className="text-xs text-red-500 font-medium">Please select a location to proceed.</p>
+                                )}
+                            </div>
+                        )}
+
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-700">Patient Name</label>
                             <Input
@@ -151,7 +218,7 @@ export function RegisterPatientCard({
                         <Button
                             type="submit"
                             className="w-full bg-teal-600 hover:bg-teal-700 text-white text-lg py-6 shadow-md hover:shadow-lg transition-all"
-                            disabled={isLoading || !isSessionActive}
+                            disabled={isLoading || !isSessionActive || isLocationMissing}
                         >
                             {isLoading ? (
                                 <>

@@ -30,7 +30,7 @@ export const dashboardService = {
         return api.post<Queue>('/api/dashboard/session/activate', { sessionId });
     },
 
-    async registerPatient(data: { queueId: string; phone: string; patientName: string; gender?: 'male' | 'female' | 'other'; age?: number; purpose: string; is_emergency?: boolean }) {
+    async registerPatient(data: { queueId: string; phone: string; patientName: string; gender?: 'male' | 'female' | 'other'; age?: number; purpose: string; is_emergency?: boolean; locationId?: string }) {
         return api.post<Token>('/api/dashboard/token/register', data);
     },
 

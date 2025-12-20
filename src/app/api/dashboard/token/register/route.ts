@@ -40,6 +40,20 @@ export async function POST(request: NextRequest) {
 
   const clinicId = profile.clinic_id;
 
+  // 2.5 Get Location Name if provided
+  let locationName: string | undefined;
+  if (body.locationId) {
+    const { data: locationData } = await supabase
+      .from('clinic_locations')
+      .select('name')
+      .eq('id', body.locationId)
+      .single();
+
+    if (locationData) {
+      locationName = locationData.name;
+    }
+  }
+
   let attempts = 0;
   const maxAttempts = 3;
 
@@ -70,7 +84,9 @@ export async function POST(request: NextRequest) {
         purpose: body.purpose,
         is_emergency: body.is_emergency || false, // Added priority flag
         token_number: nextTokenNumber,
-        status: 'waiting'
+        status: 'waiting',
+        location_id: body.locationId,
+        location_name: locationName
       })
       .select()
       .single();

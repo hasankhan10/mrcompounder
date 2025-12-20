@@ -16,6 +16,11 @@ interface ClinicSummary {
     slug: string;
     waiting_count: number;
     is_active: boolean;
+    location_stats?: {
+        id: string;
+        name: string;
+        count: number;
+    }[];
 }
 
 export default function DoctorDashboard() {
@@ -194,14 +199,32 @@ export default function DoctorDashboard() {
                                 </div>
                             </CardHeader>
                             <CardContent className="p-6">
-                                <div className="flex justify-between items-end mb-6">
-                                    <div>
-                                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Live Queue</p>
-                                        <div className="flex items-baseline gap-1 mt-1">
-                                            <span className="text-4xl font-bold text-teal-600">{clinic.waiting_count}</span>
-                                            <span className="text-sm text-slate-500">patients waiting</span>
+                                <div className="mb-6 space-y-4">
+                                    {clinic.location_stats && clinic.location_stats.length > 0 ? (
+                                        <div className="space-y-3">
+                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Live Breakdown</p>
+                                            {clinic.location_stats.map(stat => (
+                                                <div key={stat.id} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                                    <span className="text-sm font-medium text-slate-700">{stat.name}</span>
+                                                    <div className="bg-white px-2 py-1 rounded-md shadow-sm border border-slate-100">
+                                                        <span className="text-sm font-bold text-teal-600">{stat.count}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <div className="flex justify-between items-center pt-2 border-t border-slate-100">
+                                                <span className="text-sm font-bold text-slate-900">Total Waiting</span>
+                                                <span className="text-lg font-bold text-teal-700">{clinic.waiting_count}</span>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Live Queue</p>
+                                            <div className="flex items-baseline gap-1 mt-1">
+                                                <span className="text-4xl font-bold text-teal-600">{clinic.waiting_count}</span>
+                                                <span className="text-sm text-slate-500">patients waiting</span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <Button

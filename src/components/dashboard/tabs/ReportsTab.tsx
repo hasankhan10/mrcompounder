@@ -14,7 +14,11 @@ import { ReportsSummaryTable } from '@/components/dashboard/reports/ReportsSumma
 import { ReportsDetailedTable } from '@/components/dashboard/reports/ReportsDetailedTable';
 import { RevenueCalculator } from '@/components/dashboard/reports/RevenueCalculator';
 
-export function ReportsTab() {
+interface ReportsTabProps {
+    clinicId: string;
+}
+
+export function ReportsTab({ clinicId }: ReportsTabProps) {
     const [reportType, setReportType] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
     const [dateValue, setDateValue] = useState<string>(new Date().toISOString().slice(0, 7)); // Default to current month
     const [isGenerating, setIsGenerating] = useState(false);
