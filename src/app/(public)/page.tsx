@@ -22,8 +22,8 @@ function FloatingPlusIcon({ className, style }: { className?: string; style?: Re
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Home - Make your OPD Silently',
-  description: 'Replace shouting names with a simple, digital token system. Patients wait stress-free, staff manage effortlessly.',
+  title: 'Mr Compounder | Silent OPD System for Clinics & Hospitals',
+  description: 'Stop OPD shouting. Simple patient flow control for Indian clinics. works on any Android phone. Pay only per patient.',
   alternates: {
     canonical: '/',
   },
@@ -63,13 +63,12 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 text-center relative z-10">
           <Reveal width="100%" direction="up">
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 drop-shadow-lg text-gray-200">
-              End the OPD Chaos. <br />Run a Silent, Predictable Clinic.
+              The Silent OPD System <br />for Busy Indian Clinics
             </h1>
           </Reveal>
           <Reveal width="100%" direction="up" delay={0.4}>
-            <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto opacity-90 text-white">
-              Mr Compounder controls patient flow with one simple action:
-              Click “Next” → the right patient gets the ring.
+            <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto opacity-90 text-white leading-relaxed">
+              Stop shouting names in your waiting room. Mr Compounder controls patient flow with a simple "Call Next" button. Patients get a ring, chaos stops, and your clinic becomes silent.
             </p>
           </Reveal>
           <Reveal width="100%" direction="up" delay={0.6}>
@@ -116,31 +115,33 @@ export default async function HomePage() {
       {/* How It Works Section */}
       <section className="py-20 bg-slate-50">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12 animate-fade-in-up">How It Works (3 Simple Steps)</h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12 animate-fade-in-up">How It Works: No Apps, Just Phone Rings</h2>
           <div className="grid md:grid-cols-3 gap-10">
             <Reveal delay={0.2} width="100%">
               <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 hover-lift h-full">
                 <div className="text-5xl text-teal-500 mb-6 font-bold">1</div>
-                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Patient joins queue in seconds</h3>
+                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Scanner or Phone Entry</h3>
                 <p className="text-slate-600 leading-relaxed text-lg">
-                  Scan QR → enter phone number → token assigned.
-                  No app. No login. No confusion.</p>
+                  Patients scan a QR code or the compounder enters their number. Token is assigned instantly. No app download needed.
+                </p>
               </div>
             </Reveal>
             <Reveal delay={0.4} width="100%">
               <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 hover-lift h-full">
                 <div className="text-5xl text-teal-500 mb-6 font-bold">2</div>
-                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Compounder controls OPD with one button</h3>
-                <p className="text-slate-600 leading-relaxed text-lg">Click “Call Next”.
-                    The correct patient is notified instantly.</p>
+                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Compounder Calls "Next"</h3>
+                <p className="text-slate-600 leading-relaxed text-lg">
+                  One click on the dashboard calls the next patient. No shouting names, no confusion.
+                </p>
               </div>
             </Reveal>
             <Reveal delay={0.6} width="100%">
               <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 hover-lift h-full">
                 <div className="text-5xl text-teal-500 mb-6 font-bold">3</div>
-                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Get Alerted.</h3>
-                <p className="text-slate-600 leading-relaxed text-lg">Patient gets a    clear  call when it’s their turn.
-                They return calmly, without crowding the waiting room.</p>
+                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Patient's Phone Rings</h3>
+                <p className="text-slate-600 leading-relaxed text-lg">
+                  The patient gets a call or notification. They walk in calmly. The rest of the OPD remains silent.
+                </p>
               </div>
             </Reveal>
           </div>
@@ -176,7 +177,7 @@ export default async function HomePage() {
       {/* For Clinic Owners Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 text-center mb-12">For Clinic Owners: What Changes Inside Your Clinic</h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 text-center mb-12">Designed for Calm, Professional Clinics</h2>
           <div className="grid md:grid-cols-2 gap-8">
             {[
               { title: "Calm OPD Environment", desc: " No shouting, No patients arguments, Staff works without constant interruptions.", icon: <TrendingUp className="w-10 h-10 text-teal-600" /> },
@@ -204,7 +205,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 opacity-10 pattern-dots pattern-white pattern-size-4 pattern-opacity-100"></div>
 
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-bold mb-16 text-white tracking-tight">{APP_NAME} is Built for Indian Clinics</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-16 text-white tracking-tight">Built for Indian Internet (Even 2G)</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               { title: "Universal Access", desc: "Works flawlessly on cheap Androids. No high-end tech required.", icon: <Smartphone className="w-12 h-12 text-white" /> },
@@ -225,7 +226,7 @@ export default async function HomePage() {
       {/* Pricing Teaser Section */}
       <section className="py-20 bg-slate-50">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12">Pay Only When Patients Are Served</h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12">Pricing: ₹{price} Per Patient Served</h2>
           <Reveal width="100%" delay={0.2}>
             <div className="bg-white p-10 rounded-xl shadow-lg border border-slate-200 max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
               <div className="filter select-none mb-6 opacity-50">

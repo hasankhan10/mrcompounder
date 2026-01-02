@@ -20,11 +20,23 @@ const hindSiliguri = Hind_Siliguri({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.mrcompounder.com'),
   title: {
-    default: `${APP_NAME} - Smart Queue Management for Clinics`,
+    default: `Mr Compounder | Silent OPD System for Clinics & Hospitals`,
     template: `%s | ${APP_NAME}`,
   },
-  description: APP_DESCRIPTION,
-  keywords: ['clinic management', 'queue management', 'token system', 'smart clinic', 'doctor appointment', 'patient queue', 'digital token', 'mr compounder'],
+  description: 'Stop OPD shouting. Simple patient flow control for Indian clinics. Works on any Android phone. No apps, no subscriptions. Pay only per patient.',
+  keywords: [
+    'silent opd',
+    'clinic token system',
+    'patient calling system',
+    'opd management software india',
+    'queue management for doctors',
+    'mr compounder',
+    'clinic patient queue',
+    'digital token system',
+    'hospital queue management',
+    'clinic crowd control',
+    'patient flow management'
+  ],
   authors: [{ name: 'Mehedi Hassan' }],
   creator: 'Mehedi Hassan',
   publisher: 'Mehedi Hassan',
@@ -47,23 +59,23 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://www.mrcompounder.com',
     siteName: APP_NAME,
-    title: `${APP_NAME} - Smart Queue Management`,
-    description: APP_DESCRIPTION,
+    title: `Mr Compounder | Silent OPD System for Clinics & Hospitals`,
+    description: 'Stop OPD shouting. Simple patient flow control for Indian clinics. Works on any Android phone. No apps, no subscriptions.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: APP_NAME,
+        alt: 'Mr Compounder - Silent OPD System',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${APP_NAME} - Smart Queue Management`,
-    description: APP_DESCRIPTION,
+    title: `Mr Compounder | Silent OPD System for Clinics & Hospitals`,
+    description: 'Stop OPD shouting. Simple patient flow control for Indian clinics. Works on any Android phone.',
     images: ['/og-image.png'],
-    creator: '@mrcompounder', // Updated to generic or remove
+    creator: '@mrcompounder',
   },
   verification: {
     google: 'rUa5vkdxLeHoXy5bVbe0pRkZ1NsmDne-nwcaRvnUVBI',
