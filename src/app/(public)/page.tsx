@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, TrendingUp, Zap, BarChart3, Building2, Smartphone, Signal, Phone, PartyPopper } from 'lucide-react';
 import { APP_NAME } from '@/lib/config';
 import { Reveal } from '@/components/shared/Reveal';
+import { TypingEffect } from '@/components/shared/TypingEffect';
 import FaqSection from '@/components/shared/FaqSection';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 
@@ -63,7 +64,7 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 text-center relative z-10">
           <Reveal width="100%" direction="up">
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 drop-shadow-lg text-gray-200">
-              The Silent OPD System <br />for Busy Indian Clinics
+              The Silent OPD System <br />for Busy Indian <TypingEffect />
             </h1>
           </Reveal>
           <Reveal width="100%" direction="up" delay={0.4}>
