@@ -22,7 +22,7 @@ function FloatingPlusIcon({ className, style }: { className?: string; style?: Re
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Home - Smart Queue Management',
+  title: 'Home - Make your OPD Silently',
   description: 'Replace shouting names with a simple, digital token system. Patients wait stress-free, staff manage effortlessly.',
   alternates: {
     canonical: '/',
@@ -63,21 +63,22 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 text-center relative z-10">
           <Reveal width="100%" direction="up">
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 drop-shadow-lg text-gray-200">
-              End the Chaos. Bring Calm. <br /> {APP_NAME} for a Smarter Clinic.
+              End the OPD Chaos. <br />Run a Silent, Predictable Clinic.
             </h1>
           </Reveal>
           <Reveal width="100%" direction="up" delay={0.4}>
             <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto opacity-90 text-white">
-              Replace shouting names with a simple, digital token system. Patients wait stress-free, staff manage effortlessly.
+              Mr Compounder controls patient flow with one simple action:
+              Click “Next” → the right patient gets the ring.
             </p>
           </Reveal>
           <Reveal width="100%" direction="up" delay={0.6}>
             <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
               <Button asChild size="lg" className="bg-white text-teal-700 hover:bg-slate-100 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
-                <Link href="/contact">Try Demo</Link>
+                <Link href="/contact">Book Free Setup</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-teal-700 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
-                <Link href="/contact">Book Free Setup</Link>
+                <Link href="/contact">See How It Works (2 min)</Link>
               </Button>
             </div>
           </Reveal>
@@ -120,22 +121,26 @@ export default async function HomePage() {
             <Reveal delay={0.2} width="100%">
               <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 hover-lift h-full">
                 <div className="text-5xl text-teal-500 mb-6 font-bold">1</div>
-                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Scan & Join.</h3>
-                <p className="text-slate-600 leading-relaxed">Patients scan your clinic&apos;s QR code, enter their phone number, and instantly get a live token on their own phone. No app needed.</p>
+                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Patient joins queue in seconds</h3>
+                <p className="text-slate-600 leading-relaxed text-lg">
+                  Scan QR → enter phone number → token assigned.
+                  No app. No login. No confusion.</p>
               </div>
             </Reveal>
             <Reveal delay={0.4} width="100%">
               <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 hover-lift h-full">
                 <div className="text-5xl text-teal-500 mb-6 font-bold">2</div>
-                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Call Next.</h3>
-                <p className="text-slate-600 leading-relaxed">Your compounder sees the digital queue, taps &quot;Call Next,&quot; and the system moves the line forward with a single click.</p>
+                <h3 className="text-2xl font-semibold mb-4 text-slate-800">Compounder controls OPD with one button</h3>
+                <p className="text-slate-600 leading-relaxed text-lg">Click “Call Next”.
+                    The correct patient is notified instantly.</p>
               </div>
             </Reveal>
             <Reveal delay={0.6} width="100%">
               <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 hover-lift h-full">
                 <div className="text-5xl text-teal-500 mb-6 font-bold">3</div>
                 <h3 className="text-2xl font-semibold mb-4 text-slate-800">Get Alerted.</h3>
-                <p className="text-slate-600 leading-relaxed">Patients receive a clear in-page alert and web notification (if allowed) on their phone when it&apos;s their turn. They return from anywhere.</p>
+                <p className="text-slate-600 leading-relaxed text-lg">Patient gets a    clear  call when it’s their turn.
+                They return calmly, without crowding the waiting room.</p>
               </div>
             </Reveal>
           </div>
@@ -147,13 +152,13 @@ export default async function HomePage() {
       {/* For Patients Section */}
       <section className="py-20 bg-slate-100">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 text-center mb-12">For Patients: A Better Waiting Experience</h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 text-center mb-12">For Patients: Less Waiting. Less Stress.</h2>
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {[
-              "Live Token on Your Phone: Always know your turn and the current token number.",
-              "Wait Anywhere, Comfortably: No need to stay confined to a crowded waiting room.",
-              "Get Notified: Receive an alert when it's almost your turn.",
-              "Trust & Clarity: See the doctor's name on your screen, reducing confusion."
+              "Know your turn without asking anyone.",
+              "Wait outside, in your car, or nearby.",
+              "Get a clear call when it’s your turn.",
+              "No confusion about which doctor or room."
             ].map((benefit, index) => (
               <Reveal key={index} delay={index * 0.1} width="100%">
                 <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex items-start space-x-4 transition-all duration-300 h-full hover:shadow-lg">
@@ -171,13 +176,13 @@ export default async function HomePage() {
       {/* For Clinic Owners Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 text-center mb-12">For Clinic Owners: The Business Impact</h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 text-center mb-12">For Clinic Owners: What Changes Inside Your Clinic</h2>
           <div className="grid md:grid-cols-2 gap-8">
             {[
-              { title: "Increase Patient Retention", desc: "Patients who wait comfortably are 3x more likely to return and recommend your clinic.", icon: <TrendingUp className="w-10 h-10 text-teal-600" /> },
-              { title: "Streamline Operations", desc: "Reduce front-desk workload by 40%. Let your staff focus on care, not crowd control.", icon: <Zap className="w-10 h-10 text-teal-600" /> },
-              { title: "Monthly Analytics", desc: "Track all the performance of your clinic at the end of the month.", icon: <BarChart3 className="w-10 h-10 text-teal-600" /> },
-              { title: "Premium Brand Image", desc: "Stand out as a modern, patient-centric facility in your neighborhood.", icon: <Building2 className="w-10 h-10 text-teal-600" /> }
+              { title: "Calm OPD Environment", desc: " No shouting, No patients arguments, Staff works without constant interruptions.", icon: <TrendingUp className="w-10 h-10 text-teal-600" /> },
+              { title: "Predictable Patient Flow", desc: " One patient called at a time, No skipping, No confusion.", icon: <Zap className="w-10 h-10 text-teal-600" /> },
+              { title: "Modern Clinic Perception", desc: "Patients feel your clinic is organised, not chaotic.", icon: <BarChart3 className="w-10 h-10 text-teal-600" /> },
+              { title: "Less Staff Pressure", desc: " Compounder stops managing crowds, And start managing flow.", icon: <Building2 className="w-10 h-10 text-teal-600" /> }
             ].map((item, index) => (
               <Reveal key={index} delay={index * 0.1} width="100%">
                 <div className="flex items-start p-8 rounded-2xl border border-slate-100 shadow-lg hover:shadow-xl transition-all duration-300 bg-white h-full hover:border-slate-200">
@@ -199,7 +204,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 opacity-10 pattern-dots pattern-white pattern-size-4 pattern-opacity-100"></div>
 
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-bold mb-16 text-white tracking-tight">Why India Needs {APP_NAME}</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-16 text-white tracking-tight">{APP_NAME} is Built for Indian Clinics</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               { title: "Universal Access", desc: "Works flawlessly on cheap Androids. No high-end tech required.", icon: <Smartphone className="w-12 h-12 text-white" /> },
@@ -220,7 +225,7 @@ export default async function HomePage() {
       {/* Pricing Teaser Section */}
       <section className="py-20 bg-slate-50">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12">Simple, Transparent Pricing</h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-12">Pay Only When Patients Are Served</h2>
           <Reveal width="100%" delay={0.2}>
             <div className="bg-white p-10 rounded-xl shadow-lg border border-slate-200 max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
               <div className="filter select-none mb-6 opacity-50">
@@ -228,7 +233,7 @@ export default async function HomePage() {
                 <p className="text-2xl text-slate-800 font-semibold">per patient served</p>
               </div>
               <p className="text-lg text-slate-600 leading-relaxed mb-4">
-                Our simple postpaid billing system means you use now and pay later. No hidden fees, no complex subscriptions.
+                No monthly subscription. No setup cost. You pay only for patients you actually see.
               </p>
               <div className="mb-8">
                 <span className="inline-flex items-center gap-2 bg-green-100 text-green-800 text-sm font-bold px-4 py-2 rounded-full animate-pulse">
@@ -243,7 +248,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
+
       {/* FAQ Section */}
       <FaqSection />
 
@@ -253,9 +258,9 @@ export default async function HomePage() {
           <Reveal width="100%">
             <div className="relative bg-teal-700 rounded-2xl shadow-xl overflow-hidden text-white p-12 md:p-16">
               <div className="relative z-10 text-center">
-                <h2 className="text-3xl md:text-5xl font-extrabold mb-4 text-gray-200">Ready to Modernize Your Clinic?</h2>
+                <h2 className="text-3xl md:text-5xl font-extrabold mb-4 text-gray-200">Ready to Chaos free in Your Clinic?</h2>
                 <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 mb-8">
-                  Transform your waiting room today. Join dozens of clinics who have brought calm and efficiency to their practice with {APP_NAME}.
+                  Transform your waiting room today. See How a Silent OPD Feels in Your Clinic with {APP_NAME}.
                 </p>
                 <Button asChild size="lg" className="bg-white text-teal-700 hover:bg-slate-100 text-lg md:text-xl font-bold py-4 px-10 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
                   <Link href="/contact">Book a Free Setup</Link>

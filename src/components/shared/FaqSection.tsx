@@ -8,7 +8,7 @@ import { APP_NAME } from '@/lib/config';
 const faqs = [
     { q: "Do I need special hardware?", a: "No. " + APP_NAME + " works on any smartphone, tablet, or computer you already own." },
     { q: "Is there an app to download?", a: "No. It's entirely web-based, accessible directly through a browser. This means no updates to manage and instant access for your patients." },
-    { q: "What if the internet is slow or unstable?", a: APP_NAME + " is designed to be lightweight and resilient. It works perfectly even on 2G/3G networks and handles intermittent connectivity gracefully." },
+    { q: "What if the system fails during OPD hours?", a: "OPD never stops because of software. If internet fails, staff continues normally. " + APP_NAME + " supports OPD — it never blocks it." },
     { q: "Can multiple doctors use it at the same time?", a: "Yes! You can easily start and manage separate 'sessions' for different doctors within the same clinic account." },
     { q: "Can I pre-book patients for tomorrow?", a: "Absolutely. Your compounder can register patients in advance directly from the dashboard, or patients can join the queue online if you enable remote joining." }
 ];
