@@ -87,7 +87,7 @@ export default async function PricingPage() {
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                         <h3 className="font-bold text-lg mb-2 text-slate-800">What does this cost in real life?</h3>
                         <p className="text-slate-600 text-lg">
-                            • 40 patients/day × 25 days ≈ ₹2,000/month. <br />
+                            • 20 patients/day × 25 days ≈ ₹1,000/month. <br />
                             • That’s less than tea expenses in OPD <br />
                             • No patients → no bill
                         </p>
