@@ -85,26 +85,20 @@ export function NavbarAuth({ initialUser, initialRole, onLinkClick }: NavbarAuth
                 variant="ghost"
                 className="text-gray-800 border border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold cursor-pointer"
                 onClick={() => {
-                    setNavigatingTo('login');
                     onLinkClick?.();
                     router.push('/login');
                 }}
-                disabled={!!navigatingTo}
             >
-                {navigatingTo === 'login' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                 Login
             </Button>
             <Button
                 variant="outline"
                 className="bg-white/50 border-gray-300 hover:bg-teal-50 hover:text-teal-700 font-semibold cursor-pointer"
                 onClick={() => {
-                    setNavigatingTo('contact');
-                    onLinkClick?.();
+                    // onLinkClick?.();
                     router.push('/contact');
                 }}
-                disabled={!!navigatingTo}
             >
-                {navigatingTo === 'contact' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                 Book Free Setup
             </Button>
         </>

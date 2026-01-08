@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { APP_NAME, APP_DESCRIPTION } from '@/lib/config';
 import { Analytics } from "@vercel/analytics/react";
 import { JsonLd } from '@/components/seo/JsonLd';
+import { ChatBot } from '@/components/shared/ChatBot';
 import "./globals.css";
 
 const inter = Inter({
@@ -99,6 +100,7 @@ export default function RootLayout({
         <Toaster richColors position="bottom-right" />
         <Analytics />
         <JsonLd />
+        <ChatBot />
       </body>
     </html>
   );
