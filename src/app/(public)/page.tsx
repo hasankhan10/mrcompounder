@@ -4,6 +4,7 @@ import { Plus, TrendingUp, Zap, BarChart3, Building2, Smartphone, Signal, Phone,
 import { APP_NAME } from '@/lib/config';
 import { Reveal } from '@/components/shared/Reveal';
 import { TypingEffect } from '@/components/shared/TypingEffect';
+import { HeroActions } from '@/components/home/HeroActions';
 import FaqSection from '@/components/shared/FaqSection';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 
@@ -73,14 +74,7 @@ export default async function HomePage() {
             </p>
           </Reveal>
           <Reveal width="100%" direction="up" delay={0.6}>
-            <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
-              <Button asChild size="lg" className="bg-white text-teal-700 hover:bg-slate-100 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
-                <Link href="/contact">Book Free Setup</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-teal-700 text-lg md:text-xl font-bold py-3 px-8 rounded-full shadow-lg transition duration-300">
-                <Link href="/contact">See How It Works (2 min)</Link>
-              </Button>
-            </div>
+            <HeroActions />
           </Reveal>
 
           {/* Simple Mockup Description */}
