@@ -29,6 +29,17 @@ export function ChatBot() {
         }
     }, [messages, isOpen]);
 
+    // Body scroll lock
+    useEffect(() => {
+        if (isOpen) {
+            const originalStyle = window.getComputedStyle(document.body).overflow;
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = originalStyle;
+            };
+        }
+    }, [isOpen]);
+
     const handleSend = async () => {
         if (!input.trim() || isLoading) return;
 
@@ -90,7 +101,10 @@ export function ChatBot() {
                         </div>
 
                         {/* Messages */}
-                        <div className="h-[400px] overflow-y-auto p-4 bg-slate-50 relative">
+                        <div
+                            className="h-[400px] overflow-y-auto p-4 bg-slate-50 relative overscroll-contain"
+                            data-lenis-prevent
+                        >
                             <div className="space-y-4">
                                 {messages.map((msg, idx) => (
                                     <div
