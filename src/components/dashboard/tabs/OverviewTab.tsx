@@ -22,6 +22,7 @@ interface OverviewTabProps {
     onCallNext: (queueId?: string, targetTokenId?: string) => void;
     onDeleteToken: (id: string) => void;
     onMarkAbsent: () => void;
+    absentTokens: Token[];
     loadingAction: string | null;
 }
 
@@ -40,6 +41,7 @@ export function OverviewTab({
     onCallNext,
     onDeleteToken,
     onMarkAbsent,
+    absentTokens,
     loadingAction
 }: OverviewTabProps) {
 
@@ -102,6 +104,7 @@ export function OverviewTab({
                     doctorImageUrl={activeQueue!.doctor_image_url}
                     waitingTokens={waitingTokens}
                     servedTokens={servedTokens}
+                    absentTokens={absentTokens}
                     onCallNext={(tokenId) => onCallNext(undefined, tokenId)}
                     onMarkAbsent={onMarkAbsent}
                     isSessionActive={activeQueue!.status === 'active'}

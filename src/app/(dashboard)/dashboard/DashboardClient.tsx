@@ -767,6 +767,7 @@ export function DashboardClient({
             activeQueue={activeQueue}
             waitingTokens={waitingTokens}
             servedTokens={servedTokens}
+            absentTokens={absentTokens}
             onToggleBreak={handleToggleBreak}
             onEndSession={handleEndSession}
             onCallNext={handleCallNext}
