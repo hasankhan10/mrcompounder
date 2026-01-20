@@ -94,6 +94,13 @@ export function DashboardClient({
       .filter(t => t.queue_id === selectedQueueId && t.status === 'served')
       .sort((a, b) => (b.served_at || '').localeCompare(a.served_at || ''));
   }, [tokens, selectedQueueId]);
+
+  const absentTokens = useMemo(() => {
+    return tokens
+      .filter(t => t.queue_id === selectedQueueId && t.status === 'no_show')
+      .sort((a, b) => a.token_number - b.token_number);
+  }, [tokens, selectedQueueId]);
+
   // Low balance warning removed for postpaid model
 
   // Form state
@@ -786,6 +793,7 @@ export function DashboardClient({
             activeQueue={activeQueue}
             waitingTokens={waitingTokens}
             servedTokens={servedTokens}
+            absentTokens={absentTokens}
             formIsLoading={formIsLoading}
             onStartSession={handleStartSession}
             onActivateSession={handleActivateSession}

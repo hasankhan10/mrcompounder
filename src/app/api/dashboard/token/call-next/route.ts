@@ -86,13 +86,13 @@ export async function POST(request: NextRequest) {
   let nextToken = null;
 
   if (body.targetTokenId) {
-    // MANUAL CALL MODE
+    // MANUAL CALL MODE (Allow both waiting and absent/no_show patients)
     const { data: specificToken } = await supabase
       .from('tokens')
       .select('*')
       .eq('id', body.targetTokenId)
       .eq('queue_id', body.queueId)
-      .eq('status', 'waiting')
+      .in('status', ['waiting', 'no_show'])
       .single();
 
     nextToken = specificToken;

@@ -18,6 +18,7 @@ interface BookingTabProps {
     activeQueue: Queue | null;
     waitingTokens: Token[];
     servedTokens: Token[];
+    absentTokens: Token[];
     formIsLoading: boolean;
     onStartSession: (e: FormEvent) => void;
     onActivateSession: () => void;
@@ -66,6 +67,7 @@ export function BookingTab({
     activeQueue,
     waitingTokens,
     servedTokens,
+    absentTokens,
     formIsLoading,
     onStartSession,
     onActivateSession,
@@ -213,6 +215,7 @@ export function BookingTab({
                     doctorImageUrl={activeQueue!.doctor_image_url}
                     waitingTokens={waitingTokens}
                     servedTokens={servedTokens}
+                    absentTokens={absentTokens}
                     onCallNext={(tokenId) => onCallNext(undefined, tokenId)}
                     onMarkAbsent={onMarkAbsent}
                     isSessionActive={activeQueue!.status === 'active'}

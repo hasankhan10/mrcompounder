@@ -25,7 +25,6 @@ export function LocationsTab({ clinicId }: LocationsTabProps) {
                 .from('clinic_locations')
                 .select('*')
                 .eq('clinic_id', clinicId)
-                .eq('is_active', true)
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
@@ -54,8 +53,7 @@ export function LocationsTab({ clinicId }: LocationsTabProps) {
                 .from('clinic_locations')
                 .insert({
                     clinic_id: clinicId,
-                    name: newLocationName.trim(),
-                    is_active: true
+                    name: newLocationName.trim()
                 })
                 .select()
                 .single();
@@ -74,17 +72,18 @@ export function LocationsTab({ clinicId }: LocationsTabProps) {
     };
 
     const handleDeleteLocation = async (id: string) => {
+        if (!confirm('Are you sure you want to permanently delete this location? All tokens associated with this location will also be affected.')) return;
+
         try {
-            // Soft delete
             const { error } = await supabase
                 .from('clinic_locations')
-                .update({ is_active: false })
+                .delete()
                 .eq('id', id);
 
             if (error) throw error;
 
             setLocations(locations.filter(loc => loc.id !== id));
-            toast.success('Location removed');
+            toast.success('Location permanently deleted');
         } catch (error) {
             console.error('Error removing location:', error);
             toast.error('Failed to remove location');

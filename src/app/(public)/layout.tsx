@@ -18,7 +18,7 @@ function SiteFooter() {
         </div>
         <p className="text-gray-400">&copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.</p>
         <p className="text-gray-500 text-sm mt-2">
-          Created by <span className="text-gray-300 font-medium">Mehedi Hassan</span>
+          Developed by <span className="text-gray-300 font-medium"><a href="https://www.linkedin.com/in/mehedi-hasan110/" target="_blank" rel="noopener noreferrer">Mehedi Hassan</a></span>
         </p>
       </div>
     </footer>
