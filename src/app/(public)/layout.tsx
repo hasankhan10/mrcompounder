@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { GlassNavbar } from '@/components/glass-navbar';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { SmoothScroll } from '@/components/shared/SmoothScroll';
+import { ChatBot } from '@/components/shared/ChatBot';
 
 // The Footer is moved here
 function SiteFooter() {
@@ -51,6 +52,7 @@ export default async function PublicLayout({
           {children}
         </main>
         <SiteFooter />
+        <ChatBot />
       </div>
     </SmoothScroll>
   );
