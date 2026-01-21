@@ -8,17 +8,28 @@ import { QueueDisplay } from '@/components/dashboard/QueueDisplay';
 import { QueueDisplaySkeleton } from '@/components/skeletons/DashboardSkeletons';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, AlertCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase-client';
+import { RefreshCw, AlertCircle, LogOut } from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter
+} from '@/components/ui/dialog';
 
 export default function GuestQueuePage() {
     const params = useParams();
     const token = params.token as string;
+    const [supabase] = useState(() => createClient());
 
     const [isLoading, setIsLoading] = useState(true);
     const [queue, setQueue] = useState<Queue | null>(null);
     const [tokens, setTokens] = useState<Token[]>([]);
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isSessionEnded, setIsSessionEnded] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -26,6 +37,10 @@ export default function GuestQueuePage() {
             const data = await guestService.fetchQueue(token);
             setQueue(data.queue);
             setTokens(data.tokens);
+
+            if (data.queue.status === 'ended') {
+                setIsSessionEnded(true);
+            }
         } catch (err: any) {
             console.error('Error fetching guest queue:', err);
             setError(err.message || 'Failed to load queue. The link might be invalid or expired.');
@@ -37,10 +52,54 @@ export default function GuestQueuePage() {
     useEffect(() => {
         fetchData();
 
-        // Auto-refresh every 30 seconds to keep tokens in sync if multiple people are looking
-        const interval = setInterval(fetchData, 30000);
+        // Auto-refresh fallback
+        const interval = setInterval(fetchData, 60000);
         return () => clearInterval(interval);
     }, [token]);
+
+    // Real-time Subscription for Queue Status
+    useEffect(() => {
+        if (!queue?.id) return;
+
+        const channel = supabase
+            .channel(`guest-queue-${queue.id}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'queues',
+                    filter: `id=eq.${queue.id}`
+                },
+                (payload) => {
+                    const updatedQueue = payload.new as Queue;
+                    setQueue(updatedQueue);
+
+                    if (updatedQueue.status === 'ended' || updatedQueue.status === 'cancelled') {
+                        setIsSessionEnded(true);
+                        toast.error('This session has been ended by the clinic.');
+                    }
+                }
+            )
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'tokens',
+                    filter: `queue_id=eq.${queue.id}`
+                },
+                () => {
+                    // Refresh token list when any token changes
+                    fetchData();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [queue?.id, supabase]);
 
     const waitingTokens = useMemo(() =>
         tokens.filter(t => t.status === 'waiting' || t.status === 'called'),
@@ -201,6 +260,42 @@ export default function GuestQueuePage() {
                 <p>Secure Guest Session • No Login Required</p>
                 <p className="mt-1 font-medium">Mr Compounder — Digital OPD Solution</p>
             </footer>
+
+            {/* Session Ended Overlay */}
+            <Dialog open={isSessionEnded} onOpenChange={() => { }}>
+                <DialogContent className="sm:max-w-md text-center border-none shadow-2xl rounded-3xl p-8" showClose={false}>
+                    <DialogHeader>
+                        <div className="mx-auto bg-slate-100 w-20 h-20 rounded-full flex items-center justify-center mb-6">
+                            <LogOut className="w-10 h-10 text-slate-600" />
+                        </div>
+                        <DialogTitle className="text-2xl font-bold text-slate-900">Session Completed</DialogTitle>
+                        <DialogDescription className="text-slate-500 pt-2 text-base">
+                            The OPD session for <strong>Dr. {queue.doctor_name}</strong> has been ended by the clinic dashboard.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 my-4">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-slate-500">Total Served</span>
+                            <span className="text-lg font-bold text-slate-900">{servedTokens.length}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="font-medium text-slate-500">Remaining in Queue</span>
+                            <span className="font-bold text-slate-900">{waitingTokens.length}</span>
+                        </div>
+                    </div>
+
+                    <DialogFooter className="sm:justify-center mt-4">
+                        <Button
+                            onClick={() => window.location.href = '/'}
+                            className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-8 py-6 w-full text-lg shadow-lg transition-all"
+                        >
+                            Exit Manager
+                        </Button>
+                    </DialogFooter>
+                    <p className="text-[10px] text-slate-400 mt-6 tracking-widest uppercase font-bold">Mr Compounder</p>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
