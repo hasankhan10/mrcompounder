@@ -14,26 +14,49 @@ import { CallNextRequest } from '@/lib/types';
  * @return {object} 400 - Bad request (e.g., queue is empty)
  */
 import { createServerSupabaseClient } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(request: NextRequest) {
   const supabase = await createServerSupabaseClient();
   const body: CallNextRequest = await request.json();
 
+  // Determine which client to use: Standard (Auth) or Admin (Guest with shareToken)
+  let dbClient = supabase;
+
   // 1. Auth Check
   const { data: { user } } = await supabase.auth.getUser();
+
+  // If not logged in, check for share token
   if (!user) {
-    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    if (!body.shareToken) {
+      return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    }
+
+    // Verify share token matches the queue
+    const { data: queue } = await supabaseAdmin
+      .from('queues')
+      .select('id')
+      .eq('id', body.queueId)
+      .eq('share_token', body.shareToken)
+      .maybeSingle();
+
+    if (!queue) {
+      return new NextResponse(JSON.stringify({ error: 'Invalid access link' }), { status: 401 });
+    }
+
+    // AUTH SUCCESS AS GUEST -> Use Admin client to bypass RLS for this specific request
+    dbClient = supabaseAdmin;
   }
 
   // 2. Mark current token as served (if any)
   let servedToken = null;
   if (body.currentCalledTokenId) {
-    const { data: served, error: servedError } = await supabase
+    const { data: served, error: servedError } = await dbClient
       .from('tokens')
       .update({ status: 'served' })
       .eq('id', body.currentCalledTokenId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (servedError) console.error('Error serving token:', servedError);
     servedToken = served;
@@ -41,11 +64,11 @@ export async function POST(request: NextRequest) {
     // BILLING LOGIC: Deduct ₹1 for served token
     if (served) {
       // 1. Get current balance AND trial status
-      const { data: clinic } = await supabase
+      const { data: clinic } = await dbClient
         .from('clinics')
         .select('current_due, trial_end_date')
         .eq('id', served.clinic_id)
-        .single();
+        .maybeSingle();
 
       if (clinic) {
         const isTrialActive = clinic.trial_end_date && new Date(clinic.trial_end_date) > new Date();
@@ -54,7 +77,7 @@ export async function POST(request: NextRequest) {
 
           // 2. Determine Cost Per Patient (Default 1)
           let costPerPatient = 1;
-          const { data: setting } = await supabase
+          const { data: setting } = await dbClient
             .from('system_settings')
             .select('value')
             .eq('key', 'cost_per_patient')
@@ -69,7 +92,7 @@ export async function POST(request: NextRequest) {
           const newDue = currentDue + costPerPatient;
 
           // 3. Update current_due
-          await supabase
+          await dbClient
             .from('clinics')
             .update({ current_due: newDue })
             .eq('id', served.clinic_id);
@@ -87,18 +110,18 @@ export async function POST(request: NextRequest) {
 
   if (body.targetTokenId) {
     // MANUAL CALL MODE (Allow both waiting and absent/no_show patients)
-    const { data: specificToken } = await supabase
+    const { data: specificToken } = await dbClient
       .from('tokens')
       .select('*')
       .eq('id', body.targetTokenId)
       .eq('queue_id', body.queueId)
       .in('status', ['waiting', 'no_show'])
-      .single();
+      .maybeSingle();
 
     nextToken = specificToken;
   } else {
     // AUTO NEXT MODE
-    const { data: autoToken } = await supabase
+    const { data: autoToken } = await dbClient
       .from('tokens')
       .select('*')
       .eq('queue_id', body.queueId)
@@ -106,7 +129,7 @@ export async function POST(request: NextRequest) {
       .order('is_emergency', { ascending: false, nullsFirst: false }) // Prioritize emergency
       .order('token_number', { ascending: true }) // Then FIFO
       .limit(1)
-      .single();
+      .maybeSingle();
 
     nextToken = autoToken;
   }
@@ -119,12 +142,12 @@ export async function POST(request: NextRequest) {
   }
 
   // 4. Mark next token as called
-  const { data: calledToken, error: callError } = await supabase
+  const { data: calledToken, error: callError } = await dbClient
     .from('tokens')
     .update({ status: 'called' })
     .eq('id', nextToken.id)
     .select()
-    .single();
+    .maybeSingle();
 
   if (callError) {
     return new NextResponse(JSON.stringify({ error: callError.message }), { status: 500 });

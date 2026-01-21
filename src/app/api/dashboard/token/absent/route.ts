@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { CallNextRequest } from '@/lib/types';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 /**
  * POST /api/dashboard/token/absent
@@ -19,26 +20,48 @@ export async function POST(request: NextRequest) {
         return new NextResponse(JSON.stringify({ error: 'No token ID provided' }), { status: 400 });
     }
 
+    // Determine which client to use: Standard (Auth) or Admin (Guest with shareToken)
+    let dbClient = supabase;
+
     // 1. Auth Check
     const { data: { user } } = await supabase.auth.getUser();
+
+    // If not logged in, check for share token
     if (!user) {
-        return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+        if (!body.shareToken) {
+            return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+        }
+
+        // Verify share token matches the queue
+        const { data: queue } = await supabaseAdmin
+            .from('queues')
+            .select('id')
+            .eq('id', body.queueId)
+            .eq('share_token', body.shareToken)
+            .maybeSingle();
+
+        if (!queue) {
+            return new NextResponse(JSON.stringify({ error: 'Invalid access link' }), { status: 401 });
+        }
+
+        // AUTH SUCCESS AS GUEST -> Use Admin client to bypass RLS
+        dbClient = supabaseAdmin;
     }
 
     // 2. Mark current token as no_show
-    const { data: updatedToken, error } = await supabase
+    const { data: updatedToken, error } = await dbClient
         .from('tokens')
         .update({ status: 'no_show' })
         .eq('id', body.currentCalledTokenId)
         .select()
-        .single();
+        .maybeSingle();
 
     if (error) {
         return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
     }
 
     // 3. Find next waiting token (Same logic as call-next but prioritizing emergency)
-    const { data: nextToken } = await supabase
+    const { data: nextToken } = await dbClient
         .from('tokens')
         .select('*')
         .eq('queue_id', body.queueId)
@@ -46,18 +69,18 @@ export async function POST(request: NextRequest) {
         .order('is_emergency', { ascending: false, nullsFirst: false })
         .order('token_number', { ascending: true })
         .limit(1)
-        .single();
+        .maybeSingle();
 
     let calledToken = null;
 
     if (nextToken) {
         // 4. Mark next token as called
-        const { data: nextCalled, error: callError } = await supabase
+        const { data: nextCalled, error: callError } = await dbClient
             .from('tokens')
             .update({ status: 'called' })
             .eq('id', nextToken.id)
             .select()
-            .single();
+            .maybeSingle();
 
         if (!callError) {
             calledToken = nextCalled;

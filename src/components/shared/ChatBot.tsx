@@ -8,13 +8,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
+import { usePathname } from 'next/navigation';
+
 interface Message {
     role: 'user' | 'bot';
     content: string;
 }
 
 export function ChatBot() {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+
+    // Hide on Guest Queue pages
+    if (pathname?.startsWith('/q/')) return null;
+
     const [messages, setMessages] = useState<Message[]>([
         { role: 'bot', content: 'Hi there! 👋 How can I help you with Mr Compounder today?' }
     ]);

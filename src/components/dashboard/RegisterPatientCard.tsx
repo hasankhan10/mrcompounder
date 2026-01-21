@@ -153,12 +153,15 @@ export function RegisterPatientCard({
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-700">Phone Number</label>
                             <Input
-                                type="tel"
+                                type="number"
                                 placeholder="Enter phone number"
                                 value={patientPhone}
-                                onChange={(e) => setPatientPhone(e.target.value)}
+                                onChange={(e) => {
+                                    const val = e.target.value.slice(0, 10);
+                                    setPatientPhone(val);
+                                }}
                                 required
-                                className="text-lg bg-slate-50"
+                                className="text-lg bg-slate-50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                         </div>
 

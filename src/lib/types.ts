@@ -60,6 +60,7 @@ export interface Queue {
   status: QueueStatus;
   ended_at?: string; // timestamp
   served_count?: number; // Added field for history
+  share_token?: string; // Secure token for guest access
 }
 
 export interface Token {
@@ -219,6 +220,7 @@ export interface CallNextRequest {
   queueId: string;
   currentCalledTokenId?: string;
   targetTokenId?: string; // For manual "Pass" / Call Now
+  shareToken?: string; // For guest access
 }
 export interface CallNextResponse {
   servedToken?: Token;

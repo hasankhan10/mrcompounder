@@ -92,6 +92,7 @@ export function OverviewTab({
                     <SessionStatusCard
                         status={activeQueue!.status as 'active' | 'paused'}
                         doctorName={activeQueue!.doctor_name || 'Unknown Doctor'}
+                        shareToken={activeQueue!.share_token}
                         onToggleBreak={onToggleBreak}
                         onEndSession={onEndSession}
                         loadingAction={loadingAction}

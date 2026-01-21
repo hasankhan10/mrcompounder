@@ -41,12 +41,14 @@ export function PatientLogin({
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Mobile Number</label>
                         <Input
-                            type="tel"
+                            type="number"
                             value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="text-center text-2xl py-6 tracking-widest"
+                            onChange={(e) => {
+                                const val = e.target.value.slice(0, 10);
+                                setPhone(val);
+                            }}
+                            className="text-center text-2xl py-6 tracking-widest [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             placeholder="9999999999"
-                            maxLength={10}
                             required
                         />
                     </div>
