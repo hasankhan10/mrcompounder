@@ -2,9 +2,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { RegisterTokenRequest } from '@/lib/types';
 
-// TODO: Implement authentication and authorization check for compounder
-// TODO: Get clinic_id from user's session
-
 /**
  * POST /api/dashboard/token/register
  * @summary Manually registers a patient for the current session
@@ -39,6 +36,19 @@ export async function POST(request: NextRequest) {
   }
 
   const clinicId = profile.clinic_id;
+
+  // 2.2 Verify Queue Ownership
+  // Critical for data integrity: Ensure the queue belongs to this clinic
+  const { data: queueCheck } = await supabase
+    .from('queues')
+    .select('id')
+    .eq('id', body.queueId)
+    .eq('clinic_id', clinicId)
+    .single();
+
+  if (!queueCheck) {
+    return new NextResponse(JSON.stringify({ error: 'Queue not found or does not belong to your clinic' }), { status: 403 });
+  }
 
   // 2.5 Get Location Name if provided
   let locationName: string | undefined;

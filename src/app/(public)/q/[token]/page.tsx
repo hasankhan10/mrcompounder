@@ -18,6 +18,8 @@ import {
     DialogDescription,
     DialogFooter
 } from '@/components/ui/dialog';
+import { SessionStatusCard } from '@/components/dashboard/SessionStatusCard';
+import { CustomAlertDialog } from '@/components/dashboard/CustomAlertDialog';
 
 export default function GuestQueuePage() {
     const params = useParams();
@@ -30,6 +32,20 @@ export default function GuestQueuePage() {
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isSessionEnded, setIsSessionEnded] = useState(false);
+
+    const [dialogConfig, setDialogConfig] = useState<{
+        isOpen: boolean;
+        title: string;
+        description: string;
+        variant: 'default' | 'destructive';
+        onConfirm: () => Promise<void>;
+    }>({
+        isOpen: false,
+        title: '',
+        description: '',
+        variant: 'default',
+        onConfirm: async () => { },
+    });
 
     const fetchData = async () => {
         try {
@@ -172,6 +188,45 @@ export default function GuestQueuePage() {
         }
     };
 
+    const handleToggleBreak = async () => {
+        if (!queue) return;
+        const newStatus = queue.status === 'active' ? 'paused' : 'active';
+        setLoadingAction('toggle-break');
+        try {
+            const updatedQueue = await guestService.toggleBreak(queue.id, token, newStatus);
+            setQueue(updatedQueue);
+            toast.success(newStatus === 'paused' ? 'Doctor is on break' : 'Session resumed');
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to toggle break status');
+        } finally {
+            setLoadingAction(null);
+        }
+    };
+
+    const performEndSession = async () => {
+        if (!queue) return;
+        setLoadingAction('end-session');
+        try {
+            await guestService.endSession(queue.id, token);
+            setIsSessionEnded(true);
+            toast.success('Session ended successfully');
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to end session');
+        } finally {
+            setLoadingAction(null);
+        }
+    };
+
+    const handleEndSession = async () => {
+        setDialogConfig({
+            isOpen: true,
+            title: 'End Session?',
+            description: 'Are you sure you want to end this session? This will close the queue for everyone.',
+            variant: 'destructive',
+            onConfirm: performEndSession
+        });
+    };
+
     const handleSendWhatsApp = (tokenData: Token) => {
         const clinic = (queue as any)?.clinics;
         if (!clinic?.slug) return;
@@ -242,18 +297,44 @@ export default function GuestQueuePage() {
                 </Button>
             </div>
 
-            <QueueDisplay
-                doctorName={queue.doctor_name}
-                doctorImageUrl={queue.doctor_image_url}
-                waitingTokens={waitingTokens}
-                servedTokens={servedTokens}
-                absentTokens={absentTokens}
-                onCallNext={handleCallNext}
-                onMarkAbsent={handleMarkAbsent}
-                onDeleteToken={handleDeleteToken}
-                onSendWhatsApp={handleSendWhatsApp}
-                isSessionActive={['active', 'paused'].includes(queue.status)}
-                loadingAction={loadingAction}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column: Controls */}
+                <div className="space-y-8">
+                    <SessionStatusCard
+                        status={queue.status as 'active' | 'paused'}
+                        doctorName={queue.doctor_name || 'Unknown Doctor'}
+                        onToggleBreak={handleToggleBreak}
+                        onEndSession={handleEndSession}
+                        loadingAction={loadingAction}
+                    />
+                </div>
+
+                {/* Right Column: Queue Display */}
+                <QueueDisplay
+                    doctorName={queue.doctor_name}
+                    doctorImageUrl={queue.doctor_image_url}
+                    waitingTokens={waitingTokens}
+                    servedTokens={servedTokens}
+                    absentTokens={absentTokens}
+                    onCallNext={handleCallNext}
+                    onMarkAbsent={handleMarkAbsent}
+                    onDeleteToken={handleDeleteToken}
+                    onSendWhatsApp={handleSendWhatsApp}
+                    isSessionActive={queue.status === 'active'}
+                    loadingAction={loadingAction}
+                />
+            </div>
+
+            <CustomAlertDialog
+                isOpen={dialogConfig.isOpen}
+                onClose={() => setDialogConfig(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={async () => {
+                    await dialogConfig.onConfirm();
+                    setDialogConfig(prev => ({ ...prev, isOpen: false }));
+                }}
+                title={dialogConfig.title}
+                description={dialogConfig.description}
+                variant={dialogConfig.variant}
             />
 
             <footer className="mt-12 text-center text-slate-400 text-xs">

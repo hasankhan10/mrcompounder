@@ -13,24 +13,49 @@ import { ToggleBreakRequest, ToggleBreakResponse } from '@/lib/types';
  * @return {ToggleBreakResponse} 200 - Success response
  * @return {object} 404 - Not Found (e.g., session not found)
  */
+import { createServerSupabaseClient } from '@/lib/supabase-server';
+
 export async function POST(request: NextRequest) {
+  const supabase = await createServerSupabaseClient();
   const body: ToggleBreakRequest = await request.json();
-  const clinicId = 'user-clinic-id'; // Replace with actual clinic_id from session
 
-  // Logic to:
-  // 1. Find the active queue by sessionId and clinicId.
-  // 2. Update its status to the newStatus from the body.
-  console.log(`POST /api/dashboard/session/break hit for clinic ${clinicId} with body:`, body);
+  // 1. Auth Check
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  }
 
-  // Placeholder response
-  const placeholderResponse: ToggleBreakResponse = {
-    id: body.sessionId,
-    clinic_id: clinicId,
-    status: body.newStatus,
-    doctor_name: 'Dr. Placeholder',
-    session_date: new Date().toISOString().split('T')[0],
-    created_at: new Date().toISOString(),
-  };
+  // 2. Get Clinic ID
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('clinic_id')
+    .eq('id', user.id)
+    .single();
 
-  return NextResponse.json(placeholderResponse);
+  if (!profile?.clinic_id) {
+    return new NextResponse(JSON.stringify({ error: 'Clinic not found' }), { status: 404 });
+  }
+
+  const clinicId = profile.clinic_id;
+
+  // 3. Verify Session Ownership & Update
+  // We strictly check that the queue (session) belongs to the clinic_id
+  const { data: updatedQueue, error } = await supabase
+    .from('queues')
+    .update({ status: body.newStatus })
+    .eq('id', body.sessionId)
+    .eq('clinic_id', clinicId) // Security: Ensure ownership
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating session break status:', error);
+    return new NextResponse(JSON.stringify({ error: 'Failed to update session status' }), { status: 500 });
+  }
+
+  if (!updatedQueue) {
+    return new NextResponse(JSON.stringify({ error: 'Session not found or permission denied' }), { status: 404 });
+  }
+
+  return NextResponse.json(updatedQueue);
 }

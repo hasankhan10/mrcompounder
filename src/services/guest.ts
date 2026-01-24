@@ -25,5 +25,20 @@ export const guestService = {
 
     async deleteToken(tokenId: string, shareToken: string) {
         return api.delete(`/api/dashboard/token/${tokenId}?token=${shareToken}`);
+    },
+
+    async toggleBreak(sessionId: string, shareToken: string, newStatus: 'active' | 'paused') {
+        return api.post<Queue>('/api/dashboard/session/toggle-break', {
+            sessionId,
+            shareToken,
+            newStatus
+        });
+    },
+
+    async endSession(sessionId: string, shareToken: string) {
+        return api.post<{ message: string; endedAt: string }>('/api/dashboard/session/end', {
+            sessionId,
+            shareToken
+        });
     }
 };
