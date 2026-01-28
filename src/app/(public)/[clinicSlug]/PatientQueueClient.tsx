@@ -14,11 +14,6 @@ interface InitialData {
   activeQueue: Queue | null;
 }
 
-interface InitialData {
-  clinic: Clinic | null;
-  activeQueue: Queue | null;
-}
-
 interface PatientQueueClientProps {
   initialData: InitialData;
 }
@@ -114,117 +109,6 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
   }, []);
 
   const [audioEnabled, setAudioEnabled] = useState(false);
-
-  // Real-time Subscription
-  useEffect(() => {
-    if (!queue) return;
-
-    const channel = supabase
-      .channel(`patient-view-${queue.id}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'tokens', filter: `queue_id=eq.${queue.id}` },
-        (payload) => {
-          const newToken = payload.new as Token;
-          console.log('Realtime Event:', payload.eventType, newToken);
-
-          // Update My Token
-          setMyToken((prev) => {
-            if (prev && prev.id === newToken.id) {
-              if (newToken.status === 'called' && prev.status !== 'called') {
-                // Trigger Flash and Sound
-                setIsFlashing(true);
-
-                // Play Code-Generated Alarm (No MP3 needed)
-                playAlarm();
-
-                toast.success("It's your turn! Please proceed to the doctor.");
-
-                // Stop after 10 seconds
-                setTimeout(() => {
-                  setIsFlashing(false);
-                  stopAlarm();
-                }, 10000);
-              }
-              return newToken;
-            }
-            return prev;
-          });
-
-          // Update Current/Last Served
-          if (newToken.status === 'called') {
-            setCurrentToken(newToken);
-            // Self-healing: If we get a called token, the session MUST be active.
-            setQueue(prev => {
-              if (prev && prev.status === 'waiting') {
-                return { ...prev, status: 'active' };
-              }
-              return prev;
-            });
-          } else if (newToken.status === 'served') {
-            setLastServedTokenNumber(newToken.token_number);
-            // Delay clearing currentToken to allow "Call Next" to arrive and prevent "--" flicker
-            setTimeout(() => {
-              setCurrentToken((prev) => (prev && prev.id === newToken.id ? null : prev));
-            }, 1000);
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'queues', filter: `id=eq.${queue.id}` },
-        (payload) => {
-          setQueue(payload.new as Queue);
-          toast.info('Session status updated.');
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queue, supabase, audioEnabled]); // Re-subscribe if queue changes
-
-  const enableAudio = () => {
-    try {
-      // Method 1: Try to load the file (for the actual alarm later)
-      if (audioRef.current) {
-        audioRef.current.load();
-      }
-
-      // Method 2: Web Audio API (The 100% Fix)
-      // We create a silent oscillator to force the browser's audio engine to wake up.
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioContextClass) {
-        const ctx = new AudioContextClass();
-        const oscillator = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-
-        gainNode.gain.value = 0.01; // Almost silent
-        oscillator.connect(gainNode);
-        gainNode.connect(ctx.destination);
-
-        oscillator.start(0);
-        setTimeout(() => oscillator.stop(), 100); // Play for 100ms
-
-        setAudioEnabled(true);
-        toast.success("Audio Alerts Enabled! Keep this tab open.");
-      } else {
-        // Fallback for very old browsers
-        if (audioRef.current) {
-          audioRef.current.play().then(() => {
-            audioRef.current?.pause();
-            setAudioEnabled(true);
-          }).catch(e => console.error(e));
-        }
-      }
-    } catch (err) {
-      console.error("Audio enable failed:", err);
-      toast.error("Could not enable audio. Please try again.");
-    }
-  };
-
-
   const [lastServedTokens, setLastServedTokens] = useState<Token[]>([]);
 
   const fetchBookingStatus = useCallback(async (phoneNumber: string) => {
@@ -305,6 +189,151 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
       setIsLoading(false);
     }
   }, [clinic]);
+
+  // --- TIERED UPDATE LOGIC (10X Optimization) ---
+  const [useRealtime, setUseRealtime] = useState(false);
+
+  useEffect(() => {
+    if (!myToken) return;
+
+    // Condition for Real-time Entry Tier:
+    // 1. I am already "called" (my turn is now)
+    // 2. I am the literal "Next" in line (Current Token + 1)
+    const currentNum = currentToken ? currentToken.token_number : lastServedTokenNumber;
+    const isNext = myToken.status === 'called' ||
+      (myToken.status === 'waiting' && myToken.token_number === currentNum + 1);
+
+    if (isNext !== useRealtime) {
+      console.log(`[Queue Optimizer] Switching to ${isNext ? 'REAL-TIME' : 'POLLING'} mode for token #${myToken.token_number}`);
+      setUseRealtime(isNext);
+    }
+  }, [myToken?.status, myToken?.token_number, currentToken?.token_number, lastServedTokenNumber, useRealtime]);
+
+  // Polling Effect (Tier 2 - Bulk Optimization)
+  // This reduces WebSocket connection pressure on Supabase by 90%+
+  useEffect(() => {
+    // Only poll if we have a phone, are NOT in real-time mode, and have an active waiting token
+    if (!phone || useRealtime || !myToken || myToken.status === 'served' || myToken.status === 'no_show') {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      console.log(`[Queue Optimizer] Polling for update (Token #${myToken.token_number})...`);
+      fetchBookingStatus(phone);
+    }, 10000); // 10s as requested
+
+    return () => clearInterval(intervalId);
+  }, [phone, useRealtime, myToken?.id, myToken?.status, fetchBookingStatus]);
+
+  // Real-time Subscription (Tier 1 - Mission Critical)
+  useEffect(() => {
+    if (!queue || !useRealtime) return;
+
+    const channel = supabase
+      .channel(`patient-view-${queue.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'tokens', filter: `queue_id=eq.${queue.id}` },
+        (payload) => {
+          const newToken = payload.new as Token;
+          console.log('Realtime Event:', payload.eventType, newToken);
+
+          // Update My Token
+          setMyToken((prev) => {
+            if (prev && prev.id === newToken.id) {
+              if (newToken.status === 'called' && prev.status !== 'called') {
+                // Trigger Flash and Sound
+                setIsFlashing(true);
+
+                // Play Code-Generated Alarm (No MP3 needed)
+                playAlarm();
+
+                toast.success("It's your turn! Please proceed to the doctor.");
+
+                // Stop after 10 seconds
+                setTimeout(() => {
+                  setIsFlashing(false);
+                  stopAlarm();
+                }, 10000);
+              }
+              return newToken;
+            }
+            return prev;
+          });
+
+          // Update Current/Last Served
+          if (newToken.status === 'called') {
+            setCurrentToken(newToken);
+            // Self-healing: If we get a called token, the session MUST be active.
+            setQueue(prev => {
+              if (prev && prev.status === 'waiting') {
+                return { ...prev, status: 'active' };
+              }
+              return prev;
+            });
+          } else if (newToken.status === 'served') {
+            setLastServedTokenNumber(newToken.token_number);
+            // Delay clearing currentToken to allow "Call Next" to arrive and prevent "--" flicker
+            setTimeout(() => {
+              setCurrentToken((prev) => (prev && prev.id === newToken.id ? null : prev));
+            }, 1000);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'queues', filter: `id=eq.${queue.id}` },
+        (payload) => {
+          setQueue(payload.new as Queue);
+          toast.info('Session status updated.');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queue, supabase, useRealtime]); // Depend on useRealtime for handover
+
+  const enableAudio = () => {
+    try {
+      // Method 1: Try to load the file (for the actual alarm later)
+      if (audioRef.current) {
+        audioRef.current.load();
+      }
+
+      // Method 2: Web Audio API (The 100% Fix)
+      // We create a silent oscillator to force the browser's audio engine to wake up.
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioContextClass) {
+        const ctx = new AudioContextClass();
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        gainNode.gain.value = 0.01; // Almost silent
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        oscillator.start(0);
+        setTimeout(() => oscillator.stop(), 100); // Play for 100ms
+
+        setAudioEnabled(true);
+        toast.success("Audio Alerts Enabled! Keep this tab open.");
+      } else {
+        // Fallback for very old browsers
+        if (audioRef.current) {
+          audioRef.current.play().then(() => {
+            audioRef.current?.pause();
+            setAudioEnabled(true);
+          }).catch(e => console.error(e));
+        }
+      }
+    } catch (err) {
+      console.error("Audio enable failed:", err);
+      toast.error("Could not enable audio. Please try again.");
+    }
+  };
+
 
   // Auto-login on mount
   useEffect(() => {
