@@ -2,62 +2,103 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { Plus, Minus, HelpCircle } from 'lucide-react';
 import { APP_NAME } from '@/lib/config';
+import { Reveal } from '@/components/shared/Reveal';
 
 const faqs = [
-    { q: "Do I need special hardware?", a: "No. " + APP_NAME + " works on any smartphone, tablet, or computer you already own." },
-    { q: "Is there an app to download?", a: "No. It's entirely web-based, accessible directly through a browser. This means no updates to manage and instant access for your patients." },
-    { q: "What if the system fails during OPD hours?", a: "OPD never stops because of software. If internet fails, staff continues normally. " + APP_NAME + " supports OPD — it never blocks it." },
-    { q: "Can multiple doctors use it at the same time?", a: "Yes! You can easily start and manage separate 'sessions' for different doctors within the same clinic account." },
-    { q: "Can I pre-book patients for tomorrow?", a: "Absolutely. Your compounder can register patients in advance directly from the dashboard, or patients can join the queue online if you enable remote joining." }
+    {
+        q: "Do I need special hardware?",
+        a: "Not at all. " + APP_NAME + " is designed to be hardware-agnostic. It works flawlessly on any smartphone, tablet, or laptop you already own. There's no need for expensive kiosks or specialized printers."
+    },
+    {
+        q: "Is there an app for my patients to download?",
+        a: "Absolutely not. We've eliminated that friction. Patients simply scan a QR code and the queue interface opens instantly in their mobile browser. No downloads, no sign-ups, no barriers to entry."
+    },
+    {
+        q: "What if the internet is slow or fails?",
+        a: "We've built " + APP_NAME + " to be resilient. Our lightweight architecture works even on 2G connections. If a complete outage occurs, your staff can continue manually; our system is a support tool, not a bottleneck."
+    },
+    {
+        q: "Can multiple doctors share one account?",
+        a: "Yes. You can manage multiple 'Sessions' simultaneously—one for each doctor or department. Each has its own independent queue, all controlled from a single master dashboard."
+    },
+    {
+        q: "Can we pre-book patients?",
+        a: "Yes. Your staff can easily add 'walk-in' patients or pre-registered patients directly into the queue. You can also enable remote joining so patients can book their slot before they even leave home."
+    }
 ];
 
 export default function FaqSection() {
-    const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-    const toggleFaq = (index: number) => {
-        setOpenIndex(openIndex === index ? null : index);
-    };
+    const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     return (
-        <section className="py-20 bg-white">
-            <div className="container mx-auto px-4">
-                <h2 className="text-3xl md:text-5xl font-bold text-slate-900 text-center mb-12">Frequently Asked Questions</h2>
-                <div className="max-w-3xl mx-auto space-y-4">
-                    {faqs.map((item, index) => (
-                        <div
-                            key={index}
-                            className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-300"
-                        >
-                            <button
-                                onClick={() => toggleFaq(index)}
-                                className="w-full flex items-center justify-between p-6 text-left focus:outline-none bg-slate-50/50 hover:bg-slate-50 transition-colors"
-                            >
-                                <h3 className="text-lg md:text-xl font-semibold text-slate-800 pr-8">
-                                    {item.q}
-                                </h3>
-                                <ChevronDown
-                                    className={`w-6 h-6 text-teal-600 transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`}
-                                />
-                            </button>
-                            <AnimatePresence>
-                                {openIndex === index && (
-                                    <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: 'auto', opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                    >
-                                        <div className="p-6 pt-0 text-slate-600 leading-relaxed border-t border-slate-100 bg-white">
-                                            {item.a}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+        <section className="py-24 bg-white relative overflow-hidden">
+            {/* Subtle background element */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-slate-50 to-transparent pointer-events-none" />
+
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="max-w-4xl mx-auto text-center mb-12">
+                    <Reveal width="100%" direction="up">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 border border-teal-100 text-teal-600 text-[10px] font-black uppercase tracking-[0.2em] mb-8">
+                            <HelpCircle className="size-3" /> Questions & Answers
                         </div>
-                    ))}
+                        <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight mb-8">
+                            Got Questions? <br />
+                            <span className="text-teal-600">We've Got Answers.</span>
+                        </h2>
+                    </Reveal>
                 </div>
+
+                <div className="max-w-3xl mx-auto">
+                    <div className="divide-y divide-slate-100 border-t border-slate-100">
+                        {faqs.map((item, index) => (
+                            <div key={index} className="py-2">
+                                <motion.div
+                                    initial={false}
+                                    className="group"
+                                >
+                                    <button
+                                        onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                                        className="w-full flex items-center justify-between py-8 text-left focus:outline-none group-hover:px-4 transition-all duration-300 rounded-[2rem] hover:bg-slate-50"
+                                    >
+                                        <h3 className={`text-xl md:text-2xl font-bold tracking-tight transition-colors duration-300 ${openIndex === index ? 'text-teal-600' : 'text-slate-900 group-hover:text-teal-600'}`}>
+                                            {item.q}
+                                        </h3>
+                                        <div className={`flex-shrink-0 size-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${openIndex === index ? 'bg-teal-600 border-teal-600 text-white rotate-0' : 'border-slate-200 text-slate-400 rotate-90 group-hover:border-teal-600 group-hover:text-teal-600'}`}>
+                                            {openIndex === index ? <Minus className="size-5" /> : <Plus className="size-5" />}
+                                        </div>
+                                    </button>
+
+                                    <AnimatePresence initial={false}>
+                                        {openIndex === index && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                            >
+                                                <div className="px-4 pb-10 text-slate-500 text-lg font-medium leading-relaxed max-w-2xl">
+                                                    {item.a}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Bottom Support Link */}
+                <Reveal width="100%" direction="up" delay={0.4}>
+                    <div className="mt-24 text-center">
+                        <p className="text-slate-400 font-medium italic">
+                            Couldn't find what you were looking for?
+                            <a href="/contact" className="ml-2 text-teal-600 font-bold hover:underline">Contact our support team</a>
+                        </p>
+                    </div>
+                </Reveal>
             </div>
         </section>
     );

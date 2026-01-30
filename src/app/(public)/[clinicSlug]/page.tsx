@@ -10,6 +10,8 @@ interface InitialData {
   activeQueue: Queue | null;
 }
 
+import { notFound } from 'next/navigation';
+
 // This is the main server component for the page.
 // It fetches the initial, non-sensitive data required to render the page.
 export default async function PatientPage(props: { params: Promise<{ clinicSlug: string }> }) {
@@ -20,6 +22,10 @@ export default async function PatientPage(props: { params: Promise<{ clinicSlug:
     .select('*')
     .eq('slug', params.clinicSlug)
     .single();
+
+  if (!clinic) {
+    notFound();
+  }
 
   let activeQueue: Queue | null = null;
   if (clinic) {

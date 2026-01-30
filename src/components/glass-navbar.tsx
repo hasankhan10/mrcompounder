@@ -1,121 +1,160 @@
-'use client';
+"use client";
 
-import { APP_NAME } from '@/lib/config';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { NavbarAuth } from '@/components/navbar-auth';
-
-import { Menu } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
-import { useState } from 'react';
-import { User } from '@supabase/supabase-js';
-import Image from 'next/image';
+import { APP_NAME } from "@/lib/config";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { NavbarAuth } from "@/components/navbar-auth";
+import { Menu, X } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { useState, useEffect } from "react";
+import { User } from "@supabase/supabase-js";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface GlassNavbarProps {
     initialUser?: User | null;
     initialRole?: string | null;
 }
 
-interface NavLinksProps {
-    mobile?: boolean;
-    pathname: string;
-    setIsOpen: (open: boolean) => void;
-}
-
-function NavLinks({ mobile = false, pathname, setIsOpen }: NavLinksProps) {
-    const isActive = (path: string) => pathname === path;
-
-    return (
-        <>
-            <Link
-                href="/"
-                onClick={() => mobile && setIsOpen(false)}
-                className={`font-medium transition-colors ${isActive('/') ? 'text-teal-600 font-bold' : 'text-slate-700 hover:text-teal-600'} ${mobile ? 'text-lg py-2' : ''}`}
-            >
-                Home
-            </Link>
-            <Link
-                href="/about"
-                onClick={() => mobile && setIsOpen(false)}
-                className={`font-medium transition-colors ${isActive('/about') ? 'text-teal-600 font-bold' : 'text-slate-700 hover:text-teal-600'} ${mobile ? 'text-lg py-2' : ''}`}
-            >
-                About Us
-            </Link>
-            <Link
-                href="/reviews"
-                onClick={() => mobile && setIsOpen(false)}
-                className={`font-medium transition-colors ${isActive('/reviews') ? 'text-teal-600 font-bold' : 'text-slate-700 hover:text-teal-600'} ${mobile ? 'text-lg py-2' : ''}`}
-            >
-                Reviews
-            </Link>
-            <Link
-                href="/contact"
-                onClick={() => mobile && setIsOpen(false)}
-                className={`font-medium transition-colors ${isActive('/contact') ? 'text-teal-600 font-bold' : 'text-slate-700 hover:text-teal-600'} ${mobile ? 'text-lg py-2' : ''}`}
-            >
-                Contact Us
-            </Link>
-            <Link
-                href="/pricing"
-                onClick={() => mobile && setIsOpen(false)}
-                className={`font-medium transition-colors ${isActive('/pricing') ? 'text-teal-600 font-bold' : 'text-slate-700 hover:text-teal-600'} ${mobile ? 'text-lg py-2' : ''}`}
-            >
-                Pricing
-            </Link>
-        </>
-    );
-}
+const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "About Us", href: "/about" },
+    { name: "Reviews", href: "/reviews" },
+    { name: "Contact Us", href: "/contact" },
+    { name: "Pricing", href: "/pricing" },
+];
 
 export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
 
-
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
-        <nav className="sticky top-0 z-50 bg-white/30 backdrop-blur-lg border-b border-slate-200/20 shadow-sm flex items-center justify-center">
-            <div className="container mx-auto px-4">
-                <div className="flex items-center justify-between h-16">
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <Image src="/favicon.ico" alt={APP_NAME} width={40} height={40} className="h-10 w-auto rounded-xl" />
-                        <span className="text-2xl font-bold text-slate-900 drop-shadow-sm">
+        <div className="fixed top-0 left-0 right-0 z-[100] px-4 py-4 pointer-events-none">
+            <motion.nav
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className={cn(
+                    "mx-auto max-w-7xl h-16 rounded-2xl pointer-events-auto transition-all duration-500",
+                    "border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)]",
+                    scrolled
+                        ? "bg-white/80 backdrop-blur-xl border-slate-200/50"
+                        : "bg-white/40 backdrop-blur-md"
+                )}
+            >
+                <div className="container mx-auto h-full px-6 flex items-center justify-between">
+                    {/* Logo Area */}
+                    <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform group">
+                        <div className="relative size-10 rounded-xl overflow-hidden shadow-lg group-hover:shadow-teal-500/20 transition-all duration-500">
+                            <Image
+                                src="/favicon.ico"
+                                alt={APP_NAME}
+                                fill
+                                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                        </div>
+                        <span className="text-xl font-black text-slate-900 tracking-tighter">
                             {APP_NAME}
                         </span>
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-8">
-                        <NavLinks pathname={pathname} setIsOpen={setIsOpen} />
+                    <div className="hidden md:flex items-center gap-1">
+                        {navLinks.map((link) => {
+                            const active = pathname === link.href;
+                            return (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className={cn(
+                                        "relative px-4 py-2 text-sm font-bold tracking-tight transition-all duration-300 rounded-xl",
+                                        active ? "text-teal-600" : "text-slate-600 hover:text-teal-600 hover:bg-teal-50/50"
+                                    )}
+                                >
+                                    {link.name}
+                                    {active && (
+                                        <motion.div
+                                            layoutId="nav-pill"
+                                            className="absolute inset-0 bg-teal-50 rounded-xl -z-10"
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                </Link>
+                            );
+                        })}
                     </div>
 
-                    {/* Desktop Auth */}
-                    <div className="hidden md:flex items-center space-x-4">
+                    {/* Auth Actions */}
+                    <div className="hidden md:flex items-center gap-3">
                         <NavbarAuth initialUser={initialUser} initialRole={initialRole} />
                     </div>
 
-                    {/* Mobile Menu */}
-                    <div className="md:hidden">
+                    {/* Mobile Menu Trigger */}
+                    <div className="md:hidden flex items-center gap-4">
+                        <div className="h-8 w-px bg-slate-200" />
                         <Sheet open={isOpen} onOpenChange={setIsOpen}>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="text-slate-700">
-                                    <Menu className="w-6 h-6" />
+                                <Button variant="ghost" size="icon" className="size-10 rounded-xl hover:bg-teal-50 text-slate-900 transition-colors">
+                                    <Menu className="size-6" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                                <SheetTitle className="text-left text-xl font-bold mb-6">{APP_NAME}</SheetTitle>
-                                <div className="flex flex-col space-y-4 mt-4">
-                                    <NavLinks mobile pathname={pathname} setIsOpen={setIsOpen} />
-                                    <div className="h-px bg-slate-100 my-4" />
-                                    <div className="flex flex-col space-y-3 items-start">
-                                        <NavbarAuth initialUser={initialUser} initialRole={initialRole} onLinkClick={() => setIsOpen(false)} />
+                            <SheetContent side="top" className="w-full border-b border-slate-100 rounded-b-[2.5rem] p-0 overflow-hidden outline-none">
+                                <div className="p-8 pt-12">
+                                    <div className="flex items-center justify-between mb-10">
+                                        <SheetTitle className="text-2xl font-black tracking-tighter">{APP_NAME}</SheetTitle>
+                                        <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="rounded-xl">
+                                            <X className="size-6" />
+                                        </Button>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2 mb-10">
+                                        {navLinks.map((link, i) => (
+                                            <motion.div
+                                                key={link.href}
+                                                initial={{ x: -20, opacity: 0 }}
+                                                animate={{ x: 0, opacity: 1 }}
+                                                transition={{ delay: i * 0.1 }}
+                                            >
+                                                <Link
+                                                    href={link.href}
+                                                    onClick={() => setIsOpen(false)}
+                                                    className={cn(
+                                                        "block py-3 px-4 rounded-2xl text-lg font-bold transition-all",
+                                                        pathname === link.href ? "bg-teal-50 text-teal-600" : "text-slate-700 active:bg-slate-50"
+                                                    )}
+                                                >
+                                                    {link.name}
+                                                </Link>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+
+                                    <div className="h-px bg-slate-100 mb-10" />
+
+                                    <div className="flex flex-col gap-4">
+                                        <NavbarAuth
+                                            initialUser={initialUser}
+                                            initialRole={initialRole}
+                                            onLinkClick={() => setIsOpen(false)}
+                                        />
                                     </div>
                                 </div>
                             </SheetContent>
                         </Sheet>
                     </div>
                 </div>
-            </div>
-        </nav>
+            </motion.nav>
+        </div>
     );
 }

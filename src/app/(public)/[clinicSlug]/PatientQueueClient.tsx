@@ -401,8 +401,6 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
 
   // --- Render ---
 
-  if (!clinic) return <div className="p-10 text-center">Clinic not found</div>;
-
   if (isLoading && !myToken) {
     return <PatientViewSkeleton />;
   }
@@ -411,7 +409,7 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
   if (!myToken && bookings.length === 0) {
     return (
       <PatientLogin
-        clinic={clinic}
+        clinic={clinic!}
         phone={phone}
         setPhone={setPhone}
         isLoading={isLoading}
@@ -452,7 +450,7 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
   // 2. Dashboard View
   return (
     <PatientLiveQueue
-      clinic={clinic}
+      clinic={clinic!}
       queue={queue}
       myToken={myToken!}
       currentToken={currentToken}
