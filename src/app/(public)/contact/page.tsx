@@ -1,64 +1,131 @@
-import { Metadata } from 'next';
-import { ContactForm } from '@/components/public/ContactForm';
+"use client";
 
-export const metadata: Metadata = {
-  title: 'Contact Us - Get in Touch',
-  description: 'Have questions or need a free setup? Contact the Mr Compounder team via email or WhatsApp. We are here to help.',
-  alternates: {
-    canonical: '/contact',
-  },
-};
+import { ContactForm } from '@/components/public/ContactForm';
+import { Reveal } from '@/components/shared/Reveal';
+import { Mail, MessageCircle, Phone, Sparkles, Plus, Clock } from 'lucide-react';
+import { APP_NAME } from '@/lib/config';
+
+function FloatingPlusIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <Plus
+      className={`absolute text-white/10 animate-float ${className}`}
+      style={style}
+      strokeWidth={3}
+    />
+  );
+}
+
+const floatingPlusIcons = [
+  { className: "top-1/4 left-[5%] w-16 h-16", delay: "0s" },
+  { className: "top-1/3 right-[10%] w-24 h-24", delay: "2s" },
+  { className: "bottom-1/4 left-[15%] w-12 h-12", delay: "4s" },
+];
 
 export default function ContactUsPage() {
   return (
-    <div className="bg-white text-slate-800 py-16 md:py-24">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">
-            Book a Free OPD Setup or Ask a Question
-          </h1>
-          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto">
-            Have a question, or want to see how Mr Compounder works inside your clinic? We respond personally and guide you step by step.
-          </p>
+    <div className="flex flex-col w-full bg-slate-50">
+      {/* Hero Section */}
+      <section className="relative pt-44 pb-24 md:pt-56 md:pb-32 bg-teal-700 overflow-hidden">
+        {/* Floating Icons */}
+        <div className="absolute inset-0 z-0 pointer-events-none select-none">
+          {floatingPlusIcons.map((icon, idx) => (
+            <FloatingPlusIcon key={idx} className={icon.className} style={{ animationDelay: icon.delay }} />
+          ))}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
-          {/* Contact Info */}
-          <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Direct Contact (Fastest Response)</h2>
-            <div className="flex items-center space-x-4">
-              <svg className="w-8 h-8 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-              </svg>
-              <div>
-                <p className="text-lg font-semibold">Email (Response within 24 hours)</p>
-                <p className="text-slate-600">
-                  <a href="mailto:mrcompounder.com@gmail.com" className="text-teal-600 hover:underline">
+        {/* Glows */}
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-white/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-teal-400/10 blur-[100px] rounded-full pointer-events-none" />
+
+        <div className="container mx-auto px-4 relative z-10 text-center text-white">
+          <Reveal width="100%" direction="up">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-teal-100 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] mb-8">
+              <Sparkles className="size-3" /> Get in Touch
+            </div>
+            <h1 className="text-4xl md:text-7xl font-black tracking-tighter mb-6 leading-[0.9]">
+              How can we help <br />
+              <span className="text-teal-200">your clinic today?</span>
+            </h1>
+          </Reveal>
+          <Reveal width="100%" direction="up" delay={0.2}>
+            <p className="text-xl md:text-2xl text-teal-50/80 max-w-2xl mx-auto font-medium leading-relaxed">
+              Whether you're looking for a free setup or have a specific question about patient flow, our team is here to help.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Contact Grid */}
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-12 gap-12 items-start">
+
+            {/* Direct Methods (4 cols) */}
+            <div className="lg:col-span-4 space-y-6">
+              <Reveal width="100%" direction="left">
+                <div className="space-y-4 mb-10">
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">Direct Contact</h2>
+                  <p className="text-slate-500 font-medium">For immediate assistance, reach out via our official channels.</p>
+                </div>
+              </Reveal>
+
+              <Reveal width="100%" direction="left" delay={0.1}>
+                <a
+                  href="https://wa.me/917001717263"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block p-8 bg-white border border-slate-200 rounded-[2rem] hover:border-teal-500/30 hover:shadow-2xl hover:shadow-teal-500/5 transition-all duration-500"
+                >
+                  <div className="size-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <MessageCircle className="size-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">WhatsApp</h3>
+                  <p className="text-slate-500 text-sm font-medium mb-4">Recommended for clinics & doctors.</p>
+                  <span className="text-teal-600 font-bold text-sm inline-flex items-center gap-1">
+                    Chat with us <Plus className="size-3" />
+                  </span>
+                </a>
+              </Reveal>
+
+              <Reveal width="100%" direction="left" delay={0.2}>
+                <a
+                  href="mailto:mrcompounder.com@gmail.com"
+                  className="group block p-8 bg-white border border-slate-200 rounded-[2rem] hover:border-teal-500/30 hover:shadow-2xl hover:shadow-teal-500/5 transition-all duration-500"
+                >
+                  <div className="size-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <Mail className="size-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Email Support</h3>
+                  <p className="text-slate-500 text-sm font-medium mb-4">Response within 24 hours.</p>
+                  <span className="text-teal-600 font-bold text-sm tracking-tight truncate block">
                     mrcompounder.com@gmail.com
-                  </a>
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.868 8.868 0 01-4.767-1.353L2 18l1.395-3.111A8.995 8.995 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clipRule="evenodd"></path>
-              </svg>
-              <div>
-                <p className="text-lg font-semibold">WhatsApp (Recommended for Clinics)</p>
-                <p className="text-slate-600">
-                  <a href="https://wa.me/917001717263" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">
-                    (Click to Chat)
-                  </a>
-                </p>
-              </div>
-            </div>
-          </div>
+                  </span>
+                </a>
+              </Reveal>
 
-          {/* Contact Form */}
-          <ContactForm />
+              <Reveal width="100%" direction="left" delay={0.3}>
+                <div className="p-8 bg-slate-900 text-white rounded-[2rem] overflow-hidden relative">
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Clock className="size-12" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2 text-white">Operating Hours</h3>
+                  <p className="text-slate-400 text-sm font-medium">Mon - Sat: 9 AM - 8 PM IST</p>
+                </div>
+              </Reveal>
+            </div>
+
+            {/* Form Column (8 cols) */}
+            <div className="lg:col-span-8">
+              <Reveal width="100%" direction="up" delay={0.4}>
+                <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-slate-200 shadow-2xl shadow-slate-200/50">
+                  <ContactForm />
+                </div>
+              </Reveal>
+            </div>
+
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

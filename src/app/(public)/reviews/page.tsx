@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Quote, Building2, User } from 'lucide-react';
+import { Star, Quote, Building2, User, Sparkles, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { Reveal } from '@/components/shared/Reveal';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { APP_NAME } from '@/lib/config';
+import { CallToAction } from '@/components/ui/cta-3';
 
 // Dummy Data
 const CLINIC_REVIEWS = [
@@ -84,111 +85,143 @@ const PATIENT_REVIEWS = [
     }
 ];
 
+function FloatingPlusIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
+    return (
+        <Plus
+            className={`absolute text-white/10 animate-float ${className}`}
+            style={style}
+            strokeWidth={3}
+        />
+    );
+}
+
+const floatingPlusIcons = [
+    { className: "top-1/4 left-[5%] w-16 h-16", delay: "0s" },
+    { className: "top-1/2 right-[10%] w-24 h-24", delay: "2s" },
+    { className: "bottom-1/4 left-[15%] w-12 h-12", delay: "4s" },
+];
+
 export default function ReviewsPage() {
     const [activeTab, setActiveTab] = useState<'clinics' | 'patients'>('clinics');
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-24 pb-12">
-            <div className="container mx-auto px-4">
-                {/* Header */}
-                <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
-                    <Reveal width="100%">
-                        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+        <div className="flex flex-col w-full bg-slate-50 min-h-screen">
+            {/* Hero Section */}
+            <section className="relative pt-44 pb-32 md:pt-64 md:pb-48 bg-teal-700 overflow-hidden">
+                {/* Floating Icons */}
+                <div className="absolute inset-0 z-0 pointer-events-none select-none">
+                    {floatingPlusIcons.map((icon, idx) => (
+                        <FloatingPlusIcon key={idx} className={icon.className} style={{ animationDelay: icon.delay }} />
+                    ))}
+                </div>
+
+                {/* Background Glows */}
+                <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-white/5 blur-[120px] rounded-full pointer-events-none" />
+                <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-teal-400/10 blur-[120px] rounded-full pointer-events-none" />
+
+                <div className="container mx-auto px-4 relative z-10 text-center text-white">
+                    <Reveal width="100%" direction="up">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-teal-200 text-xs font-bold uppercase tracking-[0.2em] mb-8">
+                            <Sparkles className="size-3" /> Testimonials
+                        </div>
+                        <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter mb-8 leading-[0.9]">
                             Trusted by Doctors <br />
-                            <span className="text-teal-600">and Clinics.</span>
+                            <span className="text-teal-200">and Patients.</span>
                         </h1>
                     </Reveal>
-                    <Reveal delay={0.1} width="100%">
-                        <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
-                            See how Mr Compounder is changing healthcare experiences for everyone involved.
+                    <Reveal width="100%" direction="up" delay={0.2}>
+                        <p className="text-xl md:text-2xl text-teal-50/80 max-w-3xl mx-auto font-medium leading-relaxed">
+                            See how {APP_NAME} is restoring peace to waiting rooms across India, one clinic at a time.
                         </p>
                     </Reveal>
+                </div>
+            </section>
 
-                    {/* Toggle Switch */}
-                    <Reveal delay={0.2} width="100%">
-                        <div className="flex justify-center">
-                            <div className="inline-flex bg-white p-1.5 rounded-full shadow-sm border border-slate-200 relative">
-                                {/* Sliding Background */}
-                                <motion.div
-                                    className="absolute top-1.5 bottom-1.5 bg-teal-600 rounded-full shadow-md z-0"
-                                    initial={false}
-                                    animate={{
-                                        left: activeTab === 'clinics' ? '6px' : '50%',
-                                        width: 'calc(50% - 9px)',
-                                        x: activeTab === 'clinics' ? 0 : 3
-                                    }}
-                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                />
+            <div className="container mx-auto px-4 -mt-16 relative z-20">
+                {/* Toggle Switch */}
+                <div className="flex justify-center mb-16">
+                    <Reveal width="fit-content" direction="up" delay={0.3}>
+                        <div className="inline-flex bg-white/80 backdrop-blur-xl p-2 rounded-[2rem] shadow-2xl border border-white relative">
+                            {/* Sliding Background */}
+                            <motion.div
+                                className="absolute top-2 bottom-2 bg-teal-700 rounded-[1.5rem] shadow-xl z-0"
+                                initial={false}
+                                animate={{
+                                    left: activeTab === 'clinics' ? '8px' : '50%',
+                                    width: 'calc(50% - 12px)',
+                                    x: activeTab === 'clinics' ? 0 : 4
+                                }}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            />
 
-                                <button
-                                    onClick={() => setActiveTab('clinics')}
-                                    className={`relative z-10 px-8 py-3 rounded-full text-sm font-bold transition-colors duration-200 flex items-center gap-2 ${activeTab === 'clinics' ? 'text-white' : 'text-slate-600 hover:text-slate-900'
-                                        }`}
-                                >
-                                    <Building2 className="w-4 h-4" />
-                                    By Clinics
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('patients')}
-                                    className={`relative z-10 px-8 py-3 rounded-full text-sm font-bold transition-colors duration-200 flex items-center gap-2 ${activeTab === 'patients' ? 'text-white' : 'text-slate-600 hover:text-slate-900'
-                                        }`}
-                                >
-                                    <User className="w-4 h-4" />
-                                    By Patients
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => setActiveTab('clinics')}
+                                className={`relative z-10 px-10 py-4 rounded-[1.5rem] text-sm font-black tracking-tight transition-colors duration-200 flex items-center gap-2 ${activeTab === 'clinics' ? 'text-white' : 'text-slate-500 hover:text-slate-900'
+                                    }`}
+                            >
+                                <Building2 className="w-4 h-4" />
+                                For Clinics
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('patients')}
+                                className={`relative z-10 px-10 py-4 rounded-[1.5rem] text-sm font-black tracking-tight transition-colors duration-200 flex items-center gap-2 ${activeTab === 'patients' ? 'text-white' : 'text-slate-500 hover:text-slate-900'
+                                    }`}
+                            >
+                                <User className="w-4 h-4" />
+                                For Patients
+                            </button>
                         </div>
                     </Reveal>
                 </div>
 
                 {/* Content Grid */}
-                <AnimatePresence mode="wait">
-                    {activeTab === 'clinics' ? (
-                        <motion.div
-                            key="clinics"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3 }}
-                            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-                        >
-                            {CLINIC_REVIEWS.map((review, index) => (
-                                <ReviewCard key={review.id} review={review} type="clinic" index={index} />
-                            ))}
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="patients"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3 }}
-                            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
-                        >
-                            {PATIENT_REVIEWS.map((review, index) => (
-                                <ReviewCard key={review.id} review={review} type="patient" index={index} />
-                            ))}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                <div className="pb-24">
+                    <AnimatePresence mode="wait">
+                        {activeTab === 'clinics' ? (
+                            <motion.div
+                                key="clinics"
+                                initial={{ opacity: 0, y: 40 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -40 }}
+                                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                                className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+                            >
+                                {CLINIC_REVIEWS.map((review, index) => (
+                                    <ReviewCard key={review.id} review={review} type="clinic" index={index} />
+                                ))}
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="patients"
+                                initial={{ opacity: 0, y: 40 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -40 }}
+                                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                                className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+                            >
+                                {PATIENT_REVIEWS.map((review, index) => (
+                                    <ReviewCard key={review.id} review={review} type="patient" index={index} />
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
 
                 {/* Premium CTA Section */}
-                <div className="mt-24">
-                    <Reveal width="100%">
-                        <div className="relative bg-teal-700 rounded-2xl shadow-xl overflow-hidden text-white p-12 md:p-16">
-                            <div className="relative z-10 text-center">
-                                <h2 className="text-3xl md:text-5xl font-extrabold mb-4 text-gray-200">Ready to Modernize Your Clinic?</h2>
-                                <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 mb-8">
-                                    Transform your waiting room today. Join dozens of clinics who have brought calm and efficiency to their practice with {APP_NAME}.
-                                </p>
-                                <Button asChild size="lg" className="bg-white text-teal-700 hover:bg-slate-100 text-lg md:text-xl font-bold py-4 px-10 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
-                                    <Link href="/contact">Book a Free Setup</Link>
-                                </Button>
-                            </div>
-                            {/* Decorative background elements */}
-                            <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full transform -translate-x-1/4 -translate-y-1/4"></div>
-                            <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
-                        </div>
+                <div className="pb-24">
+                    <Reveal width="100%" direction="up">
+                        <CallToAction
+                            title="Ready to Modernize Your Clinic?"
+                            description={
+                                <>
+                                    Transform your waiting room today. Join dozens of clinics who have brought calm and efficiency to their practice with <span className="text-teal-600 font-bold">{APP_NAME}</span>.
+                                </>
+                            }
+                            primaryBtnText="Book a Free Setup"
+                            primaryBtnHref="/contact"
+                            secondaryBtnText="See Pricing"
+                            secondaryBtnHref="/pricing"
+                        />
                     </Reveal>
                 </div>
             </div>
@@ -198,54 +231,51 @@ export default function ReviewsPage() {
 
 function ReviewCard({ review, type, index }: { review: { rating: number; comment: string; logo?: string; name: string; location: string }; type: 'clinic' | 'patient'; index: number }) {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-md transition-shadow h-full flex flex-col ${type === 'clinic' ? 'border-t-4 border-t-teal-500' : 'border-t-4 border-t-slate-300'}`}
-        >
-            <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                    <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-slate-200'}`}
-                    />
-                ))}
-            </div>
+        <Reveal width="100%" direction="up" delay={index * 0.1}>
+            <div className="group h-full bg-white rounded-[2.5rem] p-10 border border-slate-200 hover:border-teal-500/30 hover:shadow-2xl hover:shadow-teal-500/5 transition-all duration-500 flex flex-col">
+                <div className="flex items-center gap-1 mb-6">
+                    {[...Array(5)].map((_, i) => (
+                        <Star
+                            key={i}
+                            className={`w-4 h-4 ${i < review.rating ? 'text-teal-500 fill-teal-500' : 'text-slate-200'}`}
+                        />
+                    ))}
+                </div>
 
-            <div className="mb-6 flex-grow">
-                <Quote className="w-8 h-8 text-slate-200 mb-2" />
-                <p className="text-slate-700 leading-relaxed italic">
-                    &quot;{review.comment}&quot;
-                </p>
-            </div>
+                <div className="mb-8 flex-grow">
+                    <Quote className="w-10 h-10 text-teal-500/10 mb-4 group-hover:scale-110 transition-transform duration-500" />
+                    <p className="text-slate-700 text-lg leading-relaxed font-medium italic">
+                        &quot;{review.comment}&quot;
+                    </p>
+                </div>
 
-            <div className="flex items-center gap-4 mt-auto pt-6 border-t border-slate-50">
-                {type === 'clinic' ? (
-                    <>
-                        <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 shadow-sm bg-white">
-                            <Image src={review.logo || '/placeholder-logo.png'} alt={review.name} fill className="object-cover" />
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-slate-900 text-sm">{review.name}</h4>
-                            <p className="text-xs text-slate-500 flex items-center gap-1">
-                                <Building2 className="w-3 h-3" />
-                                {review.location}
-                            </p>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold">
-                            {review.name.charAt(0)}
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-slate-900 text-sm">{review.name}</h4>
-                            <p className="text-xs text-slate-500">{review.location}</p>
-                        </div>
-                    </>
-                )}
+                <div className="flex items-center gap-4 mt-auto pt-8 border-t border-slate-50">
+                    {type === 'clinic' ? (
+                        <>
+                            <div className="relative size-14 rounded-2xl overflow-hidden border border-slate-100 shadow-sm transition-transform group-hover:scale-110 duration-500">
+                                <Image src={review.logo || '/placeholder-logo.png'} alt={review.name} fill className="object-cover" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-slate-900 tracking-tight">{review.name}</h4>
+                                <p className="text-sm text-slate-500 font-medium flex items-center gap-1">
+                                    <Building2 className="w-3 h-3" />
+                                    {review.location}
+                                </p>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="size-12 rounded-full bg-slate-900 flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform duration-500">
+                                {review.name.charAt(0)}
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-slate-900 tracking-tight">{review.name}</h4>
+                                <p className="text-sm text-slate-500 font-medium">{review.location}</p>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
-        </motion.div>
+        </Reveal>
     );
 }

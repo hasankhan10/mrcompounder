@@ -2,7 +2,23 @@ import Link from "next/link";
 import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function CallToAction() {
+interface CallToActionProps {
+    title?: React.ReactNode;
+    description?: React.ReactNode;
+    primaryBtnText?: string;
+    primaryBtnHref?: string;
+    secondaryBtnText?: string;
+    secondaryBtnHref?: string;
+}
+
+export function CallToAction({
+    title = "Ready to experience a Silent Clinic?",
+    description = "Start your 14-day free trial today. Join 100+ doctors who have already transformed their waiting rooms with Mr Compounder.",
+    primaryBtnText = "Get Started For Free",
+    primaryBtnHref = "/login",
+    secondaryBtnText = "Contact Sales",
+    secondaryBtnHref = "/contact"
+}: CallToActionProps) {
     return (
         <div className="relative mx-auto flex w-full max-w-5xl flex-col justify-between gap-y-10 border-y bg-[radial-gradient(35%_80%_at_25%_0%,theme(colors.teal.700/0.15),transparent)] px-8 py-24 overflow-hidden">
             <PlusIcon
@@ -30,19 +46,19 @@ export function CallToAction() {
 
             <div className="space-y-4">
                 <h2 className="text-center font-bold text-4xl md:text-6xl text-slate-900 tracking-tight">
-                    Ready to experience a Silent Clinic?
+                    {title}
                 </h2>
                 <p className="text-center text-slate-600 text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed">
-                    Start your 14-day free trial today. Join 100+ doctors who have already transformed their waiting rooms with Mr Compounder.
+                    {description}
                 </p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-6">
                 <Button asChild variant="outline" size="lg" className="border-teal-600/20 text-teal-700 hover:bg-teal-50 hover:text-black px-10 h-16 text-xl rounded-full">
-                    <Link href="/contact">Contact Sales</Link>
+                    <Link href={secondaryBtnHref}>{secondaryBtnText}</Link>
                 </Button>
                 <Button asChild size="lg" className="bg-teal-600 hover:bg-teal-700 text-white px-10 h-16 text-xl rounded-full shadow-xl shadow-teal-600/20">
-                    <Link href="/login">Get Started For Free <ArrowRightIcon className="size-6 ml-2 inline-block" /></Link>
+                    <Link href={primaryBtnHref}>{primaryBtnText} <ArrowRightIcon className="size-6 ml-2 inline-block" /></Link>
                 </Button>
             </div>
         </div>

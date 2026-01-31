@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -6,8 +6,7 @@ import { createClient } from '@/lib/supabase-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
 export function LoginForm() {
@@ -39,7 +38,6 @@ export function LoginForm() {
                 throw new Error('Login failed, please try again.');
             }
 
-            // After successful login, fetch the user's profile to determine their role
             const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('role, clinic_id')
@@ -54,7 +52,7 @@ export function LoginForm() {
             if (profile.role === 'super_admin') {
                 router.push('/admin');
             } else if (profile.role === 'doctor') {
-                localStorage.setItem('doctor_email', email); // For backward compatibility with existing dashboard
+                localStorage.setItem('doctor_email', email);
                 router.push('/doctor/dashboard');
             } else if (profile.role === 'compounder') {
                 if (!profile.clinic_id) {
@@ -62,7 +60,6 @@ export function LoginForm() {
                     throw new Error('No clinic associated with this account.');
                 }
 
-                // Check if clinic is active
                 const { data: clinicData, error: clinicError } = await supabase
                     .from('clinics')
                     .select('is_active')
@@ -81,7 +78,6 @@ export function LoginForm() {
 
                 router.push('/dashboard');
             } else {
-                // Default redirect if role is not recognized
                 router.push('/');
             }
 
@@ -93,31 +89,51 @@ export function LoginForm() {
     };
 
     return (
-        <Card className="w-full max-w-md shadow-2xl bg-white/80 backdrop-blur-sm border-slate-200">
-            <CardHeader className="text-center space-y-4">
-                <Link href="/" className="text-3xl font-bold text-teal-700 drop-shadow-sm">
-                    Mr. Compounder
-                </Link>
-                <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-                <CardDescription>Enter your credentials to access your dashboard.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleLogin} className="space-y-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            placeholder="your.email@example.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="bg-white"
-                        />
+        <div className="w-full max-w-md">
+            <div className="text-center mb-10">
+                <Link href="/" className="inline-flex items-center gap-2 mb-6 group">
+                    <div className="size-12 rounded-2xl bg-teal-700 flex items-center justify-center shadow-2xl shadow-teal-700/20 group-hover:scale-110 transition-transform duration-500">
+                        <Lock className="size-6 text-white" />
                     </div>
+                </Link>
+                <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Welcome Back</h1>
+                <p className="text-slate-500 font-medium tracking-tight">Access your clinical dashboard securely.</p>
+            </div>
+
+            <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-2xl shadow-slate-200/50 relative overflow-hidden">
+                {/* Decorative element */}
+                <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
+                    <ShieldCheck className="size-32" />
+                </div>
+
+                <form onSubmit={handleLogin} className="space-y-6 relative z-10">
                     <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Email Address</Label>
                         <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <Mail className="size-4 text-slate-400 mr-2" />
+                            </div>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="doctor@clinic.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="h-14 pl-11 bg-slate-50 border-slate-100 focus:bg-white focus:ring-teal-500/20 transition-all rounded-2xl font-medium"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center ml-1">
+                            <Label htmlFor="password" title="Password" className="text-xs font-bold uppercase tracking-widest text-slate-400">Password</Label>
+                            <Link href="/forgot-password" title="Forgot password" className="text-xs font-bold text-teal-600 hover:text-teal-700 transition-colors">Forgot?</Link>
+                        </div>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <Lock className="size-4 text-slate-400" />
+                            </div>
                             <Input
                                 id="password"
                                 type={showPassword ? 'text' : 'password'}
@@ -125,34 +141,48 @@ export function LoginForm() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="bg-white pr-10" // Add padding to the right for the icon
+                                className="h-14 pl-11 pr-12 bg-slate-50 border-slate-100 focus:bg-white focus:ring-teal-500/20 transition-all rounded-2xl font-medium"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 flex items-center justify-center h-full w-10 text-slate-500 hover:text-slate-700"
+                                className="absolute inset-y-0 right-0 flex items-center justify-center h-full w-12 text-slate-400 hover:text-slate-600 transition-colors"
                             >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
                     </div>
-                    {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+
+                    {error && (
+                        <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl">
+                            <p className="text-sm text-rose-600 text-center font-bold tracking-tight">{error}</p>
+                        </div>
+                    )}
+
                     <Button
                         type="submit"
-                        className="w-full text-lg py-6 bg-teal-700 text-white hover:opacity-90 transition-opacity"
+                        className="w-full h-14 bg-teal-700 text-white text-lg font-bold rounded-2xl shadow-xl shadow-teal-700/20 hover:bg-teal-800 active:scale-[0.98] transition-all disabled:opacity-70"
                         disabled={isLoading}
                     >
                         {isLoading ? (
-                            <>
-                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                Signing In...
-                            </>
+                            <span className="flex items-center gap-2 justify-center">
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                Authenticating...
+                            </span>
                         ) : (
-                            'Sign In'
+                            <span className="flex items-center gap-2 justify-center">
+                                Sign In <ArrowRight className="size-5" />
+                            </span>
                         )}
                     </Button>
                 </form>
-            </CardContent>
-        </Card>
+            </div>
+
+            <div className="mt-8 text-center">
+                <p className="text-slate-500 font-medium text-sm">
+                    New to Mr Compounder? <Link href="/contact" className="text-teal-600 font-bold hover:underline">Get a free setup</Link>
+                </p>
+            </div>
+        </div>
     );
 }

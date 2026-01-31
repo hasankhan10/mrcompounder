@@ -109,22 +109,19 @@ export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
                                     <Menu className="size-6" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="top" className="w-full border-b border-slate-100 rounded-b-[2.5rem] p-0 overflow-hidden outline-none">
+                            <SheetContent side="top" className="w-full border-b border-slate-100 rounded-b-[2.5rem] p-0 overflow-hidden outline-none transform-gpu">
                                 <div className="p-8 pt-12">
                                     <div className="flex items-center justify-between mb-10">
                                         <SheetTitle className="text-2xl font-black tracking-tighter">{APP_NAME}</SheetTitle>
-                                        <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="rounded-xl">
-                                            <X className="size-6" />
-                                        </Button>
                                     </div>
 
                                     <div className="flex flex-col gap-2 mb-10">
                                         {navLinks.map((link, i) => (
                                             <motion.div
                                                 key={link.href}
-                                                initial={{ x: -20, opacity: 0 }}
-                                                animate={{ x: 0, opacity: 1 }}
-                                                transition={{ delay: i * 0.1 }}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.1 + (i * 0.05), ease: [0.16, 1, 0.3, 1] }}
                                             >
                                                 <Link
                                                     href={link.href}

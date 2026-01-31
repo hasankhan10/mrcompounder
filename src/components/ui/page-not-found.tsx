@@ -45,7 +45,7 @@ function MessageDisplay() {
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                     <button
                         onClick={() => router.back()}
-                        className="text-white border-2 border-white/20 bg-white/5 backdrop-blur-md hover:bg-white hover:text-slate-950 transition-all duration-300 px-8 py-3.5 text-base font-bold flex items-center justify-center gap-2 rounded-full group"
+                        className="text-black border-2 border-white/20 bg-white/5 backdrop-blur-md hover:bg-white hover:text-slate-950 transition-all duration-300 px-8 py-3.5 text-base font-bold flex items-center justify-center gap-2 rounded-full group"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
