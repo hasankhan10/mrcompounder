@@ -22,7 +22,10 @@ export function InteractiveMockup() {
                 >
                     <div className="absolute -inset-0.5 bg-gradient-to-b from-teal-400/30 to-transparent rounded-[2.5rem] blur opacity-50 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
 
-                    <div className="relative bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] overflow-hidden">
+                    <div
+                        className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] overflow-hidden transform-gpu"
+                        style={{ willChange: 'transform' }}
+                    >
                         {/* Header */}
                         <div className="flex justify-between items-start mb-10">
                             <div className="space-y-1">
@@ -84,7 +87,10 @@ export function InteractiveMockup() {
                 >
                     <div className="absolute -inset-0.5 bg-gradient-to-b from-white/10 to-transparent rounded-[2rem] blur opacity-20" />
 
-                    <div className="relative bg-[#0a0a0b]/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_48px_96px_-24px_rgba(0,0,0,0.5)] overflow-hidden">
+                    <div
+                        className="relative bg-[#0a0a0b]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-[0_48px_96px_-24px_rgba(0,0,0,0.5)] overflow-hidden transform-gpu"
+                        style={{ willChange: 'transform' }}
+                    >
                         {/* Toolbar */}
                         <div className="bg-white/5 border-b border-white/5 px-6 py-4 flex items-center justify-between">
                             <div className="flex gap-1.5">

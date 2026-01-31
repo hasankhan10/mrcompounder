@@ -120,7 +120,10 @@
     }
 
     body {
-        @apply bg-background text-slate-600 min-h-screen;
+        @apply bg-background text-slate-600 min-h-screen antialiased;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        scroll-padding-top: 100px;
     }
 
     h1,
@@ -130,7 +133,14 @@
     h5,
     h6 {
         @apply text-slate-900;
+        letter-spacing: -0.02em;
     }
+}
+
+.transform-gpu {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
 }
 
 @keyframes float {

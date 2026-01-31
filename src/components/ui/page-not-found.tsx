@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 // Combined component for 404 page
 export default function NotFoundPage() {
     return (
-        <div className="w-full h-screen bg-teal-900 overflow-x-hidden flex justify-center items-center relative">
+        <div className="w-full h-screen bg-slate-950 overflow-hidden flex justify-center items-center relative">
             <MessageDisplay />
             <CharactersAnimation />
             <CircleAnimation />
@@ -28,36 +28,36 @@ function MessageDisplay() {
     }, []);
 
     return (
-        <div className="absolute flex flex-col justify-center items-center w-[90%] h-[90%] z-[100]">
+        <div className="absolute inset-x-0 inset-y-0 flex flex-col justify-center items-center z-[100] px-6">
             <div
-                className={`flex flex-col items-center transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'
+                className={`flex flex-col items-center transition-all duration-700 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                     }`}
             >
-                <div className="text-[35px] font-semibold text-teal-800 m-[1%]">
-                    Page Not Found
+                <div className="text-teal-400 font-bold tracking-widest uppercase text-xs md:text-sm mb-4">
+                    Error 404 — Page Not Found
                 </div>
-                <div className="text-[120px] font-extrabold text-teal-900 m-[1%] drop-shadow-sm">
+                <div className="text-[80px] md:text-[150px] lg:text-[200px] font-black text-white leading-none tracking-tighter drop-shadow-2xl mb-6">
                     404
                 </div>
-                <div className="text-[18px] w-1/2 min-w-[40%] text-center text-teal-700 m-[1%] font-medium">
+                <div className="text-base md:text-xl max-w-lg text-center text-slate-400 font-medium leading-relaxed mb-10">
                     The clinic or page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
                 </div>
-                <div className="flex gap-6 mt-10">
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                     <button
                         onClick={() => router.back()}
-                        className="text-teal-900 border-2 border-teal-900 hover:bg-teal-900 hover:text-white transition-all duration-300 ease-in-out px-8 py-3 h-auto text-lg font-bold flex items-center gap-2 hover:scale-105 rounded-full"
+                        className="text-white border-2 border-white/20 bg-white/5 backdrop-blur-md hover:bg-white hover:text-slate-950 transition-all duration-300 px-8 py-3.5 text-base font-bold flex items-center justify-center gap-2 rounded-full group"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
+                            width="20"
+                            height="20"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="2.5"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="transition-transform group-hover:translate-x-1"
+                            className="transition-transform group-hover:-translate-x-1"
                         >
                             <path d="m12 19-7-7 7-7" />
                             <path d="M19 12H5" />
@@ -66,19 +66,19 @@ function MessageDisplay() {
                     </button>
                     <button
                         onClick={() => router.push("/")}
-                        className="bg-teal-700 text-white hover:bg-teal-800 transition-all duration-300 ease-in-out px-8 py-3 h-auto text-lg font-bold flex items-center gap-2 hover:scale-105 rounded-full shadow-lg shadow-teal-900/20"
+                        className="bg-teal-600 text-white hover:bg-teal-500 transition-all duration-300 px-8 py-3.5 text-base font-bold flex items-center justify-center gap-2 rounded-full shadow-lg shadow-teal-500/20 group"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
+                            width="20"
+                            height="20"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="2.5"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="transition-transform group-hover:translate-x-1"
+                            className="transition-transform group-hover:scale-110"
                         >
                             <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                             <polyline points="9 22 9 12 15 12 15 22" />
@@ -154,10 +154,13 @@ function CharactersAnimation() {
             const stick = document.createElement('img');
             stick.classList.add('characters');
             stick.style.position = 'absolute';
-            stick.style.width = '18%';
-            stick.style.height = '18%';
+            // Responsive sizing for stick figures
+            const isMobile = window.innerWidth < 768;
+            const size = isMobile ? '30%' : '18%';
+            stick.style.width = size;
+            stick.style.height = 'auto';
             // Filter to make stick figures look a bit more themed (teal-ish tint)
-            stick.style.filter = 'brightness(0) saturate(100%) invert(26%) sepia(94%) saturate(613%) hue-rotate(135deg) brightness(91%) contrast(101%) opacity(0.2)';
+            stick.style.filter = 'brightness(0) saturate(100%) invert(80%) sepia(20%) saturate(1000%) hue-rotate(130deg) brightness(100%) contrast(100%) opacity(0.08)';
 
             // Set position
             if (figure.top) stick.style.top = figure.top;

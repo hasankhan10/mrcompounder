@@ -51,18 +51,6 @@ export function ForClinics() {
                             </p>
                         </Reveal>
                     </div>
-                    <Reveal width="fit-content" direction="up" delay={0.4}>
-                        <div className="flex -space-x-3">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="size-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center overflow-hidden">
-                                    <img src={`https://i.pravatar.cc/150?u=${i + 10}`} alt="doctor" className="size-full object-cover" />
-                                </div>
-                            ))}
-                            <div className="size-12 rounded-full border-4 border-white bg-teal-600 flex items-center justify-center text-white text-xs font-bold">
-                                500+
-                            </div>
-                        </div>
-                    </Reveal>
                 </div>
 
                 {/* Feature Grid */}

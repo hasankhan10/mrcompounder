@@ -100,12 +100,6 @@ export function PricingTeaser({ price }: PricingTeaserProps) {
                     </div>
                 </motion.div>
 
-                {/* Comparison Note */}
-                <div className="mt-16 text-center">
-                    <p className="text-slate-400 font-medium text-sm flex items-center justify-center gap-2">
-                        Average clinic saves over <strong className="text-slate-900">₹2,500/month</strong> compared to standard subscriptions.
-                    </p>
-                </div>
             </div>
         </section>
     );

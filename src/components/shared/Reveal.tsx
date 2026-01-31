@@ -70,6 +70,7 @@ export function Reveal({
                 variants={getVariants()}
                 initial="hidden"
                 animate={mainControls}
+                style={{ willChange: 'transform, opacity' }}
             >
                 {children}
             </motion.div>
