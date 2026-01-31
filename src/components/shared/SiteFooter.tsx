@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -11,12 +12,12 @@ import {
     ArrowRight
 } from "lucide-react";
 import { APP_NAME } from "@/lib/config";
+import { HowItWorksModal } from "./HowItWorksModal";
 
 const footerLinks = {
     product: [
-        { label: "How it Works", href: "/#how-it-works" },
+        { label: "How it Works", href: "#", isModal: true },
         { label: "Pricing", href: "/pricing" },
-        { label: "Features", href: "/#features" },
         { label: "FAQs", href: "/#faqs" },
     ],
     company: [
@@ -31,6 +32,8 @@ const footerLinks = {
 };
 
 export function SiteFooter() {
+    const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
+
     return (
         <footer className="bg-slate-950 text-slate-400 py-12 relative overflow-hidden border-t border-white/5">
             {/* Background Decorative Element */}
@@ -76,10 +79,20 @@ export function SiteFooter() {
                         <ul className="space-y-4">
                             {footerLinks.product.map((link) => (
                                 <li key={link.label}>
-                                    <Link href={link.href} className="hover:text-teal-400 transition-colors flex items-center group">
-                                        <ArrowRight className="size-3 mr-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                                        {link.label}
-                                    </Link>
+                                    {link.isModal ? (
+                                        <button
+                                            onClick={() => setIsHowItWorksOpen(true)}
+                                            className="hover:text-teal-400 transition-colors flex items-center group text-left w-full"
+                                        >
+                                            <ArrowRight className="size-3 mr-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                            {link.label}
+                                        </button>
+                                    ) : (
+                                        <Link href={link.href} className="hover:text-teal-400 transition-colors flex items-center group">
+                                            <ArrowRight className="size-3 mr-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                            {link.label}
+                                        </Link>
+                                    )}
                                 </li>
                             ))}
                         </ul>
@@ -142,6 +155,11 @@ export function SiteFooter() {
                     </div>
                 </div>
             </div>
+
+            <HowItWorksModal
+                isOpen={isHowItWorksOpen}
+                onClose={() => setIsHowItWorksOpen(false)}
+            />
         </footer>
     );
 }

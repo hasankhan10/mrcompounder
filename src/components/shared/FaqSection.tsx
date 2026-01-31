@@ -33,7 +33,7 @@ export default function FaqSection() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     return (
-        <section className="py-24 bg-white relative overflow-hidden">
+        <section id="faqs" className="py-24 bg-white relative overflow-hidden">
             {/* Subtle background element */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-slate-50 to-transparent pointer-events-none" />
 
