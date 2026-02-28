@@ -33,25 +33,28 @@ export function StartSessionCard({ doctorName, setDoctorName, doctorImage, setDo
                         <div className="mb-6">
                             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Quick Select</p>
                             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                                {recentDoctors.map((doc, idx) => (
-                                    <button
-                                        key={idx}
-                                        type="button"
-                                        onClick={() => onSelectRecent?.(doc)}
-                                        className="flex flex-col items-center min-w-[72px] group"
-                                    >
-                                        <div className="w-14 h-14 rounded-full border-2 border-slate-100 group-hover:border-teal-500 transition-colors overflow-hidden mb-1 relative">
-                                            {doc.doctor_image_url ? (
-                                                <Image src={doc.doctor_image_url} alt={doc.doctor_name} fill className="object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-lg">
-                                                    {doc.doctor_name.charAt(0)}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <span className="text-xs text-slate-600 truncate w-full text-center group-hover:text-teal-600">{doc.doctor_name}</span>
-                                    </button>
-                                ))}
+                                {recentDoctors.map((doc, idx) => {
+                                    const isSelected = doc.doctor_name === doctorName;
+                                    return (
+                                        <button
+                                            key={idx}
+                                            type="button"
+                                            onClick={() => onSelectRecent?.(doc)}
+                                            className={`flex flex-col items-center min-w-[72px] group transition-all duration-200 ${isSelected ? 'scale-105' : 'opacity-80 hover:opacity-100'}`}
+                                        >
+                                            <div className={`w-14 h-14 rounded-full border-[3px] transition-all overflow-hidden mb-1 relative ${isSelected ? 'border-teal-600 shadow-md ring-2 ring-teal-100' : 'border-slate-200 group-hover:border-teal-600'}`}>
+                                                {doc.doctor_image_url ? (
+                                                    <Image src={doc.doctor_image_url} alt={doc.doctor_name} fill className="object-cover" />
+                                                ) : (
+                                                    <div className={`w-full h-full flex items-center justify-center font-bold text-lg ${isSelected ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-400'}`}>
+                                                        {doc.doctor_name.charAt(0)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <span className={`text-xs truncate w-full px-1 text-center transition-all ${isSelected ? 'text-teal-700 font-bold' : 'text-slate-600 font-medium group-hover:text-teal-600'}`}>{doc.doctor_name}</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
