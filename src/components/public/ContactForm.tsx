@@ -71,8 +71,6 @@ export function ContactForm() {
                     <Textarea id="message" name="message" placeholder='Example: “I run an evening OPD with ~40 patients.
 I want to reduce crowding.”' value={formData.message} onChange={handleChange} rows={5} required className="mt-1 bg-white" />
                 </div>
-                {/* Gotcha field for spam protection */}
-                <Input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
 
                 <Button type="submit" className="w-full bg-teal-700 text-lg py-3 text-white hover:scale-105 transition-all" disabled={isSubmitting}>
                     {isSubmitting ? 'Sending...' : 'Request Free Setup'}
