@@ -72,6 +72,12 @@ export function ContactForm() {
 I want to reduce crowding.”' value={formData.message} onChange={handleChange} rows={5} required className="mt-1 bg-white" />
                 </div>
 
+                {/* Hidden Honeypot to trick bots without triggering server-side sensitivity */}
+                <div style={{ display: 'none' }} aria-hidden="true">
+                    <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" />
+                    <input type="hidden" name="_timestamp" value={Date.now().toString()} />
+                </div>
+
                 <Button type="submit" className="w-full bg-teal-700 text-lg py-3 text-white hover:scale-105 transition-all" disabled={isSubmitting}>
                     {isSubmitting ? 'Sending...' : 'Request Free Setup'}
                 </Button>
