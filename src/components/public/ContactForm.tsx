@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 export function ContactForm() {
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
+        phone: '',
         message: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +29,7 @@ export function ContactForm() {
         const formPayload = new FormData(event.currentTarget);
         formPayload.append("access_key", "1e4fe8c3-901f-46ab-8a40-99623595be86");
         formPayload.append("subject", `New Inquiry from ${formData.name}`);
-        formPayload.append("from_name", "MrCompounder Contact Form");
+        formPayload.append("from_name", formData.name);
 
         try {
             const response = await fetch("https://api.web3forms.com/submit", {
@@ -44,13 +44,13 @@ export function ContactForm() {
 
             if (data.success) {
                 setSubmissionStatus('success');
-                setFormData({ name: '', email: '', message: '' }); // Clear form
+                setFormData({ name: '', phone: '', message: '' }); // Clear form
                 toast.success("Message sent successfully!");
             } else {
                 setSubmissionStatus('error');
                 // Special check for spam error messages to guide the user
                 if (data.message?.toLowerCase().includes('spam')) {
-                    toast.error("Security Check: Please try refreshing or ensuring you are not using a VPN.");
+                    toast.error("Security Check: Your message was caught by the spam filter. Try changing the text slightly.");
                 } else {
                     toast.error("Error sending message: " + data.message);
                 }
@@ -73,8 +73,8 @@ export function ContactForm() {
                     <Input type="text" id="name" placeholder='Clinic/ Hospital/ Doctor/ Nursing Home Name' name="name" value={formData.name} onChange={handleChange} required className="mt-1 bg-white" />
                 </div>
                 <div>
-                    <Label htmlFor="email">Phone Number</Label>
-                    <Input type="number" id="email" placeholder='Phone Number' name="email" value={formData.email} onChange={handleChange} required className="mt-1 bg-white" />
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input type="number" id="phone" placeholder='Phone Number' name="phone" value={formData.phone} onChange={handleChange} required className="mt-1 bg-white" />
                 </div>
                 <div>
                     <Label htmlFor="message">What would you like help with?</Label>
