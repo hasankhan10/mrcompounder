@@ -28,10 +28,15 @@ export function ContactForm() {
 
         const formPayload = new FormData(event.currentTarget);
         formPayload.append("access_key", "1e4fe8c3-901f-46ab-8a40-99623595be86");
+        formPayload.append("subject", `New Inquiry from ${formData.name}`);
+        formPayload.append("from_name", "MrCompounder Contact Form");
 
         try {
             const response = await fetch("https://api.web3forms.com/submit", {
                 method: "POST",
+                headers: {
+                    "Accept": "application/json"
+                },
                 body: formPayload
             });
 
@@ -43,7 +48,12 @@ export function ContactForm() {
                 toast.success("Message sent successfully!");
             } else {
                 setSubmissionStatus('error');
-                toast.error("Error sending message: " + data.message);
+                // Special check for spam error messages to guide the user
+                if (data.message?.toLowerCase().includes('spam')) {
+                    toast.error("Security Check: Please try refreshing or ensuring you are not using a VPN.");
+                } else {
+                    toast.error("Error sending message: " + data.message);
+                }
             }
         } catch (error) {
             console.error('Failed to submit contact form:', error);
@@ -72,11 +82,9 @@ export function ContactForm() {
 I want to reduce crowding.”' value={formData.message} onChange={handleChange} rows={5} required className="mt-1 bg-white" />
                 </div>
 
-                {/* Hidden Honeypot to trick bots without triggering server-side sensitivity */}
-                <div style={{ display: 'none' }} aria-hidden="true">
-                    <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" />
-                    <input type="hidden" name="_timestamp" value={Date.now().toString()} />
-                </div>
+                {/* Hidden Honeypot to trick bots - using Web3Forms official 'botcheck' name */}
+                <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
+                <input type="hidden" name="_timestamp" value={Date.now().toString()} />
 
                 <Button type="submit" className="w-full bg-teal-700 text-lg py-3 text-white hover:scale-105 transition-all" disabled={isSubmitting}>
                     {isSubmitting ? 'Sending...' : 'Request Free Setup'}
