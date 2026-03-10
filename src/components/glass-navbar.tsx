@@ -58,7 +58,7 @@ export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
                     <Link href="/" className="flex items-center gap-3 active:scale-95 transition-transform group">
                         <div className="relative size-10 rounded-xl overflow-hidden shadow-lg group-hover:shadow-teal-500/20 transition-all duration-500">
                             <Image
-                                src="/favicon.ico"
+                                src="/logo.jpeg"
                                 alt={APP_NAME}
                                 fill
                                 className="object-cover group-hover:scale-110 transition-transform duration-500"
