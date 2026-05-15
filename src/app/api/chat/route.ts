@@ -1,9 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
-
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
-const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
+import { z } from 'zod';
 
 const SYSTEM_PROMPT = `
 You are the AI Assistant for "Mr Compounder", a Silent OPD system for clinics and hospitals.
@@ -30,42 +27,80 @@ KEY CLINIC INFO:
 Tone: Calm, structured, and helpful. Answer the user's message accordingly.
 `;
 
+// Maximum number of history messages to pass to the model (prevents token inflation)
+const MAX_HISTORY_MESSAGES = 20;
+
+// Zod schema — validates each chat message in the history array
+const chatMessageSchema = z.object({
+  role: z.enum(['user', 'model']),
+  content: z.string().min(1).max(4000),
+});
+
+// Zod schema — validates the full request body
+const chatRequestSchema = z.object({
+  message: z.string().min(1, 'Message cannot be empty').max(2000, 'Message is too long'),
+  history: z.array(chatMessageSchema).max(MAX_HISTORY_MESSAGES).optional(),
+});
+
 export async function POST(req: Request) {
-    try {
-        const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
-        if (!apiKey) {
-            return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
-        }
-
-        const { message, history } = await req.json();
-
-        // Construct the chat history for Gemini
-        // Adding system prompt as the first part of the conversation context effectively
-        const chat = model.startChat({
-            history: [
-                {
-                    role: 'user',
-                    parts: [{ text: SYSTEM_PROMPT }],
-                },
-                {
-                    role: 'model',
-                    parts: [{ text: 'Understood. I am ready to assist users with Mr Compounder.' }],
-                },
-                ...(history || []).map((msg: any) => ({
-                    role: msg.role === 'user' ? 'user' : 'model',
-                    parts: [{ text: msg.content }],
-                })),
-            ],
-        });
-
-        const result = await chat.sendMessage(message);
-        const response = await result.response;
-        const text = response.text();
-
-        return NextResponse.json({ reply: text });
-
-    } catch (error: any) {
-        console.error('Gemini API Error:', error);
-        return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
+  try {
+    // 1. API Key Guard — fail fast before any processing
+    const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
     }
+
+    // 2. Validate request body
+    let body: z.infer<typeof chatRequestSchema>;
+    try {
+      const json = await req.json();
+      const parsed = chatRequestSchema.safeParse(json);
+      if (!parsed.success) {
+        return NextResponse.json(
+          { error: parsed.error.issues[0].message },
+          { status: 400 }
+        );
+      }
+      body = parsed.data;
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    // 3. Initialize model inside the handler so it always uses the live API key
+    //    and works correctly in serverless/edge cold-start environments.
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
+
+    // 4. Cap history to the last N messages to prevent prompt injection & token inflation
+    const safeHistory = (body.history ?? []).slice(-MAX_HISTORY_MESSAGES);
+
+    // 5. Construct chat with system prompt baked in as the first exchange
+    const chat = model.startChat({
+      history: [
+        {
+          role: 'user',
+          parts: [{ text: SYSTEM_PROMPT }],
+        },
+        {
+          role: 'model',
+          parts: [{ text: 'Understood. I am ready to assist users with Mr Compounder.' }],
+        },
+        ...safeHistory.map((msg) => ({
+          role: msg.role,
+          parts: [{ text: msg.content }],
+        })),
+      ],
+    });
+
+    const result = await chat.sendMessage(body.message);
+    const response = await result.response;
+    const text = response.text();
+
+    return NextResponse.json({ reply: text });
+
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('Gemini API Error:', message);
+    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
+  }
 }
