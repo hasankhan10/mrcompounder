@@ -178,6 +178,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
   const [newClinicEmail, setNewClinicEmail] = useState('');
   const [newClinicPassword, setNewClinicPassword] = useState('');
   const [newClinicOwnerEmail, setNewClinicOwnerEmail] = useState('');
+  const [newClinicPricePerPatient, setNewClinicPricePerPatient] = useState('1.00');
   const [editClinicLogoUrl, setEditClinicLogoUrl] = useState('');
   const [formIsLoading, setFormIsLoading] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -241,7 +242,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         compounderEmail: newClinicEmail,
         compounderPassword: newClinicPassword,
         logoUrl,
-        ownerEmail: newClinicOwnerEmail || undefined // Pass owner email if provided
+        ownerEmail: newClinicOwnerEmail || undefined, // Pass owner email if provided
+        pricePerPatient: parseFloat(newClinicPricePerPatient) || 1.0
       });
       setClinics(prev => {
         if (prev.some(c => c.id === newClinic.id)) return prev;
@@ -258,6 +260,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
       setNewClinicEmail('');
       setNewClinicPassword('');
       setNewClinicOwnerEmail('');
+      setNewClinicPricePerPatient('1.00');
       toast.success('Clinic created successfully');
 
     } catch (err: unknown) {
@@ -276,6 +279,7 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     setNewClinicLocation(clinic.location || '');
     setNewClinicContactNumber(clinic.contact_number || '');
     setEditClinicLogoUrl(clinic.logo_url || '');
+    setNewClinicPricePerPatient(clinic.price_per_patient !== undefined ? clinic.price_per_patient.toString() : '1.00');
     setNewClinicPassword('');
     setNewClinicLogo(null);
     setIsEditModalOpen(true);
@@ -312,7 +316,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         location: newClinicLocation,
         contactNumber: newClinicContactNumber,
         logoUrl: logoUrl,
-        password: newClinicPassword || undefined
+        password: newClinicPassword || undefined,
+        pricePerPatient: parseFloat(newClinicPricePerPatient) || undefined
       });
       setClinics(clinics.map(c => c.id === updatedClinic.id ? updatedClinic : c));
       setIsEditModalOpen(false);
@@ -522,6 +527,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
 
         ownerEmail={newClinicOwnerEmail}
         setOwnerEmail={setNewClinicOwnerEmail}
+        pricePerPatient={newClinicPricePerPatient}
+        setPricePerPatient={setNewClinicPricePerPatient}
       />
 
       {/* Delete Clinic Alert */}
@@ -566,6 +573,8 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
         setLogoFile={setNewClinicLogo}
         password={newClinicPassword}
         setPassword={setNewClinicPassword}
+        pricePerPatient={newClinicPricePerPatient}
+        setPricePerPatient={setNewClinicPricePerPatient}
       />
 
       <DeleteClinicAlert

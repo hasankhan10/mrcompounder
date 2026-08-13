@@ -109,14 +109,17 @@ export async function PATCH(
       return NextResponse.json(updatedClinic);
     }
 
-    // 5. Handle General Info Update (Name, Slug, Logo, Location, Contact Number) & Password
-    if (body.name || body.slug || body.logoUrl || body.location || body.contactNumber || body.password) {
-      const updateData: Record<string, string> = {};
+    // 5. Handle General Info Update (Name, Slug, Logo, Location, Contact Number, Price Per Patient) & Password
+    if (body.name || body.slug || body.logoUrl || body.location || body.contactNumber || body.password || body.pricePerPatient !== undefined) {
+      const updateData: Record<string, string | number> = {};
       if (body.name) updateData.name = body.name;
       if (body.slug) updateData.slug = body.slug;
       if (body.logoUrl) updateData.logo_url = body.logoUrl;
       if (body.location) updateData.location = body.location;
       if (body.contactNumber) updateData.contact_number = body.contactNumber; // Added contact_number
+      if (body.pricePerPatient !== undefined && body.pricePerPatient !== null && !isNaN(Number(body.pricePerPatient))) {
+        updateData.price_per_patient = Number(body.pricePerPatient);
+      }
 
       // Update Clinic Table
       if (Object.keys(updateData).length > 0) {

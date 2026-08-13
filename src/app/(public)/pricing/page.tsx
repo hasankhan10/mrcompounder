@@ -93,17 +93,16 @@ export default async function PricingPage() {
                                             <h2 className="text-3xl font-black text-slate-900 mb-6">Simple, Fair Billing</h2>
 
                                             <div className="flex items-baseline gap-2 mb-8">
-                                                <span className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter">₹{price}</span>
-                                                <span className="text-xl text-slate-500 font-bold">/ patient</span>
+                                                <span className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter">Pay As You Go</span>
                                             </div>
 
                                             <div className="space-y-4 mb-10">
                                                 {[
+                                                    "Custom Per-Patient Rate Tailored to Your Clinic",
                                                     "Unlimited Doctors & Staff",
                                                     "All Premium Features Included",
                                                     "14-Day Full Free Trial",
-                                                    "No Monthly Subscriptions",
-                                                    "No Hidden Implementation Fees"
+                                                    "No Monthly Subscriptions or Hidden Fees"
                                                 ].map((item, i) => (
                                                     <div key={i} className="flex items-center gap-3">
                                                         <div className="size-5 rounded-full bg-teal-500/10 flex items-center justify-center">
@@ -116,7 +115,7 @@ export default async function PricingPage() {
 
                                             <Button asChild size="lg" className="bg-teal-600 hover:bg-teal-700 text-white text-lg font-bold h-14 rounded-2xl shadow-xl shadow-teal-500/20 active:scale-95 transition-all w-full">
                                                 <Link href="/contact" className="flex items-center gap-2 justify-center">
-                                                    Book Free Setup <ArrowRight className="size-5" />
+                                                    Book Free Setup & Custom Rate <ArrowRight className="size-5" />
                                                 </Link>
                                             </Button>
                                         </div>
@@ -131,7 +130,7 @@ export default async function PricingPage() {
                                                 <div className="space-y-4">
                                                     <h3 className="text-2xl font-black tracking-tight">How it works</h3>
                                                     <p className="text-slate-400 font-medium leading-relaxed">
-                                                        Run your OPD normally. At the end of the month, we calculate the tokens generated.
+                                                        Run your OPD normally. Each clinic gets a custom per-patient rate agreed during onboarding. At the end of the month, we calculate tokens served at your specific rate.
                                                     </p>
                                                 </div>
 
@@ -143,12 +142,12 @@ export default async function PricingPage() {
                                                             <span className="font-bold">500 total</span>
                                                         </div>
                                                         <div className="flex justify-between text-sm">
-                                                            <span className="text-slate-400">Cost at ₹{price} / patient</span>
-                                                            <span className="font-bold">₹{price} × 500</span>
+                                                            <span className="text-slate-400">Custom Clinic Rate</span>
+                                                            <span className="font-bold">e.g. ₹2.00 / patient</span>
                                                         </div>
                                                         <div className="pt-2 border-t border-white/10 flex justify-between">
                                                             <span className="text-white font-bold">Actual Monthly Bill</span>
-                                                            <span className="text-2xl font-black text-teal-400 tracking-tighter">₹{(parseInt(price) * 500).toLocaleString()}</span>
+                                                            <span className="text-2xl font-black text-teal-400 tracking-tighter">₹1,000</span>
                                                         </div>
                                                     </div>
                                                 </div>

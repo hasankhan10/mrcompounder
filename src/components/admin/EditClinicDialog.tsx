@@ -25,12 +25,14 @@ interface EditClinicDialogProps {
     setLogoFile: (file: File | null) => void;
     password: string;
     setPassword: (val: string) => void;
+    pricePerPatient: string;
+    setPricePerPatient: (val: string) => void;
 }
 
 export function EditClinicDialog({
     isOpen, onOpenChange, onSubmit, isLoading,
     name, setName, slug, setSlug, location, setLocation, contactNumber, setContactNumber, logoUrl, logoFile, setLogoFile,
-    password, setPassword
+    password, setPassword, pricePerPatient, setPricePerPatient
 }: EditClinicDialogProps) {
     const [showPassword, setShowPassword] = useState(false);
 
@@ -63,6 +65,19 @@ export function EditClinicDialog({
                     <div className="grid gap-2">
                         <Label htmlFor="edit-contactNumber">Contact Number</Label>
                         <Input id="edit-contactNumber" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} placeholder="e.g. +91 9876543210" />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="edit-pricePerPatient">Price Per Patient (₹)</Label>
+                        <Input
+                            id="edit-pricePerPatient"
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            value={pricePerPatient}
+                            onChange={(e) => setPricePerPatient(e.target.value)}
+                            placeholder="e.g. 2.00"
+                        />
                     </div>
 
                     <div className="grid gap-2">

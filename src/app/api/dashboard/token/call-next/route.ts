@@ -82,10 +82,10 @@ export async function POST(request: NextRequest) {
 
     // BILLING LOGIC: Add to current_due for served token
     if (served) {
-      // 1. Get current balance AND trial status
+      // 1. Get current balance, trial status, and custom price_per_patient
       const { data: clinic } = await supabaseAdmin // Always use admin for billing writes
         .from('clinics')
-        .select('current_due, trial_end_date')
+        .select('current_due, trial_end_date, price_per_patient')
         .eq('id', served.clinic_id)
         .maybeSingle();
 
@@ -93,18 +93,10 @@ export async function POST(request: NextRequest) {
         const isTrialActive = clinic.trial_end_date && new Date(clinic.trial_end_date) > new Date();
 
         if (!isTrialActive) {
-          // 2. Determine Cost Per Patient (Default 1)
-          let costPerPatient = 1;
-          const { data: setting } = await supabaseAdmin
-            .from('system_settings')
-            .select('value')
-            .eq('key', 'cost_per_patient')
-            .single();
-
-          if (setting?.value) {
-            const parsed = parseFloat(setting.value);
-            if (!isNaN(parsed)) costPerPatient = parsed;
-          }
+          // 2. Determine Cost Per Patient for this specific clinic (Default 1)
+          const costPerPatient = typeof clinic.price_per_patient === 'number' && !isNaN(Number(clinic.price_per_patient))
+            ? Number(clinic.price_per_patient)
+            : 1;
 
           const currentDue = clinic.current_due || 0;
           const newDue = currentDue + costPerPatient;

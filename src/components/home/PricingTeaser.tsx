@@ -52,12 +52,11 @@ export function PricingTeaser({ price }: PricingTeaserProps) {
                             <div className="flex flex-col items-center text-center">
                                 <div className="mb-10">
                                     <div className="flex items-center justify-center gap-1 mb-2">
-                                        <span className="text-3xl font-bold text-slate-400">₹</span>
-                                        <span className="text-9xl font-black text-teal-600 tracking-tighter drop-shadow-sm select-none">
-                                            {price}
+                                        <span className="text-5xl md:text-7xl font-black text-teal-600 tracking-tighter drop-shadow-sm select-none">
+                                            Pay As You Go
                                         </span>
                                     </div>
-                                    <p className="text-2xl font-bold text-slate-800 tracking-tight">Per Patient Served</p>
+                                    <p className="text-2xl font-bold text-slate-800 tracking-tight">Custom Per-Patient Rate Per Clinic</p>
                                 </div>
 
                                 <div className="max-w-md mb-12 space-y-4">

@@ -38,6 +38,7 @@ export function ClinicTable({
                         <TableHead>Location</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Served Today</TableHead>
+                        <TableHead>Rate / Pt</TableHead>
                         <TableHead>Current Bill</TableHead>
                         <TableHead>Trial Period</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -46,7 +47,7 @@ export function ClinicTable({
                 <TableBody>
                     {clinics.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={7} className="h-24 text-center text-slate-500">
+                            <TableCell colSpan={8} className="h-24 text-center text-slate-500">
                                 No clinics found.
                             </TableCell>
                         </TableRow>
@@ -93,6 +94,11 @@ export function ClinicTable({
                                 <TableCell>
                                     <div className="font-medium text-slate-900 pl-4">
                                         {clinic.served_today_count || 0}
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <div className="font-medium text-teal-700 bg-teal-50 px-2 py-1 rounded inline-block text-xs">
+                                        ₹{clinic.price_per_patient ?? 1}/pt
                                     </div>
                                 </TableCell>
                                 <TableCell>

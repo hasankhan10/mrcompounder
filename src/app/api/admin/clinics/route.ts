@@ -44,11 +44,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const body: CreateClinicRequest = await request.json();
-    const { name, slug, compounderEmail, compounderPassword, logoUrl, location, contactNumber, ownerEmail } = body;
+    const { name, slug, compounderEmail, compounderPassword, logoUrl, location, contactNumber, ownerEmail, pricePerPatient } = body;
 
     // Validate required fields
-    if (!name || !slug || !compounderEmail || !compounderPassword) {
-      return new NextResponse(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
+    if (!name || !slug || !compounderEmail || !compounderPassword || pricePerPatient === undefined || pricePerPatient === null || isNaN(Number(pricePerPatient)) || Number(pricePerPatient) <= 0) {
+      return new NextResponse(JSON.stringify({ error: 'Missing required fields or invalid price per patient' }), { status: 400 });
     }
 
     // 2. Create the Compounder User (Auth)
@@ -78,6 +78,7 @@ export async function POST(request: NextRequest) {
         contact_number: contactNumber || null,
         owner_email: ownerEmail || null, // Map ownerEmail to DB field
         current_due: 0,
+        price_per_patient: Number(pricePerPatient),
         logo_url: logoUrl || null,
         is_active: true,
       })

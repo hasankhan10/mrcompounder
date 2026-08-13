@@ -28,6 +28,7 @@ export interface Clinic {
   owner_email?: string; // Grouping ID for Doctor Dashboard
   logo_url?: string;
   current_due: number;
+  price_per_patient?: number;
   is_active: boolean;
   trial_start_date?: string; // timestamp
   trial_end_date?: string; // timestamp
@@ -139,6 +140,7 @@ export interface CreateClinicRequest {
   location?: string;
   contactNumber?: string;
   initialBalance: number;
+  pricePerPatient: number;
   compounderEmail: string;
   compounderPassword: string;
   logoUrl?: string;
@@ -169,6 +171,7 @@ export interface UpdateClinicRequest {
   logoUrl?: string;
   password?: string;
   ownerEmail?: string; // Allow updating the owner
+  pricePerPatient?: number;
 }
 export type UpdateClinicResponse = Clinic;
 

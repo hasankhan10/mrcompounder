@@ -27,12 +27,14 @@ interface CreateClinicDialogProps {
     setPassword: (val: string) => void;
     ownerEmail: string;
     setOwnerEmail: (val: string) => void;
+    pricePerPatient: string;
+    setPricePerPatient: (val: string) => void;
 }
 
 export function CreateClinicDialog({
     isOpen, onOpenChange, onSubmit, isLoading,
     name, setName, slug, setSlug, location, setLocation, contactNumber, setContactNumber, logoFile, setLogoFile,
-    email, setEmail, password, setPassword, ownerEmail, setOwnerEmail
+    email, setEmail, password, setPassword, ownerEmail, setOwnerEmail, pricePerPatient, setPricePerPatient
 }: CreateClinicDialogProps) {
     const [showPassword, setShowPassword] = useState(false);
 
@@ -67,6 +69,21 @@ export function CreateClinicDialog({
                     <div className="grid gap-2">
                         <Label htmlFor="contactNumber">Contact Number</Label>
                         <Input id="contactNumber" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} placeholder="e.g. +91 9876543210" />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="pricePerPatient">Price Per Patient (₹) <span className="text-red-500">*</span></Label>
+                        <Input
+                            id="pricePerPatient"
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            value={pricePerPatient}
+                            onChange={(e) => setPricePerPatient(e.target.value)}
+                            placeholder="e.g. 2.00"
+                            required
+                        />
+                        <p className="text-xs text-slate-500">Custom charge applied to this clinic per served patient.</p>
                     </div>
 
                     <div className="grid gap-2">
