@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Smartphone, Signal, Phone, Zap, WifiOff } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
 
@@ -67,13 +64,9 @@ export function NetworkResilience() {
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                     {features.map((feature, index) => (
-                        <motion.div
+                        <div
                             key={index}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.8, delay: feature.delay, ease: [0.16, 1, 0.3, 1] }}
-                            className="group relative"
+                            className="group relative transition-transform duration-300 hover:-translate-y-2"
                         >
                             {/* Card Glow Background */}
                             <div className="absolute inset-0 bg-teal-500/0 group-hover:bg-teal-500/5 rounded-[2rem] transition-colors duration-500" />
@@ -97,7 +90,7 @@ export function NetworkResilience() {
                                 {/* Interactive Shimmer on Hover */}
                                 <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-teal-400/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 

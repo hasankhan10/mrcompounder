@@ -34,13 +34,30 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
   const [lastServedTokenNumber, setLastServedTokenNumber] = useState<number>(0);
   const [queue, setQueue] = useState<Queue | null>(activeQueue);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const alarmIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const playAlarm = () => {
+  const stopAlarm = useCallback(() => {
+    if (alarmIntervalRef.current) {
+      clearInterval(alarmIntervalRef.current);
+      alarmIntervalRef.current = null;
+    }
+    if (audioCtxRef.current) {
+      try {
+        audioCtxRef.current.close().catch(() => {});
+      } catch {
+        // Ignore close errors on already closed context
+      }
+      audioCtxRef.current = null;
+    }
+  }, []);
+
+  const playAlarm = useCallback(() => {
     try {
       const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioContextClass) return;
+
+      stopAlarm();
 
       const ctx = new AudioContextClass();
       audioCtxRef.current = ctx;
@@ -64,49 +81,43 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
       oscillator.start();
 
       // Loop the beep every 1 second
-      const loopInterval = setInterval(() => {
-        if (ctx.state === 'closed') {
-          clearInterval(loopInterval);
+      alarmIntervalRef.current = setInterval(() => {
+        if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+          if (alarmIntervalRef.current) {
+            clearInterval(alarmIntervalRef.current);
+            alarmIntervalRef.current = null;
+          }
           return;
         }
-        const osc = ctx.createOscillator();
-        const gn = ctx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(880, ctx.currentTime);
-        osc.frequency.setValueAtTime(1760, ctx.currentTime + 0.5);
-        gn.gain.setValueAtTime(0.5, ctx.currentTime);
-        gn.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-        gn.gain.setValueAtTime(0.5, ctx.currentTime + 0.5);
-        gn.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.0);
-        osc.connect(gn);
-        gn.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 1);
+        try {
+          const osc = audioCtxRef.current.createOscillator();
+          const gn = audioCtxRef.current.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(880, audioCtxRef.current.currentTime);
+          osc.frequency.setValueAtTime(1760, audioCtxRef.current.currentTime + 0.5);
+          gn.gain.setValueAtTime(0.5, audioCtxRef.current.currentTime);
+          gn.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 0.5);
+          gn.gain.setValueAtTime(0.5, audioCtxRef.current.currentTime + 0.5);
+          gn.gain.exponentialRampToValueAtTime(0.01, audioCtxRef.current.currentTime + 1.0);
+          osc.connect(gn);
+          gn.connect(audioCtxRef.current.destination);
+          osc.start();
+          osc.stop(audioCtxRef.current.currentTime + 1);
+        } catch {
+          // Ignore transient oscillator errors
+        }
       }, 1000);
-
-      (window as unknown as { alarmInterval: NodeJS.Timeout }).alarmInterval = loopInterval;
-
     } catch (e) {
       console.error('Alarm error', e);
     }
-  };
+  }, [stopAlarm]);
 
-  const stopAlarm = () => {
-    if ((window as unknown as { alarmInterval: NodeJS.Timeout }).alarmInterval) {
-      clearInterval((window as unknown as { alarmInterval: NodeJS.Timeout }).alarmInterval);
-    }
-    if (audioCtxRef.current) {
-      audioCtxRef.current.close();
-      audioCtxRef.current = null;
-    }
-  };
-
-  // Preload Audio
+  // Clean up alarm on unmount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      audioRef.current = new Audio('/alert-sound.mp3');
-    }
-  }, []);
+    return () => {
+      stopAlarm();
+    };
+  }, [stopAlarm]);
 
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [lastServedTokens, setLastServedTokens] = useState<Token[]>([]);
@@ -295,18 +306,27 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
     };
   }, [queue, supabase, useRealtime]); // Depend on useRealtime for handover
 
-  const enableAudio = () => {
+  const unlockAudio = useCallback(() => {
     try {
-      // Method 1: Try to load the file (for the actual alarm later)
-      if (audioRef.current) {
-        audioRef.current.load();
-      }
-
-      // Method 2: Web Audio API (The 100% Fix)
-      // We create a silent oscillator to force the browser's audio engine to wake up.
       const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
-        const ctx = new AudioContextClass();
+        if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+          audioCtxRef.current = new AudioContextClass();
+        }
+        if (audioCtxRef.current.state === 'suspended') {
+          audioCtxRef.current.resume();
+        }
+      }
+    } catch (err) {
+      console.warn('Audio context unlock failed:', err);
+    }
+  }, []);
+
+  const enableAudio = () => {
+    try {
+      unlockAudio();
+      if (audioCtxRef.current) {
+        const ctx = audioCtxRef.current;
         const oscillator = ctx.createOscillator();
         const gainNode = ctx.createGain();
 
@@ -315,25 +335,22 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
         gainNode.connect(ctx.destination);
 
         oscillator.start(0);
-        setTimeout(() => oscillator.stop(), 100); // Play for 100ms
+        setTimeout(() => {
+          try {
+            oscillator.stop();
+          } catch {
+            // Ignore if already stopped
+          }
+        }, 100);
 
         setAudioEnabled(true);
         toast.success("Audio Alerts Enabled! Keep this tab open.");
-      } else {
-        // Fallback for very old browsers
-        if (audioRef.current) {
-          audioRef.current.play().then(() => {
-            audioRef.current?.pause();
-            setAudioEnabled(true);
-          }).catch(e => console.error(e));
-        }
       }
     } catch (err) {
       console.error("Audio enable failed:", err);
       toast.error("Could not enable audio. Please try again.");
     }
   };
-
 
   // Auto-login on mount
   useEffect(() => {
@@ -348,13 +365,7 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
     e.preventDefault();
 
     // Unlock Audio Context (User Interaction) - Critical for Mobile
-    if (audioRef.current) {
-      audioRef.current.load(); // Force load
-      audioRef.current.play().then(() => {
-        audioRef.current?.pause();
-        audioRef.current!.currentTime = 0;
-      }).catch(err => console.warn('Audio unlock failed (expected if no interaction):', err));
-    }
+    unlockAudio();
 
     if (!phone || !/^\d{10}$/.test(phone)) {
       setError('Please enter a valid 10-digit mobile number.');
@@ -426,12 +437,7 @@ export function PatientQueueClient({ initialData }: PatientQueueClientProps) {
         bookings={bookings}
         onSelect={(b) => {
           // Unlock Audio Context
-          if (audioRef.current) {
-            audioRef.current.play().then(() => {
-              audioRef.current?.pause();
-              audioRef.current!.currentTime = 0;
-            }).catch(err => console.warn('Audio unlock failed:', err));
-          }
+          unlockAudio();
 
           setMyToken(b.token);
           setQueue(b.queue);

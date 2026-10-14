@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus, HelpCircle } from 'lucide-react';
 import { APP_NAME } from '@/lib/config';
@@ -45,7 +46,7 @@ export default function FaqSection() {
                         </div>
                         <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight mb-8">
                             Got Questions? <br />
-                            <span className="text-teal-600">We've Got Answers.</span>
+                            <span className="text-teal-600">We&apos;ve Got Answers.</span>
                         </h2>
                     </Reveal>
                 </div>
@@ -94,8 +95,8 @@ export default function FaqSection() {
                 <Reveal width="100%" direction="up" delay={0.4}>
                     <div className="mt-24 text-center">
                         <p className="text-slate-400 font-medium italic">
-                            Couldn't find what you were looking for?
-                            <a href="/contact" className="ml-2 text-teal-600 font-bold hover:underline">Contact our support team</a>
+                            Couldn&apos;t find what you were looking for?
+                            <Link href="/contact" className="ml-2 text-teal-600 font-bold hover:underline">Contact our support team</Link>
                         </p>
                     </div>
                 </Reveal>

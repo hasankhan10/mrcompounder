@@ -1,4 +1,4 @@
-import { APP_NAME, APP_DESCRIPTION } from '@/lib/config';
+import { APP_NAME } from '@/lib/config';
 
 export function JsonLd() {
     const softwareLd = {

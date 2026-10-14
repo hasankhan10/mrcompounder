@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Zap, TrendingUp, BarChart3, Building2, UserCheck, ShieldCheck } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
 
@@ -56,15 +53,11 @@ export function ForClinics() {
                 {/* Feature Grid */}
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
                     {ownerFeatures.map((feature, index) => (
-                        <motion.div
+                        <div
                             key={index}
-                            initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                            className="flex items-start gap-8 group p-6 rounded-[2rem] hover:bg-slate-50 transition-colors duration-500"
+                            className="flex items-start gap-8 group p-6 rounded-[2rem] hover:bg-slate-50 transition-colors duration-300"
                         >
-                            <div className={`size-16 rounded-2xl ${feature.color} flex items-center justify-center text-white shadow-xl shadow-${feature.color.split('-')[1]}-500/20 group-hover:rotate-6 transition-transform duration-300`}>
+                            <div className={`size-16 rounded-2xl ${feature.color} flex items-center justify-center text-white shadow-xl group-hover:rotate-6 transition-transform duration-300`}>
                                 {feature.icon}
                             </div>
                             <div className="flex-1">
@@ -75,7 +68,7 @@ export function ForClinics() {
                                     {feature.desc}
                                 </p>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 

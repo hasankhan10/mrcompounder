@@ -18,7 +18,7 @@ interface ReportsTabProps {
     clinicId: string;
 }
 
-export function ReportsTab({ clinicId }: ReportsTabProps) {
+export function ReportsTab({ clinicId: _clinicId }: ReportsTabProps) {
     const [reportType, setReportType] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
     const [dateValue, setDateValue] = useState<string>(new Date().toISOString().slice(0, 7)); // Default to current month
     const [isGenerating, setIsGenerating] = useState(false);

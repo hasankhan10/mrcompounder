@@ -31,6 +31,26 @@ export async function POST(request: NextRequest) {
         }
 
         dbClient = supabaseAdmin;
+    } else {
+        // Authenticated compounder: verify ownership
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('clinic_id')
+            .eq('id', user.id)
+            .single();
+
+        if (profile?.clinic_id) {
+            const { data: queueOwnership } = await supabase
+                .from('queues')
+                .select('id')
+                .eq('id', sessionId)
+                .eq('clinic_id', profile.clinic_id)
+                .maybeSingle();
+
+            if (!queueOwnership) {
+                return new NextResponse(JSON.stringify({ error: 'Session not found or access denied' }), { status: 403 });
+            }
+        }
     }
 
     // 2. Update Queue Status

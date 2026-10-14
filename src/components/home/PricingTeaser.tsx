@@ -1,16 +1,13 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { PartyPopper, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Reveal } from "@/components/shared/Reveal";
 
 interface PricingTeaserProps {
-    price: string | number;
+    price?: string | number;
 }
 
-export function PricingTeaser({ price }: PricingTeaserProps) {
+export function PricingTeaser({ price: _price }: PricingTeaserProps = {}) {
     return (
         <section className="py-24 bg-slate-50 relative overflow-hidden">
             {/* Background radial gradients for depth */}
@@ -31,13 +28,7 @@ export function PricingTeaser({ price }: PricingTeaserProps) {
                     </Reveal>
                 </div>
 
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="max-w-3xl mx-auto"
-                >
+                <div className="max-w-3xl mx-auto">
                     <div className="relative group">
                         {/* Animated Glow Border */}
                         <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-teal-400 rounded-[3rem] blur opacity-10 group-hover:opacity-30 transition duration-1000 group-hover:duration-200" />
@@ -62,7 +53,7 @@ export function PricingTeaser({ price }: PricingTeaserProps) {
                                 <div className="max-w-md mb-12 space-y-4">
                                     <p className="text-lg text-slate-500 font-medium leading-relaxed">
                                         Tired of paying for expensive software that you barely use?
-                                        Our "Pay-as-you-see" model ensures you only pay when you earn.
+                                        Our &ldquo;Pay-as-you-see&rdquo; model ensures you only pay when you earn.
                                     </p>
 
                                     <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 pt-6">
@@ -97,7 +88,7 @@ export function PricingTeaser({ price }: PricingTeaserProps) {
                             <div className="absolute top-0 -inset-x-full h-full w-1/2 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-25deg] group-hover:animate-shimmer pointer-events-none" />
                         </div>
                     </div>
-                </motion.div>
+                </div>
 
             </div>
         </section>

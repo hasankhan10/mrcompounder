@@ -5,11 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { NavbarAuth } from "@/components/navbar-auth";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { User } from "@supabase/supabase-js";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -32,10 +32,16 @@ export function GlassNavbar({ initialUser, initialRole }: GlassNavbarProps) {
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
+        let lastScrolled = false;
         const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
+            const isScrolled = window.scrollY > 20;
+            if (isScrolled !== lastScrolled) {
+                lastScrolled = isScrolled;
+                setScrolled(isScrolled);
+            }
         };
-        window.addEventListener("scroll", handleScroll);
+        handleScroll();
+        window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 

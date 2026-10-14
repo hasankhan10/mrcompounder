@@ -19,9 +19,6 @@ export function ChatBot() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
 
-    // Hide on Guest Queue pages
-    if (pathname?.startsWith('/q/')) return null;
-
     const [messages, setMessages] = useState<Message[]>([
         { role: 'bot', content: 'Hi there! 👋 How can I help you with Mr Compounder today?' }
     ]);
@@ -80,6 +77,9 @@ export function ChatBot() {
         }
     };
 
+    // Hide on Guest Queue pages
+    if (pathname?.startsWith('/q/')) return null;
+
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             <AnimatePresence>
@@ -110,7 +110,6 @@ export function ChatBot() {
                         {/* Messages */}
                         <div
                             className="h-[400px] overflow-y-auto p-4 bg-slate-50 relative overscroll-contain"
-                            data-lenis-prevent
                         >
                             <div className="space-y-4">
                                 {messages.map((msg, idx) => (

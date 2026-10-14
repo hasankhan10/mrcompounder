@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { Reveal } from '@/components/shared/Reveal';
 import { HeroActions } from '@/components/home/HeroActions';

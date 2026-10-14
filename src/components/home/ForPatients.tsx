@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Check, Clock, MapPin, Bell, ShieldCheck } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
 
@@ -44,7 +41,7 @@ export function ForPatients() {
                     </Reveal>
                     <Reveal width="100%" direction="up" delay={0.2}>
                         <p className="text-xl text-slate-500 font-medium leading-relaxed">
-                            We've redesigned the waiting experience to respect your time and health.
+                            We&apos;ve redesigned the waiting experience to respect your time and health.
                             No crowding, no shouting, just a calm and organized visit.
                         </p>
                     </Reveal>
@@ -52,14 +49,9 @@ export function ForPatients() {
 
                 <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
                     {items.map((item, index) => (
-                        <motion.div
+                        <div
                             key={index}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-                            className="group"
+                            className="group transition-transform duration-200 hover:-translate-y-1"
                         >
                             <div className="relative h-full bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden">
                                 {/* Checkmark Badge */}
@@ -84,7 +76,7 @@ export function ForPatients() {
                                 {/* Bottom Glass Glow */}
                                 <div className="absolute -bottom-10 -right-10 size-32 bg-teal-400/5 rounded-full blur-2xl group-hover:bg-teal-400/20 transition-all duration-500" />
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 

@@ -65,8 +65,10 @@ const useMorphingText = (texts: string[]) => {
 
     useEffect(() => {
         let animationFrameId: number;
+        let isVisible = true;
 
         const animate = () => {
+            if (!isVisible) return;
             animationFrameId = requestAnimationFrame(animate);
 
             const newTime = new Date();
@@ -79,9 +81,34 @@ const useMorphingText = (texts: string[]) => {
             else doCooldown();
         };
 
-        animate();
+        const targetEl = text1Ref.current;
+        let observer: IntersectionObserver | null = null;
+
+        if (typeof window !== 'undefined' && 'IntersectionObserver' in window && targetEl) {
+            observer = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting) {
+                        isVisible = true;
+                        timeRef.current = new Date();
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = requestAnimationFrame(animate);
+                    } else {
+                        isVisible = false;
+                        cancelAnimationFrame(animationFrameId);
+                    }
+                },
+                { threshold: 0 }
+            );
+            observer.observe(targetEl);
+        } else {
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
         return () => {
             cancelAnimationFrame(animationFrameId);
+            if (observer && targetEl) {
+                observer.unobserve(targetEl);
+            }
         };
     }, [doMorph, doCooldown]);
 
@@ -134,6 +161,7 @@ const MorphingText: React.FC<MorphingTextProps> = ({ texts, className }) => (
         )}
     >
         <Texts texts={texts} />
+        <SvgFilters />
     </div>
 );
 

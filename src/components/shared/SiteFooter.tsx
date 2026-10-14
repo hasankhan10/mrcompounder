@@ -58,7 +58,7 @@ export function SiteFooter() {
                         </Link>
                         <p className="text-sm leading-relaxed max-w-xs">
                             Revolutionizing Indian healthcare waiting rooms with zero-friction automation.
-                            Built for doctors who value their time and their patients' peace of mind.
+                            Built for doctors who value their time and their patients&apos; peace of mind.
                         </p>
                         <div className="flex items-center gap-4">
                             <a href="https://wa.me/+917001717263" target="_blank" rel="noopener noreferrer" className="size-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-teal-600 hover:border-teal-600 transition-all duration-300">

@@ -31,6 +31,10 @@ export function useRealtimeDashboard({
 }: UseRealtimeDashboardProps) {
 
     const clinicId = clinic?.id;
+    const selectedQueueIdRef = useRef(selectedQueueId);
+    useEffect(() => {
+        selectedQueueIdRef.current = selectedQueueId;
+    }, [selectedQueueId]);
 
     // Real-time subscription for clinic updates
     useEffect(() => {
@@ -91,7 +95,7 @@ export function useRealtimeDashboard({
                                 return [updatedQueue, ...prev];
                             });
 
-                            if (selectedQueueId === updatedQueue.id) {
+                            if (selectedQueueIdRef.current === updatedQueue.id) {
                                 setSelectedQueueId(null);
                                 toast.info(updatedQueue.status === 'cancelled' ? 'Session cancelled.' : 'Session ended.');
                             }
@@ -111,7 +115,7 @@ export function useRealtimeDashboard({
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [clinicId, supabase, router, selectedQueueId, setClinic, setActiveQueues, setPastSessions, setSelectedQueueId]);
+    }, [clinicId, supabase, router, setClinic, setActiveQueues, setPastSessions, setSelectedQueueId]);
 
     // Real-time tokens subscription (Global for this clinic's active queues)
     const pendingUpdates = useRef<{ type: string, payload: unknown }[]>([]);

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Hind_Siliguri } from "next/font/google";
 import { Toaster } from 'sonner';
-import { APP_NAME, APP_DESCRIPTION } from '@/lib/config';
+import { APP_NAME } from '@/lib/config';
 import { Analytics } from "@vercel/analytics/react";
 import { JsonLd } from '@/components/seo/JsonLd';
 import "./globals.css";

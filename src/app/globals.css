@@ -111,15 +111,16 @@
         @apply border-border;
     }
 
-    html,
-    body {
-        overflow-x: hidden !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        position: relative;
+    html {
+        overflow-x: clip;
+        scroll-behavior: smooth;
     }
 
     body {
+        overflow-x: clip;
+        width: 100%;
+        max-width: 100%;
+        position: relative;
         @apply bg-background text-slate-600 min-h-screen antialiased;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;

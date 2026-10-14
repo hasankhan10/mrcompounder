@@ -5,8 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Quote, Building2, User, Sparkles, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { Reveal } from '@/components/shared/Reveal';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { APP_NAME } from '@/lib/config';
 import { CallToAction } from '@/components/ui/cta-3';
 

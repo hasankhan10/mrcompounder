@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Plus, User, Bell, Play } from "lucide-react";
 
@@ -12,19 +9,13 @@ export function InteractiveMockup() {
 
             <div className="flex flex-col lg:flex-row items-center justify-center gap-12 w-full max-w-6xl px-4">
                 {/* Patient View Card (Apple-style Glassmorphism) */}
-                <motion.div
-                    initial={{ opacity: 0, y: 40, rotateX: 10 }}
-                    whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    viewport={{ once: true }}
-                    whileHover={{ y: -10, transition: { duration: 0.3 } }}
-                    className="relative group w-full max-w-sm"
+                <div
+                    className="relative group w-full max-w-sm transition-transform duration-300 hover:-translate-y-2"
                 >
                     <div className="absolute -inset-0.5 bg-gradient-to-b from-teal-400/30 to-transparent rounded-[2.5rem] blur opacity-50 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
 
                     <div
-                        className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] overflow-hidden transform-gpu"
-                        style={{ willChange: 'transform' }}
+                        className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-8 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] overflow-hidden"
                     >
                         {/* Header */}
                         <div className="flex justify-between items-start mb-10">
@@ -48,11 +39,7 @@ export function InteractiveMockup() {
                                 </div>
                             </div>
 
-                            <motion.div
-                                animate={{ scale: [1, 1.02, 1] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="bg-white/5 border border-white/10 rounded-2xl p-6"
-                            >
+                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                                 <div className="flex items-center justify-between mb-2">
                                     <p className="text-teal-300 text-sm font-bold uppercase tracking-widest">Your Turn</p>
                                     <Bell className="size-4 text-teal-400 animate-bounce" />
@@ -60,36 +47,26 @@ export function InteractiveMockup() {
                                 <div className="flex items-center gap-3">
                                     <span className="text-4xl font-extrabold text-white">B12</span>
                                     <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
-                                        <motion.div
-                                            initial={{ width: "0%" }}
-                                            whileInView={{ width: "80%" }}
-                                            transition={{ duration: 1.5, delay: 0.5 }}
-                                            className="h-full bg-teal-400"
-                                        />
+                                        <div className="h-full bg-teal-400 w-[80%]" />
                                     </div>
                                 </div>
                                 <p className="text-white/40 text-xs mt-3 font-medium">~6 mins estimated wait time</p>
-                            </motion.div>
+                            </div>
                         </div>
 
                         {/* Bottom Notch Reflection */}
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/3 h-1 bg-white/20 rounded-t-xl" />
                     </div>
-                </motion.div>
+                </div>
 
                 {/* Dashboard Card (Pro Glass Design) */}
-                <motion.div
-                    initial={{ opacity: 0, y: 60, rotateX: -5 }}
-                    whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                    viewport={{ once: true }}
-                    className="relative group w-full max-w-lg"
+                <div
+                    className="relative group w-full max-w-lg transition-transform duration-300 hover:-translate-y-2"
                 >
                     <div className="absolute -inset-0.5 bg-gradient-to-b from-white/10 to-transparent rounded-[2rem] blur opacity-20" />
 
                     <div
-                        className="relative bg-[#0a0a0b]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-[0_48px_96px_-24px_rgba(0,0,0,0.5)] overflow-hidden transform-gpu"
-                        style={{ willChange: 'transform' }}
+                        className="relative bg-[#0a0a0b]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-[0_48px_96px_-24px_rgba(0,0,0,0.5)] overflow-hidden"
                     >
                         {/* Toolbar */}
                         <div className="bg-white/5 border-b border-white/5 px-6 py-4 flex items-center justify-between">
@@ -160,7 +137,7 @@ export function InteractiveMockup() {
                         {/* Glass light sweep */}
                         <div className="absolute -inset-x-full top-0 h-px bg-gradient-to-r from-transparent via-teal-400/30 to-transparent animate-shimmer" />
                     </div>
-                </motion.div>
+                </div>
             </div>
         </div>
     );

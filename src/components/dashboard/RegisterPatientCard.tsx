@@ -123,9 +123,10 @@ export function RegisterPatientCard({
                                 <Select
                                     value={selectedLocationId || ""}
                                     onValueChange={setSelectedLocationId}
+                                    disabled={isLoadingLocations}
                                 >
                                     <SelectTrigger className="text-lg bg-white border-blue-300 focus:ring-blue-500">
-                                        <SelectValue placeholder="Choose Room/Location" />
+                                        <SelectValue placeholder={isLoadingLocations ? "Loading locations..." : "Choose Room/Location"} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {locations.map(loc => (

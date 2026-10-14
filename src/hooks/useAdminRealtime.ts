@@ -7,7 +7,6 @@ interface UseAdminRealtimeProps {
     supabase: SupabaseClient;
     setClinics: (updater: (prev: Clinic[]) => Clinic[]) => void;
     setStats: (updater: (prev: AdminStats) => AdminStats) => void;
-    activeTab: string;
     fetchStats: (showLoading?: boolean) => Promise<void>;
     fetchClinicStats: () => Promise<void>;
 }
@@ -16,7 +15,6 @@ export function useAdminRealtime({
     supabase,
     setClinics,
     setStats,
-    activeTab,
     fetchStats,
     fetchClinicStats
 }: UseAdminRealtimeProps) {
@@ -124,5 +122,5 @@ export function useAdminRealtime({
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [supabase, activeTab, fetchStats, fetchClinicStats, setClinics]);
+    }, [supabase, fetchStats, fetchClinicStats, setClinics]);
 }

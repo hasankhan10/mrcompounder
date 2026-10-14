@@ -133,7 +133,6 @@ export function AdminClient({ initialClinics }: AdminClientProps) {
     supabase,
     setClinics,
     setStats,
-    activeTab,
     fetchStats,
     fetchClinicStats
   });

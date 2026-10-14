@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,7 @@ export function LocationsTab({ clinicId }: LocationsTabProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [supabase] = useState(() => createClient());
 
-    const fetchLocations = async () => {
+    const fetchLocations = useCallback(async () => {
         try {
             const { data, error } = await supabase
                 .from('clinic_locations')
@@ -35,13 +35,13 @@ export function LocationsTab({ clinicId }: LocationsTabProps) {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [clinicId, supabase]);
 
     useEffect(() => {
         if (clinicId) {
             fetchLocations();
         }
-    }, [clinicId]);
+    }, [clinicId, fetchLocations]);
 
     const handleAddLocation = async (e: React.FormEvent) => {
         e.preventDefault();

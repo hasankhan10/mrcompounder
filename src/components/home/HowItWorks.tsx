@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { QrCode, Play, BellRing } from "lucide-react";
 import { Reveal } from "@/components/shared/Reveal";
 
@@ -45,7 +42,7 @@ export function HowItWorks() {
                     <Reveal width="100%" direction="up" delay={0.2}>
                         <p className="text-xl text-slate-500 font-medium leading-relaxed">
                             We replaced the chaos of shouting names with a sophisticated,
-                            automated calling system that works on every patient's phone.
+                            automated calling system that works on every patient&apos;s phone.
                         </p>
                     </Reveal>
                 </div>
@@ -55,14 +52,9 @@ export function HowItWorks() {
                     <div className="hidden md:block absolute top-[20%] left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-teal-100 to-transparent z-0" />
 
                     {steps.map((step, index) => (
-                        <motion.div
+                        <div
                             key={index}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: index * 0.2, ease: [0.16, 1, 0.3, 1] }}
-                            whileHover={{ y: -12 }}
-                            className="relative group z-10"
+                            className="relative group z-10 transition-transform duration-300 hover:-translate-y-2"
                         >
                             <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} rounded-[3rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
 
@@ -91,7 +83,7 @@ export function HowItWorks() {
                                     </p>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 
@@ -100,7 +92,7 @@ export function HowItWorks() {
                     <div className="mt-24 text-center">
                         <div className="inline-flex flex-col items-center p-8 bg-teal-50 rounded-[2rem] border border-teal-100/50">
                             <p className="text-teal-800 font-bold mb-2">Designed for Indian clinics with zero learning curve.</p>
-                            <p className="text-teal-600/70 text-xl font-medium italic">"It's like a calling bell for every patient's pocket."</p>
+                            <p className="text-teal-600/70 text-xl font-medium italic">&ldquo;It&apos;s like a calling bell for every patient&apos;s pocket.&rdquo;</p>
                         </div>
                     </div>
                 </Reveal>
